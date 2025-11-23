@@ -142,7 +142,10 @@ export abstract class AcceptanceTestBase {
     });
 
     try {
+      // 💡 LOG DE DEBUGGING AÑADIDO
+      console.log(`[TEST] Intentando conectar a MASTER para eliminar BD: ${this.MSSQL_HOST}:${this.MSSQL_PORT}`); 
       await masterConnection.connect();
+      
       // Asegurar que no haya conexiones activas a la BD antes de eliminarla
       await masterConnection.request().query(`ALTER DATABASE ${this.testDbName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
       await masterConnection.request().query(`DROP DATABASE IF EXISTS ${this.testDbName}`);

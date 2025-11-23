@@ -7,11 +7,13 @@ describe('Workers E2E - Create Worker Acceptance Test', () => {
 
   let testCase: WorkersAcceptanceTest;
 
+  // Aumentar el timeout a 60 segundos (60000ms) para dar tiempo a Testcontainers
+  // y a la inicialización de la aplicación Nest.
   beforeAll(async () => {
     testCase = new WorkersAcceptanceTest();
     await testCase.setupDatabase();
     await testCase.setupApplication();
-  });
+  }, 60000); // <-- Timeout aumentado aquí
 
   afterAll(async () => {
     await testCase.teardown();
@@ -49,10 +51,10 @@ describe('Workers E2E - Create Worker Acceptance Test', () => {
       expect(result.recordset).toHaveLength(1);
       
       const workerFromDb = result.recordset[0];
-      expect(workerFromDb.first_name).toBe(newWorker.firstName);
-      expect(workerFromDb.last_name).toBe(newWorker.lastName);
-      expect(workerFromDb.document_number).toBe(newWorker.documentNumber);
-      expect(workerFromDb.date_of_birth).toBeDefined();
+      expect(workerFromDb.firstName).toBe(newWorker.firstName);
+      expect(workerFromDb.lastName).toBe(newWorker.lastName);
+      expect(workerFromDb.documentNumber).toBe(newWorker.documentNumber);
+      expect(workerFromDb.dateOfBirth).toBeDefined();
     });
   });
 });

@@ -13,13 +13,15 @@ export const migration: IMigration = {
           updatedAt DATETIME2 DEFAULT GETUTCDATE()
       );
 
-      CREATE INDEX idx_workers_document ON workers(document_number);
-      CREATE INDEX idx_workers_created_at ON workers(created_at);
+      -- CORRECCIÓN: Usar los nombres de columna definidos arriba (camelCase) para los índices
+      CREATE INDEX idx_workers_document ON workers(documentNumber);
+      CREATE INDEX idx_workers_created_at ON workers(createdAt);
     `);
   },
 
   async down(request) {
     await request.batch(`
+      -- Asegurarse de que el DOWN también usa los nombres correctos para los índices (aunque no es estrictamente necesario si la tabla se cae)
       DROP INDEX IF EXISTS idx_workers_created_at ON workers;
       DROP INDEX IF EXISTS idx_workers_document ON workers;
       DROP TABLE IF EXISTS workers;
