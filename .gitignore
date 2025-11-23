@@ -54,3 +54,30 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Database
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE specific
+*.swp
+*.swo
+*~
+.vscode-test
+.history/
+
+# Package manager lock files (optional, depends on team preference)
+# pnpm-lock.yaml
+# yarn.lock
+
+# macOS
+.AppleDouble
+.AppleDB
+Thumbs.db

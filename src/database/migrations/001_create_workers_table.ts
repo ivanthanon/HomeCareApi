@@ -5,12 +5,12 @@ export const migration: IMigration = {
     await request.batch(`
       CREATE TABLE workers (
           id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-          first_name NVARCHAR(255) NOT NULL,
-          last_name NVARCHAR(255) NOT NULL,
-          document_number NVARCHAR(50) UNIQUE NOT NULL,
-          date_of_birth DATE NOT NULL,
-          created_at DATETIME2 DEFAULT GETUTCDATE(),
-          updated_at DATETIME2 DEFAULT GETUTCDATE()
+          firstName NVARCHAR(255) NOT NULL,
+          lastName NVARCHAR(255) NOT NULL,
+          documentNumber NVARCHAR(50) UNIQUE NOT NULL,
+          dateOfBirth DATE NOT NULL,
+          createdAt DATETIME2 DEFAULT GETUTCDATE(),
+          updatedAt DATETIME2 DEFAULT GETUTCDATE()
       );
 
       CREATE INDEX idx_workers_document ON workers(document_number);

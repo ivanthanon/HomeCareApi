@@ -1,7 +1,7 @@
 import sql from 'mssql';
-import { dbConfig } from './config';
+import { connectionString } from './config';
 
-export const pool = new sql.ConnectionPool(dbConfig);
+export const pool = new sql.ConnectionPool(connectionString);
 
 export const connectToDatabase = async (): Promise<void> => {
   try {

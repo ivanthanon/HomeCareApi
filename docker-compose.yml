@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mssql:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    container_name: HomeCareDB
+    hostname: homecare-db
+    ports:
+      - "1433:1433"
+    expose:
+      - "1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - homecare-network
+    environment:
+      SA_PASSWORD: "HomeCare2025"
+      MSSQL_AGENT_ENABLED: "true"
+    restart: unless-stopped
+
+volumes:
+  mssql_data:
+
+networks:
+  homecare-network:
+    driver: bridge
