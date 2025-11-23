@@ -1,0 +1,30 @@
+{
+  "development": {
+    "server": "localhost",
+    "port": 1433,
+    "user": "sa",
+    "password": "YourPassword123",
+    "database": "homecare_db",
+    "authentication": {
+      "type": "default"
+    },
+    "options": {
+      "encrypt": true,
+      "trustServerCertificate": true
+    }
+  },
+  "production": {
+    "server": "your-prod-server",
+    "port": 1433,
+    "user": "prod_user",
+    "password": "prod_password",
+    "database": "homecare_prod",
+    "authentication": {
+      "type": "default"
+    },
+    "options": {
+      "encrypt": true,
+      "trustServerCertificate": false
+    }
+  }
+}
