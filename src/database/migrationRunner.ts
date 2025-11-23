@@ -1,14 +1,23 @@
 import fs from 'fs';
 import path from 'path';
-import { pool } from './connection';
+import type { ConnectionPool } from 'mssql';
 import { IMigration } from './IMigration';
 
 export class MigrationRunner {
   private migrationsPath = path.join(__dirname, 'migrations');
   private migrationsTable = '__migrations__';
+  private pool: ConnectionPool;
+
+  constructor(pool: ConnectionPool) {
+    if (!pool) {
+      throw new Error('MigrationRunner requires a mssql ConnectionPool instance');
+    }
+
+    this.pool = pool;
+  }
 
   async initialize(): Promise<void> {
-    const request = pool.request();
+    const request = this.pool.request();
     await request.query(`
       IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '${this.migrationsTable}')
       BEGIN
@@ -36,7 +45,7 @@ export class MigrationRunner {
           const filePath = path.join(this.migrationsPath, file);
           const { migration } = await import(filePath);
           
-          const request = pool.request();
+          const request = this.pool.request();
           await migration.up(request);
           
           await this.markMigrationAsExecuted(file);
@@ -65,7 +74,7 @@ export class MigrationRunner {
       const filePath = path.join(this.migrationsPath, lastMigration.name);
       const { migration } = await import(filePath);
       
-      const request = pool.request();
+      const request = this.pool.request();
       await migration.down(request);
       
       await this.unmarkMigration(lastMigration.name);
@@ -77,7 +86,7 @@ export class MigrationRunner {
   }
 
   private async isMigrationExecuted(name: string): Promise<boolean> {
-    const request = pool.request();
+    const request = this.pool.request();
     const result = await request
       .input('name', name)
       .query(`SELECT * FROM ${this.migrationsTable} WHERE name = @name`);
@@ -86,21 +95,21 @@ export class MigrationRunner {
   }
 
   private async markMigrationAsExecuted(name: string): Promise<void> {
-    const request = pool.request();
+    const request = this.pool.request();
     await request
       .input('name', name)
       .query(`INSERT INTO ${this.migrationsTable} (name) VALUES (@name)`);
   }
 
   private async unmarkMigration(name: string): Promise<void> {
-    const request = pool.request();
+    const request = this.pool.request();
     await request
       .input('name', name)
       .query(`DELETE FROM ${this.migrationsTable} WHERE name = @name`);
   }
 
   private async getLastExecutedMigration(): Promise<{ name: string } | null> {
-    const request = pool.request();
+    const request = this.pool.request();
     const result = await request.query(`
       SELECT TOP 1 name FROM ${this.migrationsTable} ORDER BY executed_at DESC
     `);

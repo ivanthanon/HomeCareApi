@@ -6,7 +6,7 @@ async function run() {
 
   try {
     await connectToDatabase();
-    const migrationRunner = new MigrationRunner();
+    const migrationRunner = new MigrationRunner(pool);
 
     if (command === 'up') {
       await migrationRunner.runMigrations();
