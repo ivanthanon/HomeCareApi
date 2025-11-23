@@ -9,49 +9,54 @@ export abstract class AcceptanceTestBase {
   protected dbConnection: sql.ConnectionPool;
   protected testDbName = `test_homecare_${Date.now()}`;
 
-  private readonly MSSQL_HOST = process.env.MSSQL_HOST || 'localhost';
-  private readonly MSSQL_PORT = parseInt(process.env.MSSQL_PORT || '1434');
-  private readonly MSSQL_USER = process.env.MSSQL_USER || 'sa';
-  private readonly MSSQL_PASSWORD = process.env.MSSQL_PASSWORD || 'HomeCare2025';
+  // Las propiedades son 'protected' para permitir la asignación del puerto dinámico
+  protected MSSQL_HOST = process.env.MSSQL_HOST || 'localhost';
+  protected MSSQL_PORT = parseInt(process.env.MSSQL_PORT || '1434');
+  protected readonly MSSQL_USER = process.env.MSSQL_USER || 'sa';
+  protected readonly MSSQL_PASSWORD = process.env.MSSQL_PASSWORD || 'HomeCare2025';
+
   private testContainer: StartedTestContainer | null = null;
 
   /**
-   * Prepara la BD de test: crea BD nueva y ejecuta migraciones
+   * Prepara la BD de test: inicia el contenedor, crea BD nueva y ejecuta migraciones.
+   * La base de datos de test siempre se levanta en un contenedor.
    */
   async setupDatabase(): Promise<void> {
     console.log(`[TEST] Creando base de datos de test: ${this.testDbName}`);
+    console.log(`[TEST] Configuración de conexión inicial: ${this.MSSQL_HOST}:${this.MSSQL_PORT}`);
 
-    // Si se solicita, levantar un contenedor MSSQL para pruebas
-    if (process.env.USE_TESTCONTAINER === 'true') {
-      console.log('[TEST] Iniciando contenedor de SQL Server para tests...');
 
-      const image = process.env.MSSQL_IMAGE || 'mcr.microsoft.com/mssql/server:2019-latest';
+    // INICIO DEL CONTENEDOR (YA NO ES CONDICIONAL)
+    console.log('[TEST] Iniciando contenedor de SQL Server para tests...');
 
-      const container = await new GenericContainer(image)
-        .withEnvironment({ ACCEPT_EULA: 'Y', SA_PASSWORD: this.MSSQL_PASSWORD })
-        .withExposedPorts(1433)
-        .start();
+    const image = process.env.MSSQL_IMAGE || 'mcr.microsoft.com/mssql/server:2019-latest';
 
-      this.testContainer = container;
+    const container = await new GenericContainer(image)
+      .withEnvironment({ ACCEPT_EULA: 'Y', SA_PASSWORD: this.MSSQL_PASSWORD })
+      .withExposedPorts(1433)
+      .start();
 
-      const host = container.getHost();
-      const port = container.getMappedPort(1433);
+    this.testContainer = container;
 
-      // Reemplazar los valores de conexión para apuntar al contenedor
-      (this as any).MSSQL_HOST = host;
-      (this as any).MSSQL_PORT = port;
+    const host = container.getHost();
+    const port = container.getMappedPort(1433);
 
-      console.log(`[TEST] Contenedor iniciado en ${host}:${port}`);
+    // Reemplazar los valores de conexión con los del contenedor dinámico
+    this.MSSQL_HOST = host;
+    this.MSSQL_PORT = port;
 
-      // Esperar a que SQL Server acepte conexiones (reintentos)
-      await this.waitForSqlServer(host, port, this.MSSQL_USER, this.MSSQL_PASSWORD);
-      console.log('[TEST] Contenedor SQL Server listo');
-    }
+    console.log(`[TEST] Contenedor iniciado en ${host}:${port}`);
+
+    // Esperar a que SQL Server acepte conexiones (reintentos)
+    await this.waitForSqlServer(host, port, this.MSSQL_USER, this.MSSQL_PASSWORD);
+    console.log('[TEST] Contenedor SQL Server listo');
+    // FIN DEL CONTENEDOR
+
 
     // 1. Conectar a master para crear la BD
     const masterConnection = new sql.ConnectionPool({
-      server: (this as any).MSSQL_HOST,
-      port: (this as any).MSSQL_PORT,
+      server: this.MSSQL_HOST, // Usando la propiedad actualizada del contenedor
+      port: this.MSSQL_PORT,   // Usando la propiedad actualizada del contenedor
       user: this.MSSQL_USER,
       password: this.MSSQL_PASSWORD,
       database: 'master',
@@ -71,8 +76,8 @@ export abstract class AcceptanceTestBase {
 
     // 2. Conectar a la BD de test
     this.dbConnection = new sql.ConnectionPool({
-      server: (this as any).MSSQL_HOST,
-      port: (this as any).MSSQL_PORT,
+      server: this.MSSQL_HOST, 
+      port: this.MSSQL_PORT,   
       user: this.MSSQL_USER,
       password: this.MSSQL_PASSWORD,
       database: this.testDbName,
@@ -122,8 +127,8 @@ export abstract class AcceptanceTestBase {
 
     // Eliminar BD de test
     const masterConnection = new sql.ConnectionPool({
-      server: (this as any).MSSQL_HOST,
-      port: (this as any).MSSQL_PORT,
+      server: this.MSSQL_HOST, // Usando el host/puerto del contenedor
+      port: this.MSSQL_PORT,   // Usando el host/puerto del contenedor
       user: this.MSSQL_USER,
       password: this.MSSQL_PASSWORD,
       database: 'master',
@@ -138,6 +143,8 @@ export abstract class AcceptanceTestBase {
 
     try {
       await masterConnection.connect();
+      // Asegurar que no haya conexiones activas a la BD antes de eliminarla
+      await masterConnection.request().query(`ALTER DATABASE ${this.testDbName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
       await masterConnection.request().query(`DROP DATABASE IF EXISTS ${this.testDbName}`);
       await masterConnection.close();
       console.log(`[TEST] ✓ BD de test eliminada`);
