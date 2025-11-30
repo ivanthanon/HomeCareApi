@@ -6,7 +6,7 @@ import { AppModule } from '../../src/app.module';
 
 const testContainerSettings = require('./testContainerSettings.json');
 
-interface ITestContainerConfig {
+interface TestContainerConfig {
   sqlServer: {
     image: string;
     exposedPort: number;
@@ -22,13 +22,13 @@ interface ITestContainerConfig {
   };
 }
 
-const ITestContainerConfig = testContainerSettings as ITestContainerConfig;
+const TestContainerConfig = testContainerSettings as TestContainerConfig;
 
 export abstract class AcceptanceTestBase {
   protected app: INestApplication;
   protected dbConnection: sql.ConnectionPool;
   
-  protected testDbName = `${ITestContainerConfig.databaseConfig.testDbName}_${Date.now()}`;
+  protected testDbName = `${TestContainerConfig.databaseConfig.testDbName}_${Date.now()}`;
   private host: string;
   private port: number;
   private password = `Password${crypto.randomUUID()}!`;
@@ -36,19 +36,19 @@ export abstract class AcceptanceTestBase {
   private testContainer: StartedTestContainer | null = null;
 
   async setupDatabase(): Promise<void> {
-    const container = await new GenericContainer(ITestContainerConfig.sqlServer.image)
+    const container = await new GenericContainer(TestContainerConfig.sqlServer.image)
       .withEnvironment({ 
-        ...ITestContainerConfig.sqlServer.environment,
+        ...TestContainerConfig.sqlServer.environment,
         SA_PASSWORD: this.password 
       })
-      .withExposedPorts(ITestContainerConfig.sqlServer.exposedPort) 
-      .withWaitStrategy(Wait.forLogMessage(new RegExp(ITestContainerConfig.sqlServer.waitStrategy.message))) 
+      .withExposedPorts(TestContainerConfig.sqlServer.exposedPort) 
+      .withWaitStrategy(Wait.forLogMessage(new RegExp(TestContainerConfig.sqlServer.waitStrategy.message))) 
       .start();
 
     this.testContainer = container;
 
     this.host = container.getHost();
-    this.port = container.getMappedPort(ITestContainerConfig.sqlServer.exposedPort);
+    this.port = container.getMappedPort(TestContainerConfig.sqlServer.exposedPort);
 
     console.log(`[TEST] Container live. Host: ${this.host}, Port: ${this.port}, Pass: ${this.password.substring(0, 5)}...`);
 
@@ -66,11 +66,11 @@ export abstract class AcceptanceTestBase {
     return {
       server: this.host,
       port: this.port,
-      user: ITestContainerConfig.sqlServer.user, 
+      user: TestContainerConfig.sqlServer.user, 
       password: this.password,
       database: database,
       authentication: { type: 'default' },
-      options: ITestContainerConfig.databaseConfig.connectionOptions,
+      options: TestContainerConfig.databaseConfig.connectionOptions,
     };
   }
 
