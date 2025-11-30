@@ -6,7 +6,7 @@ import { AppModule } from '../../src/app.module';
 
 const testContainerSettings = require('./testContainerSettings.json');
 
-interface ITestContainerConfig {
+interface TestContainerConfig {
   sqlServer: {
     image: string;
     exposedPort: number;
@@ -22,7 +22,7 @@ interface ITestContainerConfig {
   };
 }
 
-const TestContainerConfig = testContainerSettings as ITestContainerConfig;
+const TestContainerConfig = testContainerSettings as TestContainerConfig;
 
 export abstract class AcceptanceTestBase {
   protected app: INestApplication;
