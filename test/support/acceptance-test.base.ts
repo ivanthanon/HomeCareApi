@@ -1,236 +1,130 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import sql from 'mssql';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
+import sql, { config as SqlConfig } from 'mssql';
+import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers'; 
 import { AppModule } from '../../src/app.module';
+
+const testContainerSettings = require('./testContainerSettings.json');
+
+interface ITestContainerConfig {
+  sqlServer: {
+    image: string;
+    exposedPort: number;
+    environment: Record<string, string>;
+    waitStrategy: {
+      message: string;
+    };
+    user: string;
+  };
+  databaseConfig: {
+    connectionOptions: SqlConfig['options'];
+    testDbName: string;
+  };
+}
+
+const TestContainerConfig = testContainerSettings as ITestContainerConfig;
 
 export abstract class AcceptanceTestBase {
   protected app: INestApplication;
   protected dbConnection: sql.ConnectionPool;
-  protected testDbName = `test_homecare_${Date.now()}`;
-
-  // Las propiedades son 'protected' para permitir la asignación del puerto dinámico
-  protected MSSQL_HOST = process.env.MSSQL_HOST || 'localhost';
-  protected MSSQL_PORT = parseInt(process.env.MSSQL_PORT || '1434');
-  protected readonly MSSQL_USER = process.env.MSSQL_USER || 'sa';
-  protected readonly MSSQL_PASSWORD = process.env.MSSQL_PASSWORD || 'HomeCare2025';
+  
+  protected testDbName = `${TestContainerConfig.databaseConfig.testDbName}_${Date.now()}`;
+  private host: string;
+  private port: number;
+  private password = `Password${crypto.randomUUID()}!`;
 
   private testContainer: StartedTestContainer | null = null;
 
-  /**
-   * Prepara la BD de test: inicia el contenedor, crea BD nueva y ejecuta migraciones.
-   * La base de datos de test siempre se levanta en un contenedor.
-   */
   async setupDatabase(): Promise<void> {
-    console.log(`[TEST] Creando base de datos de test: ${this.testDbName}`);
-    console.log(`[TEST] Configuración de conexión inicial: ${this.MSSQL_HOST}:${this.MSSQL_PORT}`);
-
-
-    // INICIO DEL CONTENEDOR (YA NO ES CONDICIONAL)
-    console.log('[TEST] Iniciando contenedor de SQL Server para tests...');
-
-    const image = process.env.MSSQL_IMAGE || 'mcr.microsoft.com/mssql/server:2019-latest';
-
-    const container = await new GenericContainer(image)
-      .withEnvironment({ ACCEPT_EULA: 'Y', SA_PASSWORD: this.MSSQL_PASSWORD })
-      .withExposedPorts(1433)
+    const container = await new GenericContainer(TestContainerConfig.sqlServer.image)
+      .withEnvironment({ 
+        ...TestContainerConfig.sqlServer.environment,
+        SA_PASSWORD: this.password 
+      })
+      .withExposedPorts(TestContainerConfig.sqlServer.exposedPort) 
+      .withWaitStrategy(Wait.forLogMessage(new RegExp(TestContainerConfig.sqlServer.waitStrategy.message))) 
       .start();
 
     this.testContainer = container;
 
-    const host = container.getHost();
-    const port = container.getMappedPort(1433);
+    this.host = container.getHost();
+    this.port = container.getMappedPort(TestContainerConfig.sqlServer.exposedPort);
 
-    // Reemplazar los valores de conexión con los del contenedor dinámico
-    this.MSSQL_HOST = host;
-    this.MSSQL_PORT = port;
+    console.log(`[TEST] Container live. Host: ${this.host}, Port: ${this.port}, Pass: ${this.password.substring(0, 5)}...`);
 
-    console.log(`[TEST] Contenedor iniciado en ${host}:${port}`);
-
-    // Esperar a que SQL Server acepte conexiones (reintentos)
-    await this.waitForSqlServer(host, port, this.MSSQL_USER, this.MSSQL_PASSWORD);
-    console.log('[TEST] Contenedor SQL Server listo');
-    // FIN DEL CONTENEDOR
-
-
-    // 1. Conectar a master para crear la BD
-    const masterConnection = new sql.ConnectionPool({
-      server: this.MSSQL_HOST, // Usando la propiedad actualizada del contenedor
-      port: this.MSSQL_PORT,   // Usando la propiedad actualizada del contenedor
-      user: this.MSSQL_USER,
-      password: this.MSSQL_PASSWORD,
-      database: 'master',
-      authentication: {
-        type: 'default',
-      },
-      options: {
-        encrypt: true,
-        trustServerCertificate: true,
-      },
-    });
-
-    await masterConnection.connect();
-    await masterConnection.request().query(`CREATE DATABASE ${this.testDbName}`);
-    await masterConnection.close();
-    console.log(`[TEST] ✓ Base de datos ${this.testDbName} creada`);
-
-    // 2. Conectar a la BD de test
-    this.dbConnection = new sql.ConnectionPool({
-      server: this.MSSQL_HOST, 
-      port: this.MSSQL_PORT,   
-      user: this.MSSQL_USER,
-      password: this.MSSQL_PASSWORD,
-      database: this.testDbName,
-      authentication: {
-        type: 'default',
-      },
-      options: {
-        encrypt: true,
-        trustServerCertificate: true,
-      },
-    });
-
+    await this.createTestDatabase();
+    const dbConfig = this.getConnectionConfig(this.testDbName);
+    this.dbConnection = new sql.ConnectionPool(dbConfig);
     await this.dbConnection.connect();
-    console.log(`[TEST] ✓ Conectado a BD de test`);
 
-    // 3. Ejecutar migraciones
+    console.log(`[TEST] ✓ Connected to dynamic DB: ${this.testDbName}`);
+
     await this.runMigrations();
   }
 
-  /**
-   * Inicializa la aplicación Nest
-   */
+  private getConnectionConfig(database: string): SqlConfig {
+    return {
+      server: this.host,
+      port: this.port,
+      user: TestContainerConfig.sqlServer.user, 
+      password: this.password,
+      database: database,
+      authentication: { type: 'default' },
+      options: TestContainerConfig.databaseConfig.connectionOptions,
+    };
+  }
+
+  private async createTestDatabase(): Promise<void> {
+    const masterConfig = this.getConnectionConfig('master');
+    const masterPool = new sql.ConnectionPool(masterConfig);
+    
+    await masterPool.connect();
+    await masterPool.request().query(`CREATE DATABASE ${this.testDbName}`);
+    await masterPool.close();
+  }
+
+  private async runMigrations(): Promise<void> {
+    const { MigrationRunner } = await import('../../src/database/migrationRunner');
+    const migrationRunner = new MigrationRunner(this.dbConnection);
+    await migrationRunner.runMigrations();
+    console.log('[TEST] ✓ Migrations applied correctly');
+  }
+
   async setupApplication(): Promise<void> {
-    console.log('[TEST] Inicializando aplicación Nest...');
+    console.log('[TEST] Initializing Nest application...');
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     this.app = moduleFixture.createNestApplication();
     await this.app.init();
-    console.log('[TEST] ✓ Aplicación Nest inicializada');
+    console.log('[TEST] ✓ Nest application initialized');
   }
 
-  /**
-   * Limpia recursos (BD, app)
-   */
   async teardown(): Promise<void> {
-    console.log('[TEST] Limpiando recursos...');
+    if (this.app) await this.app.close();
+    if (this.dbConnection) await this.dbConnection.close();
 
-    if (this.app) {
-      await this.app.close();
-    }
-
-    if (this.dbConnection) {
-      await this.dbConnection.close();
-    }
-
-    // Eliminar BD de test
-    const masterConnection = new sql.ConnectionPool({
-      server: this.MSSQL_HOST, // Usando el host/puerto del contenedor
-      port: this.MSSQL_PORT,   // Usando el host/puerto del contenedor
-      user: this.MSSQL_USER,
-      password: this.MSSQL_PASSWORD,
-      database: 'master',
-      authentication: {
-        type: 'default',
-      },
-      options: {
-        encrypt: true,
-        trustServerCertificate: true,
-      },
-    });
-
-    try {
-      // 💡 LOG DE DEBUGGING AÑADIDO
-      console.log(`[TEST] Intentando conectar a MASTER para eliminar BD: ${this.MSSQL_HOST}:${this.MSSQL_PORT}`); 
-      await masterConnection.connect();
-      
-      // Asegurar que no haya conexiones activas a la BD antes de eliminarla
-      await masterConnection.request().query(`ALTER DATABASE ${this.testDbName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
-      await masterConnection.request().query(`DROP DATABASE IF EXISTS ${this.testDbName}`);
-      await masterConnection.close();
-      console.log(`[TEST] ✓ BD de test eliminada`);
-    } catch (error) {
-      console.error(`[TEST] Error al eliminar BD: ${error}`);
-    }
-
-    // Detener contenedor si fue levantado
     if (this.testContainer) {
-      try {
-        console.log('[TEST] Deteniendo contenedor de test...');
-        await this.testContainer.stop();
-        console.log('[TEST] ✓ Contenedor detenido');
-      } catch (err) {
-        console.warn('[TEST] Error al detener contenedor:', err);
-      }
+      await this.testContainer.stop();
+      console.log('[TEST] ✓ Container stopped');
     }
   }
 
-  /**
-   * Ejecuta una query contra la BD de test
-   */
   async executeQuery(query: string, params?: Record<string, any>): Promise<any> {
     const request = this.dbConnection.request();
-
     if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        request.input(key, value);
-      });
+      Object.entries(params).forEach(([key, value]) => request.input(key, value));
     }
-
     return request.query(query);
   }
 
-  /**
-   * Limpia datos de una tabla
-   */
   async cleanTable(tableName: string): Promise<void> {
     await this.executeQuery(`DELETE FROM ${tableName}`);
   }
 
-  /**
-   * Limpia todas las tablas
-   */
   async cleanAllTables(): Promise<void> {
     await this.cleanTable('workers');
-  }
-
-  // ============ MÉTODOS PRIVADOS ============
-
-  private async runMigrations(): Promise<void> {
-    const { MigrationRunner } = await import('../../src/database/migrationRunner');
-    const migrationRunner = new MigrationRunner(this.dbConnection);
-    await migrationRunner.runMigrations();
-    console.log('[TEST] ✓ Migraciones ejecutadas');
-  }
-
-  private async waitForSqlServer(host: string, port: number, user: string, password: string): Promise<void> {
-    const maxRetries = 30;
-    const delayMs = 2000;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const pool = new sql.ConnectionPool({
-          server: host,
-          port,
-          user,
-          password,
-          database: 'master',
-          authentication: { type: 'default' },
-          options: { encrypt: true, trustServerCertificate: true },
-          connectionTimeout: 5000,
-        });
-
-        await pool.connect();
-        await pool.close();
-        return;
-      } catch (err) {
-        console.log(`[TEST] Waiting for SQL Server (${attempt}/${maxRetries})...`);
-        await new Promise(res => setTimeout(res, delayMs));
-      }
-    }
-
-    throw new Error('SQL Server in testcontainer did not become ready in time');
   }
 }

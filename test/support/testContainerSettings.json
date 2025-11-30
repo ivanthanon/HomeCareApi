@@ -1,0 +1,21 @@
+{
+  "sqlServer": {
+    "image": "mcr.microsoft.com/mssql/server:2019-latest",
+    "exposedPort": 1433,
+    "user": "sa",
+    "environment": {
+      "ACCEPT_EULA": "Y"
+    },
+    "waitStrategy": {
+      "message": "SQL Server is now ready for client connections"
+    }
+  },
+  "databaseConfig": {
+    "connectionOptions": {
+      "encrypt": true,
+      "trustServerCertificate": true,
+      "connectTimeout": 10000
+    },
+    "testDbName": "test_homecare"
+  }
+}
