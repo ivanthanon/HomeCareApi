@@ -46,7 +46,7 @@ describe('Workers E2E - Create Worker Acceptance Test', () => {
       expect(workerFromDb.firstName).toBe(newWorker.firstName);
       expect(workerFromDb.lastName).toBe(newWorker.lastName);
       expect(workerFromDb.documentNumber).toBe(newWorker.documentNumber);
-      expect(workerFromDb.dateOfBirth).toBeDefined();
+      expect(workerFromDb.dateOfBirth).toBe(newWorker.dateOfBirth);
     });
   });
 });
