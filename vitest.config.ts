@@ -5,7 +5,6 @@ export default defineConfig({
 
     environment: 'jsdom', 
     
-    // 2. Cobertura (Opcional)
     coverage: {
       provider: 'v8', // o 'istanbul'
       reporter: ['text', 'json', 'html'],
