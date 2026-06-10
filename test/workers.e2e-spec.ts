@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
-import { AcceptanceTestBase } from './support/acceptance-test.base';
+import { AcceptanceTestBase } from './base/acceptance-test.base';
 
 describe('Workers E2E - Create Worker Acceptance Test', () => {
   class WorkersAcceptanceTest extends AcceptanceTestBase {}
