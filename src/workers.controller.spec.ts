@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkersController } from './api/controllers/workers.controller';
 import { CreateWorkerCommandHandler } from './app/commands/createworker/createWorkerCommandHandler';

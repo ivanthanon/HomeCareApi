@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
+import unpluginSwc from 'unplugin-swc';
 
 export default defineConfig({
   resolve: {
@@ -7,6 +8,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  plugins: [unpluginSwc.vite()],
   test: {
     environment: 'node',
     globals: true,

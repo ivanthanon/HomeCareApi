@@ -1,11 +1,11 @@
-import { Controller, Post, Body, HttpCode, Inject } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { CreateWorkerCommandHandler, CreateWorkerRequest } from '../../app/commands/createworker/createWorkerCommandHandler';
 import { CreateWorkerCommand } from '../../app/commands/createworker/createWorkerCommand';
 
 @Controller('workers')
 export class WorkersController {
   constructor(
-    @Inject(CreateWorkerCommandHandler) private readonly createWorkerCommandHandler: CreateWorkerCommandHandler,
+    private readonly createWorkerCommandHandler: CreateWorkerCommandHandler,
   ) {}
 
   @Post()
