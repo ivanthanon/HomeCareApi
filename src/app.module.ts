@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { WorkersController } from './api/controllers/workers.controller';
-import { CreateWorkerCommandHandler } from './app/commands/createworker/createWorkerCommandHandler';
+import { EmployeesController } from './api/controllers/employee.controller';
+import { CreateEmployeeCommandHandler } from './app/commands/createEmployee/createEmployeeCommandHandler';
 
 @Module({
-  controllers: [WorkersController],
-  providers: [CreateWorkerCommandHandler],
+  controllers: [EmployeesController],
+  providers: [CreateEmployeeCommandHandler],
 })
 export class AppModule {}

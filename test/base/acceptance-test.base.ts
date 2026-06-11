@@ -125,6 +125,6 @@ export abstract class AcceptanceTestBase {
   }
 
   async cleanAllTables(): Promise<void> {
-    await this.cleanTable('workers');
+    await this.cleanTable('employees'); // Add more tables as needed
   }
 }
