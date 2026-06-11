@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import { WorkersController } from './api/controllers/workers.controller';
 import { CreateWorkerCommandHandler } from './app/commands/createworker/createWorkerCommandHandler';
 import { CreateWorkerCommand } from './app/commands/createworker/createWorkerCommand';
+import request from 'supertest';
 import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
 
 describe('WorkersController', () => {
-  let workersController: WorkersController;
+  let app: INestApplication;
   let createWorkerCommandHandler: CreateWorkerCommandHandler;
   let mockExecute: Mock;
 
@@ -15,7 +17,7 @@ describe('WorkersController', () => {
       execute: mockExecute,
     };
 
-    const app: TestingModule = await Test.createTestingModule({
+    const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [WorkersController],
       providers: [
         {
@@ -25,7 +27,8 @@ describe('WorkersController', () => {
       ],
     }).compile();
 
-    workersController = app.get<WorkersController>(WorkersController);
+    app = moduleFixture.createNestApplication();
+    await app.init();
     createWorkerCommandHandler = app.get<CreateWorkerCommandHandler>(CreateWorkerCommandHandler);
   });
 
@@ -42,7 +45,10 @@ describe('WorkersController', () => {
         id: createWorkerRequest.id,
       });
 
-      await workersController.createWorker(createWorkerRequest);
+      await request(app.getHttpServer())
+        .post('/workers')
+        .send(createWorkerRequest)
+        .expect(201);
 
       const expectedCommand = new CreateWorkerCommand(
         '550e8400-e29b-41d4-a716-446655440000',
