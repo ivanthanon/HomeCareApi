@@ -24,6 +24,7 @@ describe('Workers E2E - Create Worker Acceptance Test', () => {
   describe('create_a_worker', () => {
     it('Should create a worker', async () => {
       const newWorker = {
+        id: '550e8400-e29b-41d4-a716-446655440000',
         firstName: 'María',
         lastName: 'García López',
         documentNumber: '12345678A',
@@ -35,11 +36,11 @@ describe('Workers E2E - Create Worker Acceptance Test', () => {
         .send(newWorker)
         .expect(201);
 
-      const workerId = response.body.id;
+      expect(response.body.id).toBe(newWorker.id);
       
       const result = await testCase['dbConnection']
         .request()
-        .input('id', workerId)
+        .input('id', newWorker.id)
         .query('SELECT * FROM workers WHERE id = @id');
       expect(result.recordset).toHaveLength(1);
       const workerFromDb = result.recordset[0];

@@ -12,6 +12,7 @@ export class WorkersController {
   @HttpCode(201)
   async createWorker(@Body() createWorkerRequest: CreateWorkerRequest) {
     const command = new CreateWorkerCommand(
+      createWorkerRequest.id,
       createWorkerRequest.firstName,
       createWorkerRequest.lastName,
       createWorkerRequest.documentNumber,

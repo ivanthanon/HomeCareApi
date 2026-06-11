@@ -32,18 +32,20 @@ describe('WorkersController', () => {
   describe('createWorker', () => {
     it('should create a command and call CreateWorkerUseCase.execute', async () => {
       const createWorkerRequest = {
+        id: '550e8400-e29b-41d4-a716-446655440000',
         firstName: 'John',
         lastName: 'Doe',
         documentNumber: '12345678',
         dateOfBirth: '1990-01-01',
       };
       mockExecute.mockResolvedValue({
-        id: '1',
+        id: createWorkerRequest.id,
       });
 
       await workersController.createWorker(createWorkerRequest);
 
       const expectedCommand = new CreateWorkerCommand(
+        '550e8400-e29b-41d4-a716-446655440000',
         'John',
         'Doe',
         '12345678',

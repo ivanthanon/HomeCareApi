@@ -1,6 +1,7 @@
 import { CreateWorkerCommand } from './createWorkerCommand';
 
 export interface CreateWorkerRequest {
+  id: string;
   firstName: string;
   lastName: string;
   documentNumber: string;
