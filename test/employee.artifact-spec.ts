@@ -1,9 +1,9 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
-import { AcceptanceTestBase } from './base/acceptance-test.base';
+import { ArtifactTestBase } from './base/artifact-test.base';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
-  class EmployeesAcceptanceTest extends AcceptanceTestBase {}
+  class EmployeesAcceptanceTest extends ArtifactTestBase {}
 
   let testCase: EmployeesAcceptanceTest;
   const path = '/employees';

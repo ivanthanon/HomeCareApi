@@ -12,7 +12,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    include: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
+    include: ['**/*.spec.ts', '**/*.artifact-spec.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

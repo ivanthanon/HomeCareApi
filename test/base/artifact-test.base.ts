@@ -24,7 +24,7 @@ interface ITestContainerConfig {
 
 const ITestContainerConfig = testContainerSettings as ITestContainerConfig;
 
-export abstract class AcceptanceTestBase {
+export abstract class ArtifactTestBase {
   protected app: INestApplication;
   protected dbConnection: sql.ConnectionPool;
   
