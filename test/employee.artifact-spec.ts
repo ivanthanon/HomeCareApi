@@ -3,14 +3,14 @@ import request from 'supertest';
 import { ArtifactTestBase } from './base/artifact-test.base';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
-  class EmployeesAcceptanceTest extends ArtifactTestBase {}
+  class EmployeesArtifactTest extends ArtifactTestBase {}
 
-  let testCase: EmployeesAcceptanceTest;
+  let testCase: EmployeesArtifactTest;
   const path = '/employees';
 
   beforeAll(async () => {
-    testCase = new EmployeesAcceptanceTest();
-    await testCase.setupDatabase();
+    testCase = new EmployeesArtifactTest();
+    await testCase.startDatabaseTestContainer();
     await testCase.setupApplication();
   }, 60000);
 
@@ -19,7 +19,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
   });
 
   afterEach(async () => {
-    await testCase.cleanAllTables();
+    await testCase.cleanTable('employees');
   });
 
   describe('create_a_employee', () => {
