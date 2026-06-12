@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-  "module": "commonjs",
+    "ignoreDeprecations": "6.0",
+    "module": "commonjs",
   "moduleResolution": "node",
     "esModuleInterop": true,
     "isolatedModules": true,
