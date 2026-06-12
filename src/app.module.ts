@@ -5,6 +5,9 @@ import { SqlServerEmployeeRepository } from './infrastructure/adapters/SqlServer
 
 @Module({
   controllers: [EmployeesController],
-  providers: [CreateEmployeeCommandHandler, SqlServerEmployeeRepository],
+  providers: [
+    CreateEmployeeCommandHandler,
+    { provide: 'EMPLOYEE_REPOSITORY', useClass: SqlServerEmployeeRepository },
+  ],
 })
 export class AppModule {}

@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { Employee, EmployeeRepository } from '../../ports/driven/employee.repository';
 
 export class CreateEmployeeCommand {
@@ -10,12 +11,13 @@ export class CreateEmployeeCommand {
   ) {}
 }
 
+@Injectable()
 export class CreateEmployeeCommandHandler {
-  constructor(private readonly workerRepository: EmployeeRepository) {}
+  constructor(@Inject('EMPLOYEE_REPOSITORY') private readonly employeeRepository: EmployeeRepository) {}
   
   async execute(command: CreateEmployeeCommand): Promise<void> {
     const employee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
     
-    await this.workerRepository.create(employee);
-  }q
+    await this.employeeRepository.create(employee);
+  }
 }
