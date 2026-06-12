@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { Employee, EmployeeRepository } from '../../ports/driven/employee.repository';
 
 export class CreateEmployeeCommand {
@@ -11,7 +11,7 @@ export class CreateEmployeeCommand {
   ) {}
 }
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class CreateEmployeeCommandHandler {
   constructor(@Inject('EMPLOYEE_REPOSITORY') private readonly employeeRepository: EmployeeRepository) {}
   
