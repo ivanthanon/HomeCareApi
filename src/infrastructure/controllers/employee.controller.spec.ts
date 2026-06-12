@@ -41,9 +41,6 @@ describe('EmployeesController', () => {
         documentNumber: '12345678',
         dateOfBirth: '1990-01-01',
       };
-      mockExecute.mockResolvedValue({
-        id: createEmployeeRequest.id,
-      });
 
       await request(app.getHttpServer())
         .post(path)
