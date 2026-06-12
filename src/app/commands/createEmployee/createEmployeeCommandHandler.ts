@@ -1,4 +1,4 @@
-import { EmployeeRepository } from '../../ports/driven/employee.repository';
+import { Employee, EmployeeRepository } from '../../ports/driven/employee.repository';
 
 export class CreateEmployeeCommand {
   constructor(
@@ -14,6 +14,8 @@ export class CreateEmployeeCommandHandler {
   constructor(private readonly workerRepository: EmployeeRepository) {}
   
   async execute(command: CreateEmployeeCommand): Promise<void> {
-    await this.workerRepository.create(command);
+    const employee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
+    
+    await this.workerRepository.create(employee);
   }q
 }

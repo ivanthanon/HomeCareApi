@@ -9,5 +9,5 @@ export class Employee {
 }
 
 export interface EmployeeRepository {
-  create(command: Employee): Promise<void>;
+  create(employee: Employee): Promise<void>;
 }
