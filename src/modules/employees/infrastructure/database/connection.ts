@@ -1,5 +1,5 @@
 import sql from 'mssql';
-import { connectionString } from './config';
+import { connectionString } from 'src/modules/employees/infrastructure/database/config';
 
 export const pool = new sql.ConnectionPool(connectionString);
 

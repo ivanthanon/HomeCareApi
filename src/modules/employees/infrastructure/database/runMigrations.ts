@@ -1,5 +1,5 @@
-import { connectToDatabase, pool } from './connection';
-import { MigrationRunner } from './migrationRunner';
+import { connectToDatabase, pool } from 'src/modules/employees/infrastructure/database/connection';
+import { MigrationRunner } from 'src/modules/employees/infrastructure/database/migrationRunner';
 
 async function run() {
   const command = process.argv[2] || 'up';

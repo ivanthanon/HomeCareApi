@@ -1,4 +1,4 @@
-import { IMigration } from '../IMigration';
+import { IMigration } from 'src/modules/employees/infrastructure/database/IMigration';
 
 export const migration: IMigration = {
   async up(request) {

@@ -1,9 +1,9 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest';
-import { TestcontainerSetup } from '../../../../test/base/testcontainer-setup';
-import { SqlServerEmployeeRepository } from '../SqlServerEmployeeRepository';
-import { Employee } from '../../../app/ports/driven/employee.repository';
+import { TestcontainerSetup } from 'test/base/testcontainer-setup';
+import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
+import { Employee } from 'src/modules/employees/domain/entities/employee';
 
-const testContainerSettings = require('../../../../test/base/testContainerSettings.json');
+import testContainerSettings from 'test/base/testContainerSettings.json';
 
 class SqlServerEmployeeRepositoryTest extends TestcontainerSetup {
   constructor() {

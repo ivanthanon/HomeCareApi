@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { ConnectionPool } from 'mssql';
-import { IMigration } from './IMigration';
+import { IMigration } from 'src/modules/employees/infrastructure/database/IMigration';
 
 export class MigrationRunner {
   private migrationsPath = path.join(__dirname, 'migrations');

@@ -7,7 +7,3 @@ export class Employee {
     readonly dateOfBirth: string
   ) {}
 }
-
-export interface EmployeeRepository {
-  create(employee: Employee): Promise<void>;
-}

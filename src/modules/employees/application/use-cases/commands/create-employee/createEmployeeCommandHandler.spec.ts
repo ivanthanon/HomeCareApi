@@ -1,6 +1,6 @@
-import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from './createEmployeeCommandHandler';
-import { EmployeeRepository } from '../../ports/driven/employee.repository';
-import { Employee } from '../../ports/driven/employee.repository';
+import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
+import { EmployeeRepository } from 'src/modules/employees/application/ports/driven/employee.repository';
+import { Employee } from 'src/modules/employees/domain/entities/employee';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('CreateEmployeeCommandHandler', () => {

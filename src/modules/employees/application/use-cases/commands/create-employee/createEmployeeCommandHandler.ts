@@ -1,5 +1,6 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { Employee, EmployeeRepository } from '../../ports/driven/employee.repository';
+import { EmployeeRepository } from 'src/modules/employees/application/ports/driven/employee.repository';
+import { Employee } from 'src/modules/employees/domain/entities/employee';
 
 export class CreateEmployeeCommand {
   constructor(

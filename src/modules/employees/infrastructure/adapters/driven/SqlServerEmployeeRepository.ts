@@ -1,6 +1,7 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { ConnectionPool, Date, NVarChar, UniqueIdentifier } from 'mssql';
-import { Employee, EmployeeRepository } from "src/app/ports/driven/employee.repository";
+import { EmployeeRepository } from "src/modules/employees/application/ports/driven/employee.repository";
+import { Employee } from "src/modules/employees/domain/entities/employee";
 
 @Injectable({ scope: Scope.REQUEST })
 export class SqlServerEmployeeRepository implements EmployeeRepository {
