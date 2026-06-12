@@ -18,7 +18,7 @@ export interface ITestContainerConfig {
 }
 
 export class TestcontainerSetup {
-  protected dbConnection: sql.ConnectionPool;
+  public dbConnection: sql.ConnectionPool;
   protected testDbName: string;
   private host: string;
   private port: number;
