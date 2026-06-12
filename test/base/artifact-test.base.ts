@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConnectionPool } from 'mssql';
 import { AppModule } from '../../src/app.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
 
@@ -18,7 +19,10 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(ConnectionPool)
+      .useValue(this.dbConnection)
+      .compile();
 
     this.app = moduleFixture.createNestApplication();
     await this.app.init();

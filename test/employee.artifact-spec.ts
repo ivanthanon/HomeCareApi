@@ -1,5 +1,6 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
+import { Employee } from '../src/app/ports/driven/employee.repository';
 import { ArtifactTestBase } from './base/artifact-test.base';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
@@ -24,29 +25,39 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
 
   describe('create_a_employee', () => {
     it('Should create an employee', async () => {
-      const newEmployee = {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        firstName: 'María',
-        lastName: 'García López',
-        documentNumber: '12345678A',
-        dateOfBirth: '1985-03-15',
-      };
+      const employee = new Employee(
+        '550E8400-E29B-41D4-A716-446655440000',
+        'María',
+        'García López',
+        '12345678A',
+        '1985-03-15',
+      );
 
       await request(testCase['app'].getHttpServer())
         .post(path)
-        .send(newEmployee)
+        .send({
+          id: employee.id,
+          firstName: employee.firstName,
+          lastName: employee.lastName,
+          documentNumber: employee.documentNumber,
+          dateOfBirth: employee.dateOfBirth,
+        })
         .expect(201);
-      
-      const result = await testCase['dbConnection']
-        .request()
-        .input('id', newEmployee.id)
-        .query('SELECT * FROM employees WHERE id = @id');
+
+      const result = await testCase.executeQuery(
+        'SELECT * FROM employees WHERE id = @id',
+        { id: employee.id },
+      );
       expect(result.recordset).toHaveLength(1);
-      const employeeFromDb = result.recordset[0];
-      expect(employeeFromDb.firstName).toBe(newEmployee.firstName);
-      expect(employeeFromDb.lastName).toBe(newEmployee.lastName);
-      expect(employeeFromDb.documentNumber).toBe(newEmployee.documentNumber);
-      expect(employeeFromDb.dateOfBirth).toBe(newEmployee.dateOfBirth);
+      const fromDb = result.recordset[0];
+      const employeeFromDb = new Employee(
+        fromDb.id,
+        fromDb.firstName,
+        fromDb.lastName,
+        fromDb.documentNumber,
+        new Date(fromDb.dateOfBirth).toISOString().split('T')[0],
+      );
+      expect(employeeFromDb).toEqual(employee);
     });
   });
 });
