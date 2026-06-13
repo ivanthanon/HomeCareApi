@@ -1,24 +1,30 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConnectionPool } from 'mssql';
 import { EmployeesController } from 'src/modules/employees/infrastructure/adapters/driving/controllers/employee.controller';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
 import { EmployeeRepository } from 'src/modules/employees/application/ports/driven/employee.repository';
+import appConfig from './config/app.config';
 
 @Module({
   controllers: [EmployeesController],
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      envFilePath: '.env',
+      load: [appConfig],
     }),
     EmployeesModule,
   ],
   providers: [
     {
       provide: ConnectionPool,
-      useFactory: (databaseConfig: any) => new ConnectionPool(databaseConfig),
-      inject: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const dbConfig = configService.get('settings.database');
+        const pool = new ConnectionPool(dbConfig);
+        return pool.connect();
+      },
+      inject: [ConfigService],
     },
     {
       provide: SqlServerEmployeeRepository,
@@ -32,4 +38,5 @@ import { EmployeeRepository } from 'src/modules/employees/application/ports/driv
     },
   ],
 })
-export class EmployeesModule {}
+
+export class EmployeesModule { }
