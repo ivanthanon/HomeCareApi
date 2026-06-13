@@ -3,14 +3,17 @@ import { EmployeeRepository } from 'src/modules/employees/domain/repositories/em
 import { Employee } from 'src/modules/employees/domain/entities/employee';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
+import { Clock } from 'src/modules/employees/domain/shared/clock';
 
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
   let mockRepository: EmployeeRepository;
+  let mockClock: Clock;
 
   beforeEach(() => {
     mockRepository = { create: vi.fn() };
-    handler = new CreateEmployeeCommandHandler(mockRepository);
+    mockClock = { now: vi.fn().mockReturnValue(new Date('2024-01-01T00:00:00.000Z')) };
+    handler = new CreateEmployeeCommandHandler(mockRepository, mockClock);
   });
 
   it('should call repository.create and return the id', async () => {

@@ -14,10 +14,11 @@ export class Employee {
     firstName: string,
     lastName: string,
     documentNumber: string,
-    dateOfBirth: string
+    dateOfBirth: string,
+    currentDate: Date,
   ): Result<Employee, Error> {
     
-    if (new Date().getFullYear() - new Date(dateOfBirth).getFullYear() < 18) {
+    if (currentDate.getFullYear() - new Date(dateOfBirth).getFullYear() < 18) {
       return Err(new Error('Employee must be an adult'));
     }
     

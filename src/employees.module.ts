@@ -6,6 +6,8 @@ import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
 import appConfig from './config/app.config';
+import { DateClock } from './modules/employees/infrastructure/adapters/driven/dateClock';
+import { Clock } from './modules/employees/domain/shared/clock';
 
 @Module({
   controllers: [EmployeesController],
@@ -33,8 +35,8 @@ import appConfig from './config/app.config';
     },
     {
       provide: CreateEmployeeCommandHandler,
-      useFactory: (employeeRepository: EmployeeRepository) => new CreateEmployeeCommandHandler(employeeRepository),
-      inject: [SqlServerEmployeeRepository],
+      useFactory: (employeeRepository: EmployeeRepository, clock: Clock) => new CreateEmployeeCommandHandler(employeeRepository, clock),
+      inject: [SqlServerEmployeeRepository, DateClock],
     },
   ],
 })
