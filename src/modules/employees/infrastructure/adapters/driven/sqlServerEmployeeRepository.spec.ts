@@ -1,9 +1,9 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest';
-import { TestcontainerSetup } from 'test/base/testcontainer-setup';
+import { TestcontainerSetup } from 'testhelpers/base/testcontainer-setup';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
 import { Employee } from 'src/modules/employees/domain/entities/employee';
 
-import testContainerSettings from 'test/base/testContainerSettings.json';
+import testContainerSettings from 'testhelpers/base/testContainerSettings.json';
 
 class SqlServerEmployeeRepositoryTest extends TestcontainerSetup {
   constructor() {
