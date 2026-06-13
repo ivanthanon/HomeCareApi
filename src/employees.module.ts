@@ -13,7 +13,7 @@ import { EmployeeRepository } from 'src/modules/employees/application/ports/driv
     {
       provide: ConnectionPool,
       useFactory: (databaseConfig: any) => new ConnectionPool(databaseConfig),
-      inject: ['DATABASE_CONFIG'],
+      inject: [ConfigModule],
     },
     {
       provide: SqlServerEmployeeRepository,
