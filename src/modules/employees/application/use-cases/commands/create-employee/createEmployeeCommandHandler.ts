@@ -12,9 +12,8 @@ export class CreateEmployeeCommand {
   ) {}
 }
 
-@Injectable({ scope: Scope.REQUEST })
 export class CreateEmployeeCommandHandler {
-  constructor(@Inject('EMPLOYEE_REPOSITORY') private readonly employeeRepository: EmployeeRepository) {}
+  constructor(private readonly employeeRepository: EmployeeRepository) {}
   
   async execute(command: CreateEmployeeCommand): Promise<void> {
     const employee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);

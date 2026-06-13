@@ -1,0 +1,13 @@
+{
+  "development": {
+    "server": "localhost",
+    "port": 1433,
+    "database": "HomeCare",
+    "user": "HomeCareUser",
+    "password": "Homecare@2025",
+    "options": {
+      "encrypt": true,
+      "trustServerCertificate": true
+    }
+  }
+}
