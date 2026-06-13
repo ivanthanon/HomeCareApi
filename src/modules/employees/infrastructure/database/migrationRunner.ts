@@ -1,14 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import type { ConnectionPool } from 'mssql';
-import { IMigration } from 'src/modules/employees/infrastructure/database/IMigration';
-
+import { ConnectionPool } from 'mssql';
 export class MigrationRunner {
   private migrationsPath = path.join(__dirname, 'migrations');
   private migrationsTable = '__migrations__';
   private pool: ConnectionPool;
 
-  constructor(pool: ConnectionPool) {
+  constructor(pool: ConnectionPool, private connectionString: string) {
     if (!pool) {
       throw new Error('MigrationRunner requires a mssql ConnectionPool instance');
     }
@@ -34,7 +32,7 @@ export class MigrationRunner {
     await this.initialize();
 
     const files = fs.readdirSync(this.migrationsPath)
-      .filter(file => file.endsWith('.ts') && !file.startsWith('IMigration'))
+      .filter(file => (file.endsWith('.ts') || file.endsWith('.js')) && !file.startsWith('IMigration'))
       .sort();
 
     for (const file of files) {

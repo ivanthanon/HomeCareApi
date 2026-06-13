@@ -19,8 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "vitest run --dir test --config vitest.config.ts",
-    "migration:up": "ts-node src/database/runMigrations.ts up",
-    "migration:down": "ts-node src/database/runMigrations.ts down"
+    "migration:up": "ts-node src/modules/employees/infrastructure/database/runMigrations.ts up",
+    "migration:down": "ts-node src/modules/employees/infrastructure/database/runMigrations.ts down"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
