@@ -2,6 +2,7 @@ import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules
 import { EmployeeRepository } from 'src/modules/employees/application/ports/driven/employee.repository';
 import { Employee } from 'src/modules/employees/domain/entities/employee';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { Failure } from 'src/modules/employees/domain/result/result';
 
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
@@ -39,5 +40,7 @@ describe('CreateEmployeeCommandHandler', () => {
     const result = await handler.execute(command);
 
     expect(result.success).toBe(false);
+    const failure : Failure<Error> = result as Failure<Error>;
+    expect(failure.error.message).toBe('Employee must be an adult');
   });
 })

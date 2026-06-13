@@ -19,7 +19,7 @@ export class CreateEmployeeCommandHandler {
     const employee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
 
     if (new Date().getFullYear() - new Date(employee.dateOfBirth).getFullYear() < 18) {
-      return Err(new Error());
+      return Err(new Error('Employee must be an adult'));
     }
 
     await this.employeeRepository.create(employee);
