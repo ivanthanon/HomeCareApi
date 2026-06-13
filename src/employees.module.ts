@@ -8,7 +8,12 @@ import { EmployeeRepository } from 'src/modules/employees/application/ports/driv
 
 @Module({
   controllers: [EmployeesController],
-  imports: [ConfigModule.forRoot()],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    EmployeesModule,
+  ],
   providers: [
     {
       provide: ConnectionPool,
