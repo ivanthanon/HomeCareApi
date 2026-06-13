@@ -7,7 +7,7 @@ export class Employee {
     readonly lastName: string,
     readonly documentNumber: string,
     readonly dateOfBirth: string
-  ) {}
+  ) { }
 
   public static create(
     id: string,
@@ -17,11 +17,15 @@ export class Employee {
     dateOfBirth: string,
     currentDate: Date,
   ): Result<Employee, Error> {
-    
-    if (currentDate.getFullYear() - new Date(dateOfBirth).getFullYear() < 18) {
-      return Err(new Error('Employee must be an adult'));
+
+    if (IsAdult(currentDate, dateOfBirth)) {
+      return Ok(new Employee(id, firstName, lastName, documentNumber, dateOfBirth));
     }
-    
-    return Ok(new Employee(id, firstName, lastName, documentNumber, dateOfBirth));
+
+    return Err(new Error('Employee must be an adult'));
   }
+}
+
+function IsAdult(currentDate: Date, dateOfBirth: string) {
+  return currentDate.getFullYear() - new Date(dateOfBirth).getFullYear() >= 18;
 }
