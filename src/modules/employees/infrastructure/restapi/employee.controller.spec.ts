@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { EmployeesController } from 'src/modules/employees/infrastructure/adapters/driving/controllers/employee.controller';
+import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/employee.controller';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand} from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
 import request from 'supertest';
 import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
