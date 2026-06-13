@@ -16,13 +16,13 @@ export class CreateEmployeeCommandHandler {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
   
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
-    const employee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
+    const employeeResult = Employee.create(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
 
-    if (new Date().getFullYear() - new Date(employee.dateOfBirth).getFullYear() < 18) {
-      return Err(new Error('Employee must be an adult'));
+    if (employeeResult.success === false) {
+      return employeeResult;
     }
 
-    await this.employeeRepository.create(employee);
+    await this.employeeRepository.create(employeeResult.value);
     
     return Ok(undefined);
   }
