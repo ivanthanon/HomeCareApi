@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionPool } from 'mssql';
 import { EmployeesModule } from 'src/employees.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
+import { ConfigModule } from '@nestjs/config/dist/config.module';
 
 const testContainerSettings = require('./testContainerSettings.json');
 const config = testContainerSettings as ITestContainerConfig;
@@ -17,15 +18,13 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
   async setupApplication(): Promise<void> {
     console.log('[TEST] Initializing Nest application...');
 
-    const databaseConfig = this.getConnectionConfig(this.testDbName);
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [EmployeesModule],
+      imports: [EmployeesModule, ConfigModule.forRoot({
+        envFilePath: '.test.settings.env'
+      })],      
     })
       .overrideProvider(ConnectionPool)
       .useValue(this.dbConnection)
-      .overrideProvider('DATABASE_CONFIG')
-      .useValue(databaseConfig)
       .compile();
 
     this.app = moduleFixture.createNestApplication();
