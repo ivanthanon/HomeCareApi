@@ -1,6 +1,6 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
 import { EmployeeRepository } from 'src/modules/employees/application/ports/driven/employee.repository';
 import { Employee } from 'src/modules/employees/domain/entities/employee';
+import { Err, Ok, Result } from 'src/modules/employees/domain/result/result';
 
 export class CreateEmployeeCommand {
   constructor(
@@ -15,9 +15,15 @@ export class CreateEmployeeCommand {
 export class CreateEmployeeCommandHandler {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
   
-  async execute(command: CreateEmployeeCommand): Promise<void> {
+  async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
     const employee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
-    
+
+    if (new Date().getFullYear() - new Date(employee.dateOfBirth).getFullYear() < 18) {
+      return Err(new Error());
+    }
+
     await this.employeeRepository.create(employee);
+    
+    return Ok(undefined);
   }
 }

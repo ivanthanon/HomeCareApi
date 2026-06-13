@@ -26,6 +26,18 @@ describe('CreateEmployeeCommandHandler', () => {
     const expectedEmployee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
     expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);
   });
-});
 
+  it('should throw an error if given employee is not an adult', async () => {
+    const command = new CreateEmployeeCommand(
+      '550e8400-e29b-41d4-a716-446655440000',
+      'John',
+      'Doe',
+      '12345678',
+      '2026-01-01',
+    );
 
+    const result = await handler.execute(command);
+
+    expect(result.success).toBe(false);
+  });
+})
