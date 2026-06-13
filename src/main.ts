@@ -19,6 +19,18 @@ function dbConfig() {
 }
 
 async function bootstrap() {
+  const env = process.env.NODE_ENV || 'development';
+
+  if (env === 'development') {
+    await applyMigrations();
+  }
+
+  const app = await NestFactory.create(EmployeesModule);
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+
+async function applyMigrations() {
   const config = dbConfig();
   const pool = new ConnectionPool(config);
   await pool.connect();
@@ -26,8 +38,4 @@ async function bootstrap() {
   const migrationRunner = new MigrationRunner(pool, config);
   await migrationRunner.runMigrations();
   await pool.close();
-
-  const app = await NestFactory.create(EmployeesModule);
-  await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
