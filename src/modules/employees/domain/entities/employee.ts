@@ -1,4 +1,4 @@
-import { Err, Ok, Result } from "../result/result";
+import { Err, Ok, Result } from "../shared/result";
 
 export class Employee {
   constructor(

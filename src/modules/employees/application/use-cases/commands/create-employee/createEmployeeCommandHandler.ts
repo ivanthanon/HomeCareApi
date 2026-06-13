@@ -1,6 +1,6 @@
 import { EmployeeRepository } from 'src/modules/employees/application/ports/driven/employee.repository';
 import { Employee } from 'src/modules/employees/domain/entities/employee';
-import { Err, Ok, Result } from 'src/modules/employees/domain/result/result';
+import { Err, Ok, Result } from 'src/modules/employees/domain/shared/result';
 
 export class CreateEmployeeCommand {
   constructor(
