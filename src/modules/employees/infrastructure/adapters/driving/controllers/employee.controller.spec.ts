@@ -9,6 +9,7 @@ describe('EmployeesController', () => {
   let app: INestApplication;
   let createEmployeeCommandHandler: CreateEmployeeCommandHandler;
   let mockExecute: Mock;
+
   const path = '/employees';
 
   beforeEach(async () => {
@@ -41,6 +42,7 @@ describe('EmployeesController', () => {
         documentNumber: '12345678',
         dateOfBirth: '1990-01-01',
       };
+      createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: true, value: undefined });
 
       await request(app.getHttpServer())
         .post(path)
