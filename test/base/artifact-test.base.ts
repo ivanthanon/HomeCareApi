@@ -17,11 +17,15 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
   async setupApplication(): Promise<void> {
     console.log('[TEST] Initializing Nest application...');
 
+    const databaseConfig = this.getConnectionConfig(this.testDbName);
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [EmployeesModule],
     })
       .overrideProvider(ConnectionPool)
       .useValue(this.dbConnection)
+      .overrideProvider('DATABASE_CONFIG')
+      .useValue(databaseConfig)
       .compile();
 
     this.app = moduleFixture.createNestApplication();
