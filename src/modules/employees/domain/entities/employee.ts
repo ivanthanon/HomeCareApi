@@ -27,5 +27,13 @@ export class Employee {
 }
 
 function IsAdult(currentDate: Date, dateOfBirth: string) {
-  return currentDate.getFullYear() - new Date(dateOfBirth).getFullYear() >= 18;
+  const yearDiff = currentDate.getFullYear() - new Date(dateOfBirth).getFullYear();
+  const monthDiff = currentDate.getMonth() - new Date(dateOfBirth).getMonth();
+  const dayDiff = currentDate.getDate() - new Date(dateOfBirth).getDate();
+
+  if (yearDiff > 18 || (yearDiff === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
+    return true;
+  }
+
+  return false;
 }

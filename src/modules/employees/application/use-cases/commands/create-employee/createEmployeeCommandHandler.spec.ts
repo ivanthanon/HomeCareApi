@@ -12,7 +12,7 @@ describe('CreateEmployeeCommandHandler', () => {
 
   beforeEach(() => {
     mockRepository = { create: vi.fn() };
-    mockClock = { now: vi.fn().mockReturnValue(new Date('2024-01-01T00:00:00.000Z')) };
+    mockClock = { now: vi.fn().mockReturnValue(new Date('2026-06-13T00:00:00.000Z')) };
     handler = new CreateEmployeeCommandHandler(mockRepository, mockClock);
   });
 
@@ -22,7 +22,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678',
-      '1990-01-01',
+      '2008-06-13',
     );
 
     await handler.execute(command);
@@ -37,7 +37,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678',
-      '2026-01-01',
+      '2008-06-14',
     );
 
     const result = await handler.execute(command);
