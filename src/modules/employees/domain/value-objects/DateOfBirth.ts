@@ -4,15 +4,14 @@ export class DateOfBirth {
     private constructor(readonly value: string) { }
 
     public static create(value: string, currentDate: Date): Result<DateOfBirth, Error> {
-        if (!IsAdult(currentDate, value)) {
+        if (!this.IsAdult(currentDate, value)) {
             return Err(new Error("Employee must be an adult"));
         }
         
         return Ok(new DateOfBirth(value));
     }
-}
 
-    function IsAdult(currentDate: Date, dateOfBirth: string) {
+    private static IsAdult(currentDate: Date, dateOfBirth: string): boolean {
         const yearDiff = currentDate.getFullYear() - new Date(dateOfBirth).getFullYear();
         const monthDiff = currentDate.getMonth() - new Date(dateOfBirth).getMonth();
         const dayDiff = currentDate.getDate() - new Date(dateOfBirth).getDate();
@@ -23,5 +22,6 @@ export class DateOfBirth {
 
         return false;
     }
+}
 
 
