@@ -34,9 +34,9 @@ import { Clock } from './modules/employees/domain/shared/clock';
       inject: [ConnectionPool],
     },
     {
-      provide: CreateEmployeeCommandHandler,
-      useFactory: (employeeRepository: EmployeeRepository, clock: Clock) => new CreateEmployeeCommandHandler(employeeRepository, clock),
-      inject: [SqlServerEmployeeRepository, DateClock],
+      provide: CreateEmployeeCommandHandler, 
+      useFactory: (employeeRepository: EmployeeRepository, clock: DateClock) => new CreateEmployeeCommandHandler(employeeRepository, new DateClock()),
+      inject: [SqlServerEmployeeRepository],
     },
   ],
 })
