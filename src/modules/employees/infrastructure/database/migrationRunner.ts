@@ -6,7 +6,7 @@ export class MigrationRunner {
   private migrationsTable = '__migrations__';
   private pool: ConnectionPool;
 
-  constructor(pool: ConnectionPool, private connectionString: string) {
+  constructor(pool: ConnectionPool) {
     if (!pool) {
       throw new Error('MigrationRunner requires a mssql ConnectionPool instance');
     }

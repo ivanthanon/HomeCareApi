@@ -35,7 +35,7 @@ async function applyMigrations() {
   const pool = new ConnectionPool(config);
   await pool.connect();
 
-  const migrationRunner = new MigrationRunner(pool, config);
+  const migrationRunner = new MigrationRunner(pool);
   await migrationRunner.runMigrations();
   await pool.close();
 }
