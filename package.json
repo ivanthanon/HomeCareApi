@@ -1,7 +1,7 @@
 {
   "name": "homecare-api",
   "version": "0.0.1",
-  "type": "module",
+  "type": "commonjs",
   "description": "",
   "author": "",
   "private": true,
@@ -19,11 +19,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "vitest run --dir test --config vitest.config.ts",
-    "migration:up": "ts-node src/database/runMigrations.ts up",
-    "migration:down": "ts-node src/database/runMigrations.ts down"
+    "migration:up": "ts-node src/modules/employees/infrastructure/database/runMigrations.ts up",
+    "migration:down": "ts-node src/modules/employees/infrastructure/database/runMigrations.ts down"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "mssql": "^9.1.1",
@@ -37,6 +38,8 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@swc/cli": "^0.8.1",
+    "@swc/core": "^1.15.41",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
@@ -55,6 +58,8 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0",
+    "unplugin-swc": "^1.5.9",
+    "vite-plugin-swc": "^0.0.2",
     "vitest": "^4.0.13"
   },
   "jest": {

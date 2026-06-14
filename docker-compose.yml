@@ -1,10 +1,6 @@
-version: '3.8'
-
 services:
   mssql:
-    build:
-      context: .
-      dockerfile: Dockerfile.db
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: HomeCareDB
     hostname: homecare-db
     ports:
@@ -17,6 +13,7 @@ services:
       - homecare-network
     environment:
       SA_PASSWORD: "HomeCare2025"
+      ACCEPT_EULA: "Y"
       MSSQL_AGENT_ENABLED: "true"
     restart: unless-stopped
 

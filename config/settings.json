@@ -1,3 +1,0 @@
-{
-  "development": "Server=localhost,1433;Database=HomeCare;User Id=HomeCareUser;Password=Homecare@2025;Encrypt=true;TrustServerCertificate=true;"
-}

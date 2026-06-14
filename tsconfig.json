@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-  "module": "commonjs",
+    "ignoreDeprecations": "6.0",
+    "module": "commonjs",
   "moduleResolution": "node",
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -9,6 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",

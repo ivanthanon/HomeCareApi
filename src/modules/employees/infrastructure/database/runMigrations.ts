@@ -1,0 +1,27 @@
+import { connectToDatabase, pool } from 'src/modules/employees/infrastructure/database/connection';
+import { connectionString } from 'src/modules/employees/infrastructure/database/config';
+import { MigrationRunner } from 'src/modules/employees/infrastructure/database/migrationRunner';
+
+async function run() {
+  const command = process.argv[2] || 'up';
+
+  try {
+    await connectToDatabase();
+    const migrationRunner = new MigrationRunner(pool, connectionString);
+
+    if (command === 'up') {
+      await migrationRunner.runMigrations();
+    } else if (command === 'down') {
+      await migrationRunner.revertLastMigration();
+    } else {
+      console.log('Usage: npm run migration [up|down]');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    process.exit(1);
+  } finally {
+    await pool.close();
+  }
+}
+
+run();
