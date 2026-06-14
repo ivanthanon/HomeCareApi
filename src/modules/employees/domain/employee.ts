@@ -1,12 +1,16 @@
 import { Err, Ok, Result } from "./shared/result";
+import { DateOfBirth } from "./value-objects/DateOfBirth";
+import { DocumentNumber } from "./value-objects/DocumentNumber";
+import { EmployeeId } from "./value-objects/EmployeeId";
+import { Name } from "./value-objects/Name";
 
 export class Employee {
-  constructor(
-    readonly id: string,
-    readonly firstName: string,
-    readonly lastName: string,
-    readonly documentNumber: string,
-    readonly dateOfBirth: string
+  public constructor(
+    readonly id: EmployeeId,
+    readonly firstName: Name,
+    readonly lastName: Name,
+    readonly documentNumber: DocumentNumber,
+    readonly dateOfBirth: DateOfBirth,
   ) { }
 
   public static create(
@@ -18,22 +22,39 @@ export class Employee {
     currentDate: Date,
   ): Result<Employee, Error> {
 
-    if (IsAdult(currentDate, dateOfBirth)) {
-      return Ok(new Employee(id, firstName, lastName, documentNumber, dateOfBirth));
+    const employeeIdValueObject = EmployeeId.create(id);
+    if (employeeIdValueObject.success === false) {
+      return Err(new Error(employeeIdValueObject.error.message));
     }
 
-    return Err(new Error('Employee must be an adult'));
+    const firstNameValueObject = Name.create(firstName);
+    if (firstNameValueObject.success === false) {
+      return Err(new Error(firstNameValueObject.error.message));
+    }
+
+    const lastNameValueObject = Name.create(lastName);
+    if (lastNameValueObject.success === false) {
+      return Err(new Error(lastNameValueObject.error.message));
+    }
+
+    const documentNumberValueObject = DocumentNumber.create(documentNumber);
+    if (documentNumberValueObject.success === false) {
+      return Err(new Error(documentNumberValueObject.error.message));
+    }
+
+    const dateOfBirthValueObject = DateOfBirth.create(dateOfBirth, currentDate);
+    if (dateOfBirthValueObject.success === false) {
+      return Err(new Error(dateOfBirthValueObject.error.message));
+    }
+
+    return Ok(
+      new Employee(
+        employeeIdValueObject.value,
+        firstNameValueObject.value,
+        lastNameValueObject.value,
+        documentNumberValueObject.value,
+        dateOfBirthValueObject.value
+      )
+    );
   }
-}
-
-function IsAdult(currentDate: Date, dateOfBirth: string) {
-  const yearDiff = currentDate.getFullYear() - new Date(dateOfBirth).getFullYear();
-  const monthDiff = currentDate.getMonth() - new Date(dateOfBirth).getMonth();
-  const dayDiff = currentDate.getDate() - new Date(dateOfBirth).getDate();
-
-  if (yearDiff > 18 || (yearDiff === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
-    return true;
-  }
-
-  return false;
 }

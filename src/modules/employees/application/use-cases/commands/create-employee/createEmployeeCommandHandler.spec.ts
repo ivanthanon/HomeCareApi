@@ -16,28 +16,49 @@ describe('CreateEmployeeCommandHandler', () => {
     handler = new CreateEmployeeCommandHandler(mockRepository, mockClock);
   });
 
-  it('should call repository.create and return the id', async () => {
+  it('should call repository.create', async () => {
+    const employeeJson = {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      firstName: 'John',
+      lastName: 'Doe',
+      documentNumber: '12345789K',
+      dateOfBirth: '1991-06-13',
+    };
+
     const command = new CreateEmployeeCommand(
-      '550e8400-e29b-41d4-a716-446655440000',
-      'John',
-      'Doe',
-      '12345678',
-      '2008-06-13',
+      employeeJson.id,
+      employeeJson.firstName,
+      employeeJson.lastName,
+      employeeJson.documentNumber,
+      employeeJson.dateOfBirth,
     );
 
     await handler.execute(command);
 
-    const expectedEmployee = new Employee(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth);
-    expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);
+    expect(mockRepository.create).toHaveBeenCalledWith(expect.any(Employee));
+    const passedEmployee = mockRepository.create.mock.calls[0][0];
+    expect(passedEmployee.id.value).toBe(employeeJson.id);
+    expect(passedEmployee.firstName.value).toBe(employeeJson.firstName);
+    expect(passedEmployee.lastName.value).toBe(employeeJson.lastName);
+    expect(passedEmployee.documentNumber.value).toBe(employeeJson.documentNumber);
+    expect(passedEmployee.dateOfBirth.value).toBe(employeeJson.dateOfBirth);
   });
 
   it('should throw an error if given employee is not an adult', async () => {
+    const employeeJson = {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      firstName: 'John',
+      lastName: 'Doe',
+      documentNumber: '12345678K',
+      dateOfBirth: '2008-06-14',
+    };
+
     const command = new CreateEmployeeCommand(
-      '550e8400-e29b-41d4-a716-446655440000',
-      'John',
-      'Doe',
-      '12345678',
-      '2008-06-14',
+      employeeJson.id,
+      employeeJson.firstName,
+      employeeJson.lastName,
+      employeeJson.documentNumber,
+      employeeJson.dateOfBirth,
     );
 
     const result = await handler.execute(command);

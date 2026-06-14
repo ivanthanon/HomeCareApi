@@ -26,30 +26,42 @@ describe('SqlServerEmployeeRepository', () => {
 
   describe('create', () => {
     it('Should insert an employee into the database', async () => {
-      const employee = new Employee(
-        '550E8400-E29B-41D4-A716-446655440000',
-        'María',
-        'García López',
-        '12345678A',
-        '1985-03-15',
+      const expectedEmployee = {
+        id: '550E8400-E29B-41D4-A716-446655440000',
+        firstName: 'María',
+        lastName: 'García López',
+        documentNumber: '12345678A',
+        dateOfBirth: '1985-03-15',
+      };
+
+      const employee = Employee.create(
+        expectedEmployee.id,
+        expectedEmployee.firstName,
+        expectedEmployee.lastName,
+        expectedEmployee.documentNumber,
+        expectedEmployee.dateOfBirth,
+        new Date()
       );
 
-      await repository.create(employee);
+      if (employee.success == true) {
+        await repository.create(employee.value);
+      }
 
       const result = await setup.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
-        { id: employee.id },
+        { id: expectedEmployee.id },
       );
       expect(result.recordset).toHaveLength(1);
       const fromDb = result.recordset[0];
-      const employeeFromDb = new Employee(
-        fromDb.id,
-        fromDb.firstName,
-        fromDb.lastName,
-        fromDb.documentNumber,
-        new Date(fromDb.dateOfBirth).toISOString().split('T')[0],
-      );
-      expect(employeeFromDb).toEqual(employee);
+      expect(fromDb).toMatchObject({
+        id: expectedEmployee.id,
+        firstName: expectedEmployee.firstName,
+        lastName: expectedEmployee.lastName,
+        documentNumber: expectedEmployee.documentNumber,
+      });
+      const expectedDate = new Date(expectedEmployee.dateOfBirth).toISOString().split('T')[0];
+      const actualDate = fromDb.dateOfBirth.toISOString().split('T')[0];
+      expect(actualDate).toBe(expectedDate);
     });
   });
 });
