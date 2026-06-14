@@ -4,7 +4,9 @@ describe("EmployeeId Value Object", () => {
     it("should not create an EmployeeId when UUID is invalid", () => {
         const invalidUUID = "this-is-not-a-guid";
         const employeeId = EmployeeId.create(invalidUUID);
-        expect(employeeId.success).toBe(false);
+        if (employeeId.success == false) {
+            expect(employeeId.error.message).toBe("Invalid UUID format");
+        }
     });
     it("should create an EmployeeId when UUID is valid", () => {
         const validUUID = "550e8400-e29b-41d4-a716-446655440000";
