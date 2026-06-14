@@ -8,6 +8,10 @@ export class DocumentNumber {
             return Err(new Error("Invalid document number format. It must be exactly 9 characters long."));
         }
 
-        return Ok(new DocumentNumber("value"));
+        if (!/[A-Z]/.test(value.charAt(8))) {
+            return Err(new Error("Invalid document number format. The last character must be a capital letter."));
+        }
+
+        return Ok(new DocumentNumber(value));
     }
 }
