@@ -8,6 +8,6 @@ export class EmployeeId {
             return Err(new Error());
         }
         
-        return Err((new Error()));
+        return Ok(new EmployeeId(value));
     }
 }
