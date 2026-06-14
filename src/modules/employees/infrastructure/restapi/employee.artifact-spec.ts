@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
-import { Employee } from 'src/modules/employees/domain/entities/employee';
+import { Employee } from 'src/modules/employees/domain/employee';
 import { ArtifactTestBase } from 'testhelpers/base/artifact-test.base';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {

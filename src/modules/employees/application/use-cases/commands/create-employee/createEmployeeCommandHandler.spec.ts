@@ -1,6 +1,6 @@
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
-import { Employee } from 'src/modules/employees/domain/entities/employee';
+import { Employee } from 'src/modules/employees/domain/employee';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';

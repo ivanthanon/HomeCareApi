@@ -1,7 +1,7 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest';
 import { TestcontainerSetup } from 'testhelpers/base/testcontainer-setup';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
-import { Employee } from 'src/modules/employees/domain/entities/employee';
+import { Employee } from 'src/modules/employees/domain/employee';
 
 import testContainerSettings from 'testhelpers/base/testContainerSettings.json';
 

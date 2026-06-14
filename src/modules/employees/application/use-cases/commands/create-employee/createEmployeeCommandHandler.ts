@@ -1,5 +1,5 @@
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
-import { Employee } from 'src/modules/employees/domain/entities/employee';
+import { Employee } from 'src/modules/employees/domain/employee';
 import { Err, Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
 
