@@ -33,6 +33,7 @@ describe('CreateEmployeeCommandHandler', () => {
     );
 
     await handler.execute(command);
+
     const expectedEmployee = new Employee(
     { value: employeeJson.id },
     { value: employeeJson.firstName },
@@ -51,7 +52,6 @@ describe('CreateEmployeeCommandHandler', () => {
       documentNumber: '12345678K',
       dateOfBirth: '2008-06-14',
     };
-
     const command = new CreateEmployeeCommand(
       employeeJson.id,
       employeeJson.firstName,
