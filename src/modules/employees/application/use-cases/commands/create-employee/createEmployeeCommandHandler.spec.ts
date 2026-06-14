@@ -24,7 +24,6 @@ describe('CreateEmployeeCommandHandler', () => {
       documentNumber: '12345789K',
       dateOfBirth: '1991-06-13',
     };
-
     const command = new CreateEmployeeCommand(
       employeeJson.id,
       employeeJson.firstName,
@@ -34,14 +33,14 @@ describe('CreateEmployeeCommandHandler', () => {
     );
 
     await handler.execute(command);
-
-    expect(mockRepository.create).toHaveBeenCalledWith(expect.any(Employee));
-    const passedEmployee = vi.mocked(mockRepository.create).mock.calls[0][0] as Employee;  
-    expect(passedEmployee.id.value).toBe(employeeJson.id);
-    expect(passedEmployee.firstName.value).toBe(employeeJson.firstName);
-    expect(passedEmployee.lastName.value).toBe(employeeJson.lastName);
-    expect(passedEmployee.documentNumber.value).toBe(employeeJson.documentNumber);
-    expect(passedEmployee.dateOfBirth.value).toBe(employeeJson.dateOfBirth);
+    const expectedEmployee = new Employee(
+    { value: employeeJson.id },
+    { value: employeeJson.firstName },
+    { value: employeeJson.lastName },
+    { value: employeeJson.documentNumber },
+    { value: employeeJson.dateOfBirth },
+    );
+    expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);
   });
 
   it('should throw an error if given employee is not an adult', async () => {
