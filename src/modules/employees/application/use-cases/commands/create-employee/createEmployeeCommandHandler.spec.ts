@@ -36,7 +36,7 @@ describe('CreateEmployeeCommandHandler', () => {
     await handler.execute(command);
 
     expect(mockRepository.create).toHaveBeenCalledWith(expect.any(Employee));
-    const passedEmployee = mockRepository.create.mock.calls[0][0];
+    const passedEmployee = vi.mocked(mockRepository.create).mock.calls[0][0] as Employee;  
     expect(passedEmployee.id.value).toBe(employeeJson.id);
     expect(passedEmployee.firstName.value).toBe(employeeJson.firstName);
     expect(passedEmployee.lastName.value).toBe(employeeJson.lastName);
