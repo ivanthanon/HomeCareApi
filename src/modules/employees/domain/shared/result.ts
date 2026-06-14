@@ -10,9 +10,9 @@ export type Failure<E> = {
 
 export type Result<T, E = Error> = Success<T> | Failure<E>;
 
-export const Ok = <T>(value: T): Success<T> => ({
+export const Ok = <T = void>(value?: T): Success<T> => ({
   success: true,
-  value,
+  value: value as T,
 });
 
 export const Err = <E>(error: E): Failure<E> => ({

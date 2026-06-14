@@ -25,6 +25,6 @@ export class CreateEmployeeCommandHandler {
 
     await this.employeeRepository.create(employeeResult.value);
     
-    return Ok(undefined);
+    return Ok();
   }
 }
