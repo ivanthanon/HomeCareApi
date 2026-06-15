@@ -34,7 +34,6 @@ describe('SqlServerEmployeeRepository', () => {
         documentNumber: '12345678A',
         dateOfBirth: '1985-03-15',
       };
-
       const employee = Employee.create(
         expectedEmployee.id,
         expectedEmployee.firstName,
