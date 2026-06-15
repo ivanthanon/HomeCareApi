@@ -4,6 +4,7 @@ import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructur
 import { Employee } from 'src/modules/employees/domain/employee';
 
 import testContainerSettings from 'testhelpers/base/testContainerSettings.json';
+import { Success } from 'src/modules/employees/domain/shared/result';
 
 class SqlServerEmployeeRepositoryTest extends TestcontainerSetup {
   constructor() {
@@ -42,10 +43,9 @@ describe('SqlServerEmployeeRepository', () => {
         expectedEmployee.dateOfBirth,
         new Date()
       );
-
-      if (employee.success == true) {
-        await repository.create(employee.value);
-      }
+      const employeeResult : Success<Employee> = employee as Success<Employee>;
+    
+      await repository.create(employeeResult.value);
 
       const result = await setup.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
