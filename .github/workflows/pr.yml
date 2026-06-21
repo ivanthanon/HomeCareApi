@@ -23,10 +23,10 @@ jobs:
           node-version: '24'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build TypeScript
         run: pnpm build
 
-      - name: Tests
+      - name: Run Tests
         run: pnpm test
