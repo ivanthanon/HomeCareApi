@@ -1,7 +1,7 @@
 import { Controller, Post, Body, HttpCode, Scope, BadRequestException } from '@nestjs/common';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
 
-@Controller({ path: 'employees', scope: Scope.REQUEST })
+@Controller({ path: 'employees' })
 export class EmployeesController {
   constructor(
     private readonly createEmployeeCommandHandler: CreateEmployeeCommandHandler,
