@@ -1,34 +1,28 @@
 name: PR Pipeline
 
-# El pipeline se activará CADA VEZ que se abra o actualice un Pull Request hacia main o master
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  pullrequest-validation:
-    runs-on: ubuntu-latest 
+  nestjs-validation:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: '24' 
+          cache: 'npm'       
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci         
 
       - name: Build application
-        run: pnpm build
+        run: npm run build
 
       - name: Run Unit Tests
-        run: pnpm test
+        run: npm run test
