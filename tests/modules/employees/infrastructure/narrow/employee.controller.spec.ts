@@ -75,7 +75,7 @@ describe('EmployeesController', () => {
 
             expect(response.body).toMatchObject({
                 "error": "Bad Request",
-                "message": "Employee name must not be empty",
+                "message": "Employee lastname must not be empty",
                 "statusCode": 400,
             });
         });

@@ -17,7 +17,7 @@ export class EmployeesController {
 
     
     if (!createEmployeeRequest.lastName) {
-      throw new BadRequestException('Employee name must not be empty');
+      throw new BadRequestException('Employee lastname must not be empty');
     }
 
     const command = new CreateEmployeeCommand(
