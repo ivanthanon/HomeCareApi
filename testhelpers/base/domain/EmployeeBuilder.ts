@@ -12,6 +12,6 @@ export class EmployeeBuilder {
             new Name(firstName),
             new Name(lastName),
             new DocumentNumber(documentNumber),
-            new DateOfBirth(dateOfBirth));
+            new DateOfBirth(new Date(dateOfBirth)));
     }
 }
