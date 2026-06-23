@@ -4,9 +4,9 @@ import { ConnectionPool } from 'mssql';
 import { EmployeesModule } from 'src/employees.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
-import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
-import { DateClockStub } from 'src/modules/employees/infrastructure/adapters/driven/dateClock';
-import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
+import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { DateClockStub } from 'src/modules/employees/infrastructure/adapters/dateClock';
+import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 
 const testContainerSettings = require('./testContainerSettings.json');
 const config = testContainerSettings as ITestContainerConfig;

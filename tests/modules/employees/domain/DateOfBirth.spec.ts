@@ -1,5 +1,5 @@
-import { Failure } from "../shared/result";
-import { DateOfBirth } from "./DateOfBirth";
+import { Failure } from "src/modules/employees/domain/shared/result";
+import { DateOfBirth } from "src/modules/employees/domain/value-objects/DateOfBirth";
 
 describe('DateOfBirth VO', () => {
     it.each([

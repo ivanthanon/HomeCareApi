@@ -5,7 +5,7 @@ import { EmployeeId } from "src/modules/employees/domain/value-objects/EmployeeI
 import { Name } from "src/modules/employees/domain/value-objects/Name";
 
 
-export class EmployeeBuilder {
+export class EmployeeFactory {
     static fromPrimitives(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: string): Employee {
         return new Employee(
             new EmployeeId(id),

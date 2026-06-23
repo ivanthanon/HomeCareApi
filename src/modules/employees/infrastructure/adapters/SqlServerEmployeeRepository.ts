@@ -1,4 +1,3 @@
-import { Injectable, Scope } from '@nestjs/common';
 import { ConnectionPool, Date, NVarChar, UniqueIdentifier } from 'mssql';
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
 import { Employee } from "src/modules/employees/domain/employee";

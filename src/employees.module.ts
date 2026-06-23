@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConnectionPool } from 'mssql';
-import { EmployeesController } from 'src/modules/employees/infrastructure/endpoints/employee.controller';
-import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
-import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
+import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/employee.controller';
+import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
 import appConfig from './config/app.config';
-import { DateClock } from './modules/employees/infrastructure/adapters/driven/dateClock';
-import { Clock } from './modules/employees/domain/shared/clock';
+import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
 
 @Module({
   controllers: [EmployeesController],

@@ -1,4 +1,4 @@
-import { EmployeeId } from './EmployeeId';
+import { EmployeeId } from "src/modules/employees/domain/value-objects/EmployeeId";
 
 describe("EmployeeId Value Object", () => {
     it("should not create an EmployeeId when UUID is invalid", () => {

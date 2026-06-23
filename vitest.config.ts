@@ -7,8 +7,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       'src': path.resolve(__dirname, './src'),
-      'test': path.resolve(__dirname, './testhelpers'),
-      'testhelpers': path.resolve(__dirname, './testhelpers')
+      'tests': path.resolve(__dirname, './tests')
     },
   },
   plugins: [unpluginSwc.vite()],

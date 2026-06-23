@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
-import { ArtifactTestBase } from 'testhelpers/base/artifact-test.base';
+import { ArtifactTestBase } from 'tests/base/artifact-test.base';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
   class EmployeesArtifactTest extends ArtifactTestBase { }
