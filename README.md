@@ -25,51 +25,66 @@ HomeCareApi/
 │   ├── employees.module.ts              # Root NestJS module
 │   ├── config/
 │   │   └── app.config.ts                # Configuration
+│   ├── database/                        # Database layer
+│   │   ├── config.ts
+│   │   ├── connection.ts
+│   │   ├── IMigration.ts
+│   │   ├── migrationRunner.ts
+│   │   ├── runMigrations.ts
+│   │   └── migrations/
+│   │       └── 001_create_workers_table.ts
 │   └── modules/
 │       └── employees/                   # Bounded context
 │           ├── domain/                  # Domain layer
 │           │   ├── employee.ts          # Employee aggregate root
 │           │   ├── repositories/
-│           │   │   └── employee.repository.ts      
-│           │   ├── value-objects/                  
+│           │   │   └── employee.repository.ts
+│           │   ├── value-objects/
 │           │   │   ├── EmployeeId.ts
 │           │   │   ├── Name.ts
 │           │   │   ├── DocumentNumber.ts
-│           │   │   ├── DateOfBirth.ts
-│           │   │   └── *.spec.ts                   
+│           │   │   └── DateOfBirth.ts
 │           │   └── shared/
-│           │       ├── clock.ts         
-│           │       └── result.ts        
+│           │       ├── clock.ts
+│           │       ├── result.ts
+│           │       └── utils.ts
 │           │
-│           ├── application/             
-│           │   └── use-cases/
-│           │       ├── commands/
-│           │       │   └── create-employee/
-│           │       │       ├── createEmployeeCommandHandler.ts
-│           │       │       └── createEmployeeCommandHandler.spec.ts
-│           │       └── queries/         
+│           ├── application/
+│           │   └── create-employee/
+│           │       └── createEmployeeCommandHandler.ts
 │           │
-│           └── infrastructure/          
-│               ├── adapters/driven/
+│           └── infrastructure/
+│               ├── adapters/
 │               │   ├── SqlServerEmployeeRepository.ts
-│               │   ├── sqlServerEmployeeRepository.spec.ts
 │               │   └── dateClock.ts
-│               ├── database/           # migrations database for environment            
-│               │   ├── config.ts
-│               │   ├── connection.ts
-│               │   ├── migrationRunner.ts
-│               │   ├── runMigrations.ts
-│               │   └── migrations/
-│               │       └── 001_create_workers_table.ts
-│               └── endpoints/
-│                   ├── employee.controller.ts
-│                   └── employee.artifact-spec.ts   # artifact test
+│               └── restapi/
+│                   └── create-employee/
+│                       └── employee.controller.ts
 │
-├── testhelpers/                         # Shared test infrastructure
-│   └── base/
-│       ├── artifact-test.base.ts        # artifact test base (NestJS + TestContainer)
-│       ├── testcontainer-setup.ts       # Testcontainers setup (MSSQL)
-│       └── testContainerSettings.json
+├── tests/                               # Tests
+│   ├── base/
+│   │   ├── artifact-test.base.ts
+│   │   ├── testcontainer-setup.ts
+│   │   └── testContainerSettings.json
+│   └── modules/
+│       └── employees/
+│           ├── application/
+│           │   └── create-employee/
+│           │       └── createEmployeeCommandHandler.spec.ts
+│           ├── domain/
+│           │   ├── EmployeeId.spec.ts
+│           │   ├── Name.spec.ts
+│           │   ├── DocumentNumber.spec.ts
+│           │   ├── DateOfBirth.spec.ts
+│           │   └── EmployeeFactory.ts
+│           └── infrastructure/
+│               ├── narrow/
+│               │   ├── sqlServerEmployeeRepository.spec.ts
+│               │   └── employee.controller.spec.ts
+│               ├── artifact/
+│               │   └── create-an-employee.artifact-spec.ts
+│               └── stubs/
+│                   └── dateClockStub.ts
 │
 ├── vitest.config.ts                     # Vitest configuration
 ├── nest-cli.json                        # NestJS CLI configuration

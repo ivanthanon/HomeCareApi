@@ -1,13 +1,12 @@
-import { connectToDatabase, pool } from 'src/modules/employees/infrastructure/database/connection';
-import { connectionString } from 'src/modules/employees/infrastructure/database/config';
-import { MigrationRunner } from 'src/modules/employees/infrastructure/database/migrationRunner';
+import { connectToDatabase, pool } from './connection';
+import { MigrationRunner } from './migrationRunner';
 
 async function run() {
   const command = process.argv[2] || 'up';
 
   try {
     await connectToDatabase();
-    const migrationRunner = new MigrationRunner(pool, connectionString);
+    const migrationRunner = new MigrationRunner(pool);
 
     if (command === 'up') {
       await migrationRunner.runMigrations();
