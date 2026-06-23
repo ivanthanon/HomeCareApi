@@ -22,8 +22,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
     await testCase.cleanTable('employees');
   });
 
-  describe('create_a_employee', () => {
-    it('Should create an employee', async () => {
+  describe('when creating a valid employee', () => {
+    it('should persist the employee in the database', async () => {
       const employee = {
         id: '550E8400-E29B-41D4-A716-446655440000',
         firstName: 'María',
@@ -55,8 +55,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
     });
   });
 
-  describe('Should not create a employee', () => {
-    it('when is not an adult', async () => {
+  describe('when employee is not an adult', () => {
+    it('should return a 400 Bad Request error', async () => {
       const employee = {
         id: '550E8400-E29B-41D4-A716-446655330000',
         firstName: 'María',
