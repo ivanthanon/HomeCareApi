@@ -24,6 +24,10 @@ export class EmployeesController {
       throw new BadRequestException('Employee id must be a valid guid');
     }
 
+    if (!createEmployeeRequest.documentNumber) {
+      throw new BadRequestException('Employee document number must not be empty')
+    }
+
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
       createEmployeeRequest.firstName,
