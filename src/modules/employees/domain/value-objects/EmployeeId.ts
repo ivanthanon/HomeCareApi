@@ -1,6 +1,6 @@
 import { Ok, Err, Result } from "src/modules/employees/domain/shared/result";
 export class EmployeeId {
-    private constructor(readonly value: string) {}
+    public constructor(readonly value: string) {}
 
     public static create(value: string): Result<EmployeeId, Error> {
         if (this.IsAValidGuid(value) == false) {
