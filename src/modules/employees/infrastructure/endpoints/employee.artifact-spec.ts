@@ -37,20 +37,20 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         .send(employee)
         .expect(201);
 
-      const result = await testCase.executeQuery(
+      const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
         { id: employee.id },
       );
-      expect(result.recordset).toHaveLength(1);
-      const fromDb = result.recordset[0];
-      expect(fromDb).toMatchObject({
+      expect(query.recordset).toHaveLength(1);
+      const employeeFromDatabase = query.recordset[0];
+      expect(employeeFromDatabase).toMatchObject({
         id: employee.id,
         firstName: employee.firstName,
         lastName: employee.lastName,
         documentNumber: employee.documentNumber,
       });
       const expectedDate = new Date(employee.dateOfBirth).toISOString().split('T')[0];
-      const actualDate = fromDb.dateOfBirth.toISOString().split('T')[0];
+      const actualDate = employeeFromDatabase.dateOfBirth.toISOString().split('T')[0];
       expect(actualDate).toBe(expectedDate);
     });
   });
@@ -65,7 +65,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         dateOfBirth: '2026-02-10',
       };
 
-      var response = await request(testCase['app'].getHttpServer())
+      const response = await request(testCase['app'].getHttpServer())
         .post(path)
         .send(employee)
         .expect(400);
@@ -76,11 +76,11 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         "statusCode": 400,
       }
       expect(response.body).toStrictEqual(expectedResponse);
-      const result = await testCase.executeQuery(
+      const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
         { id: employee.id },
       );
-      expect(result.recordset).toHaveLength(0);
+      expect(query.recordset).toHaveLength(0);
     });
   });
 });
