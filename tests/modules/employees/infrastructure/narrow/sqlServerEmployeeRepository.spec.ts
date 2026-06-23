@@ -1,8 +1,8 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest';
-import { TestcontainerSetup } from 'testhelpers/base/testcontainer-setup';
-import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/driven/SqlServerEmployeeRepository';
-import testContainerSettings from 'testhelpers/base/testContainerSettings.json';
-import { EmployeeBuilder } from 'testhelpers/base/domain/EmployeeBuilder';
+import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
+import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
+import testContainerSettings from 'tests/base/testContainerSettings.json';
+import { EmployeeFactory } from 'tests/modules/employees/domain/EmployeeFactory';
 
 class SqlServerEmployeeRepositoryTest extends TestcontainerSetup {
   constructor() {
@@ -25,7 +25,7 @@ describe('SqlServerEmployeeRepository', () => {
 
   describe('create', () => {
     it('Should insert an employee into the database', async () => {
-      const employeeToCreate = EmployeeBuilder.fromPrimitives(
+      const employeeToCreate = EmployeeFactory.fromPrimitives(
         '550E8400-E29B-41D4-A716-446655440000',
         'María',
         'García López',

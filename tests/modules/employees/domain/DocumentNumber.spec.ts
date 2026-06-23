@@ -1,4 +1,4 @@
-import { DocumentNumber } from "./DocumentNumber";
+import { DocumentNumber } from "src/modules/employees/domain/value-objects/DocumentNumber";
 
 describe("DocumentNumber VO", () => {  
     it("should not create a DocumentNumber when value is valid", () => {

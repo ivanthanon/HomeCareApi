@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpCode, Scope, BadRequestException } from '@nestjs/common';
-import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
+import { Controller, Post, Body, HttpCode, BadRequestException } from '@nestjs/common';
+import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 
 @Controller({ path: 'employees' })
 export class EmployeesController {

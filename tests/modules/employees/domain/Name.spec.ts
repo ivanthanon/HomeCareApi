@@ -1,4 +1,4 @@
-import { Name } from "./Name";
+import { Name } from "src/modules/employees/domain/value-objects/Name";
 
 describe("Name Value Object", () =>  {
     it("should not create a Name when value is less than two characters", () => {

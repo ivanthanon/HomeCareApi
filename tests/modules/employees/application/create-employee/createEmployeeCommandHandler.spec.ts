@@ -1,9 +1,9 @@
-import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/use-cases/commands/create-employee/createEmployeeCommandHandler';
+import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
-import { EmployeeBuilder } from 'testhelpers/base/domain/EmployeeBuilder';
+import { EmployeeFactory } from 'tests/modules/employees/domain/EmployeeFactory';
 
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
@@ -27,7 +27,7 @@ describe('CreateEmployeeCommandHandler', () => {
 
     await handler.execute(command);
 
-    const expectedEmployee = EmployeeBuilder.fromPrimitives(
+    const expectedEmployee = EmployeeFactory.fromPrimitives(
       command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth
     )
     expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);

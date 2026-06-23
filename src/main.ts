@@ -1,11 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ConnectionPool } from 'mssql';
-import { config as loadDotenv } from 'dotenv';
-import { resolve } from 'path';
 import { EmployeesModule } from './employees.module';
-import { MigrationRunner } from './modules/employees/infrastructure/database/migrationRunner';
+import { MigrationRunner } from './database/migrationRunner';
 
-loadDotenv({ path: resolve(process.cwd(), '.env') });
 
 function dbConfig() {
   return {

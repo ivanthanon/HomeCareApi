@@ -55,7 +55,7 @@ export class TestcontainerSetup {
 
     console.log(`[TEST] ✓ Connected to dynamic DB: ${this.testDbName}`);
 
-    const { MigrationRunner } = await import('../../src/modules/employees/infrastructure/database/migrationRunner');
+    const { MigrationRunner } = await import('src/database/migrationRunner');
     const migrationRunner = new MigrationRunner(this.dbConnection);
     await migrationRunner.runMigrations();
     console.log('[TEST] ✓ Migrations applied correctly');
