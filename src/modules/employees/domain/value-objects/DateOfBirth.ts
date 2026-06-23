@@ -1,7 +1,7 @@
 import { Ok, Err, Result } from "src/modules/employees/domain/shared/result";
 
 export class DateOfBirth {
-    private constructor(readonly value: string) { }
+    public constructor(readonly value: string) { }
 
     public static create(value: string, currentDate: Date): Result<DateOfBirth, Error> {
         if (!this.IsAdult(currentDate, value)) {

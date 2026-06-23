@@ -1,7 +1,7 @@
 import { Ok, Err, Result } from "src/modules/employees/domain/shared/result";
 
 export class DocumentNumber {
-    private constructor (readonly value: string) {}
+    public constructor (readonly value: string) {}
 
     public static create(value: string): Result<DocumentNumber, Error> {
         if (value.length !== 9) {
