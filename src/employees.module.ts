@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConnectionPool } from 'mssql';
-import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/employee.controller';
+import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';

@@ -10,6 +10,11 @@ export class EmployeesController {
   @Post()
   @HttpCode(201)
   async createEmployee(@Body() createEmployeeRequest: CreateEmployeeRequest) {
+
+    if (!createEmployeeRequest.firstName) {
+      throw new BadRequestException('Employee name must not be empty');
+    }
+
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
       createEmployeeRequest.firstName,
