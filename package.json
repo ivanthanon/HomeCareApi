@@ -8,19 +8,17 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch -- exec \"node --env-file=.env\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "vitest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "vitest run --dir test --config vitest.config.ts",
-    "migration:up": "ts-node src/modules/employees/infrastructure/database/runMigrations.ts up",
-    "migration:down": "ts-node src/modules/employees/infrastructure/database/runMigrations.ts down"
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude='**/*.artifact-spec.ts'",
+    "test:artifact": "vitest run artifact",
+    "migration:up": "node --env-file=.env -r ts-node/register src/database/runMigrations.ts up",
+    "migration:down": "node --env-file=.env -r ts-node/register src/database/runMigrations.ts down"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
