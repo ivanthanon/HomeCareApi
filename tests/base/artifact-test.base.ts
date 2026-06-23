@@ -5,8 +5,8 @@ import { EmployeesModule } from 'src/employees.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
-import { DateClockStub } from 'src/modules/employees/infrastructure/adapters/dateClock';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
+import { DateClockStub } from 'tests/modules/employees/infrastructure/stubs/dateClockStub';
 
 const testContainerSettings = require('./testContainerSettings.json');
 const config = testContainerSettings as ITestContainerConfig;

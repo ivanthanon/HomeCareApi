@@ -5,9 +5,3 @@ export class DateClock implements Clock {
         return new Date();
     }
 }
-
-export class DateClockStub implements Clock {
-    now(): Date {
-        return new Date('2026-01-01T00:00:00.000Z');
-    }
-}

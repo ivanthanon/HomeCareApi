@@ -1,12 +1,11 @@
 import { Ok, Err, Result } from "src/modules/employees/domain/shared/result";
+import { isAValidDate } from "../shared/utils";
 
 export class DateOfBirth {
     public constructor(readonly value: Date) { }
 
     public static create(value: string, currentDate: Date): Result<DateOfBirth, Error> {
-        const dateOfBirth = Date.parse(value);
-
-        if (isNaN(dateOfBirth)) {
+        if (!isAValidDate(value)) {
             return Err(new Error("The date of birth is not a valid Date"))
         }
 
@@ -14,7 +13,7 @@ export class DateOfBirth {
             return Err(new Error("Employee must be an adult"));
         }
         
-        return Ok(new DateOfBirth(new Date(dateOfBirth)));
+        return Ok(new DateOfBirth(new Date(value)));
     }
 
     private static IsAdult(currentDate: Date, dateOfBirth: string): boolean {
