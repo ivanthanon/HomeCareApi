@@ -28,6 +28,12 @@ export class EmployeesController {
       throw new BadRequestException('Employee document number must not be empty')
     }
 
+    const dateOfBirth = Date.parse(createEmployeeRequest.dateOfBirth);
+    
+    if (isNaN(dateOfBirth)) {
+        throw new BadRequestException('Employee date of birth number must be a valid date')
+    }
+
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
       createEmployeeRequest.firstName,
@@ -43,8 +49,6 @@ export class EmployeesController {
 
     return;
   }
-
-
 }
 
 

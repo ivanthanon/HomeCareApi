@@ -128,4 +128,28 @@ describe('EmployeesController', () => {
             });
         });
     });
+
+    describe('When employee has a invalid date', () => {
+        it('should not create a employee', async () => {
+            const createEmployeeRequest = {
+                id: '550e8400-e29b-41d4-a716-446655440000',
+                firstName: 'Juan',
+                lastName: 'Doe',
+                documentNumber: '44444444X',
+                dateOfBirth: 'errorDate',
+            };
+            createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
+
+            const response = await request(app.getHttpServer())
+                .post(path)
+                .send(createEmployeeRequest)
+                .expect(400);
+
+            expect(response.body).toMatchObject({
+                "error": "Bad Request",
+                "message": "Employee date of birth number must be a valid date",
+                "statusCode": 400,
+            });
+        });
+    });
 });
