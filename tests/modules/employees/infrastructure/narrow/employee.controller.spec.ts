@@ -56,4 +56,28 @@ describe('EmployeesController', () => {
             });
         });
     });
+
+    describe('When employee has a empty lastName', () => {
+        it('should not create a employee', async () => {
+            const createEmployeeRequest = {
+                id: '550e8400-e29b-41d4-a716-446655440000',
+                firstName: 'Juanito',
+                lastName: '',
+                documentNumber: '12345678',
+                dateOfBirth: '1990-01-01',
+            };
+            createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
+
+            const response = await request(app.getHttpServer())
+                .post(path)
+                .send(createEmployeeRequest)
+                .expect(400);
+
+            expect(response.body).toMatchObject({
+                "error": "Bad Request",
+                "message": "Employee name must not be empty",
+                "statusCode": 400,
+            });
+        });
+    });
 });
