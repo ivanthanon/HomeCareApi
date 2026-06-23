@@ -1,5 +1,6 @@
 import { Controller, Post, Body, HttpCode, BadRequestException } from '@nestjs/common';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { isAValidDate, isAValidGuid } from 'src/modules/employees/domain/shared/utils';
 
 @Controller({ path: 'employees' })
 export class EmployeesController {
@@ -47,18 +48,10 @@ export class EmployeesController {
       throw new BadRequestException('Employee document number must not be empty');
     }
 
-    const dateOfBirth = Date.parse(createEmployeeRequest.dateOfBirth);
-
-    if (isNaN(dateOfBirth)) {
+    if (!isAValidDate(createEmployeeRequest.dateOfBirth)) {
       throw new BadRequestException('Employee date of birth number must be a valid date');
     }
   }
-}
-
-
-function isAValidGuid(value: string): boolean {
-  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-  return uuidRegex.test(value);
 }
 
 export interface CreateEmployeeRequest {
