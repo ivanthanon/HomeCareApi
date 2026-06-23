@@ -4,6 +4,12 @@ export class DateOfBirth {
     public constructor(readonly value: string) { }
 
     public static create(value: string, currentDate: Date): Result<DateOfBirth, Error> {
+        const dateOfBirth = Date.parse(value);
+
+        if (isNaN(dateOfBirth)) {
+            return Err(new Error("The date of birth is not a valid Date"))
+        }
+        
         if (!this.IsAdult(currentDate, value)) {
             return Err(new Error("Employee must be an adult"));
         }
