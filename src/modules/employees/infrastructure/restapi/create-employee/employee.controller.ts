@@ -11,28 +11,7 @@ export class EmployeesController {
   @HttpCode(201)
   async createEmployee(@Body() createEmployeeRequest: CreateEmployeeRequest) {
 
-    if (!createEmployeeRequest.firstName) {
-      throw new BadRequestException('Employee name must not be empty');
-    }
-
-    
-    if (!createEmployeeRequest.lastName) {
-      throw new BadRequestException('Employee lastname must not be empty');
-    }
-
-    if (!isAValidGuid(createEmployeeRequest.id)) {
-      throw new BadRequestException('Employee id must be a valid guid');
-    }
-
-    if (!createEmployeeRequest.documentNumber) {
-      throw new BadRequestException('Employee document number must not be empty')
-    }
-
-    const dateOfBirth = Date.parse(createEmployeeRequest.dateOfBirth);
-    
-    if (isNaN(dateOfBirth)) {
-        throw new BadRequestException('Employee date of birth number must be a valid date')
-    }
+    this.validateRequest(createEmployeeRequest);
 
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
@@ -48,6 +27,31 @@ export class EmployeesController {
     }
 
     return;
+  }
+
+  private validateRequest(createEmployeeRequest: CreateEmployeeRequest) {
+    if (!createEmployeeRequest.firstName) {
+      throw new BadRequestException('Employee name must not be empty');
+    }
+
+
+    if (!createEmployeeRequest.lastName) {
+      throw new BadRequestException('Employee lastname must not be empty');
+    }
+
+    if (!isAValidGuid(createEmployeeRequest.id)) {
+      throw new BadRequestException('Employee id must be a valid guid');
+    }
+
+    if (!createEmployeeRequest.documentNumber) {
+      throw new BadRequestException('Employee document number must not be empty');
+    }
+
+    const dateOfBirth = Date.parse(createEmployeeRequest.dateOfBirth);
+
+    if (isNaN(dateOfBirth)) {
+      throw new BadRequestException('Employee date of birth number must be a valid date');
+    }
   }
 }
 
