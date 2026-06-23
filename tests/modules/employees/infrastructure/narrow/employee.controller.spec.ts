@@ -80,4 +80,28 @@ describe('EmployeesController', () => {
             });
         });
     });
+
+    describe('When employee has a invalid id', () => {
+        it('should not create a employee', async () => {
+            const createEmployeeRequest = {
+                id: 'pepito',
+                firstName: 'Juan',
+                lastName: 'Doe',
+                documentNumber: '12345678',
+                dateOfBirth: '1990-01-01',
+            };
+            createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
+
+            const response = await request(app.getHttpServer())
+                .post(path)
+                .send(createEmployeeRequest)
+                .expect(400);
+
+            expect(response.body).toMatchObject({
+                "error": "Bad Request",
+                "message": "Employee id must be a valid guid",
+                "statusCode": 400,
+            });
+        });
+    });
 });

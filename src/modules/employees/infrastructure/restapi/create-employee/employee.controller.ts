@@ -20,6 +20,10 @@ export class EmployeesController {
       throw new BadRequestException('Employee lastname must not be empty');
     }
 
+    if (!isAValidGuid(createEmployeeRequest.id)) {
+      throw new BadRequestException('Employee id must be a valid guid');
+    }
+
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
       createEmployeeRequest.firstName,
@@ -35,6 +39,14 @@ export class EmployeesController {
 
     return;
   }
+
+
+}
+
+
+function isAValidGuid(value: string): boolean {
+  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  return uuidRegex.test(value);
 }
 
 export interface CreateEmployeeRequest {
