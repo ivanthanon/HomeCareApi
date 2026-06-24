@@ -4,6 +4,7 @@ import { EmployeeInMemoryRepository } from "./EmployeeInMemoryRepository";
 import { Clock } from "src/modules/employees/domain/shared/clock";
 import { Employee } from "src/modules/employees/domain/employee";
 import { Failure } from "src/modules/employees/domain/shared/result";
+import { ConfigService } from "@nestjs/config";
 
 
 describe('CreateEmployeeCommandHandler', () => {
@@ -14,7 +15,7 @@ describe('CreateEmployeeCommandHandler', () => {
     beforeEach(() => {
         inMemoryRepository = new EmployeeInMemoryRepository();
         mockClock = new DateClockStub();
-        handler = new CreateEmployeeCommandHandler(inMemoryRepository, mockClock);
+        handler = new CreateEmployeeCommandHandler(inMemoryRepository, mockClock,  new ConfigService({app: {ageOfMajority: 18}}));
     })
 
     it('should create employee in memory repository', async () => {
@@ -51,4 +52,20 @@ describe('CreateEmployeeCommandHandler', () => {
         expect(failure.error.message).toBe('Employee must be an adult');
         expect(inMemoryRepository.employeeList.length).toBe(0);
     });
+
+    it('should throw an exception when configuration of age majority does not exist', async () => {
+        const command = new CreateEmployeeCommand(
+            '550e8400-e29b-41d4-a716-446655440000',
+            'John',
+            'Doe',
+            '12345678K',
+            '2008-06-14T00:00:00Z',
+        );
+        const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(inMemoryRepository, mockClock, new ConfigService());
+
+
+        await expect(handlerWithoutConfigAgeMajority.execute(command)).rejects.toThrow(
+            "The value of AgeOfMajority doesn't exist in configuration"
+        );
+    })
 })

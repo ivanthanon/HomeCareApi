@@ -34,8 +34,8 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
     },
     {
       provide: CreateEmployeeCommandHandler, 
-      useFactory: (employeeRepository: EmployeeRepository, clock: DateClock) => new CreateEmployeeCommandHandler(employeeRepository, new DateClock()),
-      inject: [SqlServerEmployeeRepository],
+      useFactory: (employeeRepository: EmployeeRepository, clock: DateClock, configService: ConfigService) => new CreateEmployeeCommandHandler(employeeRepository, new DateClock(), configService),
+      inject: [SqlServerEmployeeRepository, ConfigService]
     },
   ],
 })
