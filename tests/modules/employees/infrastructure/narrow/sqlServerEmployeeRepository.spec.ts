@@ -30,7 +30,7 @@ describe('SqlServerEmployeeRepository', () => {
         'María',
         'García López',
         '12345678A',
-        '1985-03-15',
+        '1985-03-15T00:00:00Z',
       );
     
       await repository.create(employeeToCreate);
@@ -46,10 +46,8 @@ describe('SqlServerEmployeeRepository', () => {
         firstName: employeeToCreate.firstName.value,
         lastName: employeeToCreate.lastName.value,
         documentNumber: employeeToCreate.documentNumber.value,
+        dateOfBirth: employeeToCreate.dateOfBirth.value
       });
-      const expectedDate = new Date(employeeToCreate.dateOfBirth.value).toISOString().split('T')[0];
-      const actualDate = fromDb.dateOfBirth.toISOString().split('T')[0];
-      expect(actualDate).toBe(expectedDate);
     });
   });
 });

@@ -39,7 +39,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '2008-06-14',
+      '2008-06-14T00:00:00Z',
     );
 
     const result = await handler.execute(command);

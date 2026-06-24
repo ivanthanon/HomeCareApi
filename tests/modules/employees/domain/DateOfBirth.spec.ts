@@ -3,9 +3,9 @@ import { DateOfBirth } from "src/modules/employees/domain/value-objects/DateOfBi
 
 describe('DateOfBirth VO', () => {
     it.each([
-        '2008-06-15',
-        '2008-07-13',
-        '2009-05-12'])
+        '2008-06-15T00:00:00Z',
+        '2008-07-13T00:00:00Z',
+        '2009-05-12T00:00:00Z'])
         ('should not create a DateOfBirth when is not an adult', (dateOfBirth) => {
         const currentDate = new Date('2026-06-14');
         const result = DateOfBirth.create(dateOfBirth, currentDate);
@@ -15,10 +15,10 @@ describe('DateOfBirth VO', () => {
     });
 
     it.each([
-        '2008-06-14',
-        '2008-06-13',
-        '2008-05-12',
-        '2007-05-05'])
+        '2008-06-14T00:00:00Z',
+        '2008-06-13T00:00:00Z',
+        '2008-05-12T00:00:00Z',
+        '2007-05-05T00:00:00Z'])
         ('should create a DateOfBirth when is an adult', (dateOfBirth) => {
         const currentDate = new Date('2026-06-14');
         const result = DateOfBirth.create(dateOfBirth, currentDate);
@@ -29,7 +29,7 @@ describe('DateOfBirth VO', () => {
 describe('When DateOfBirth is a invalid date', () => {
     it('should not createe a DateBirth', () => {
         const invalidDate = "InvalidDate";
-        const currentDate = new Date('2025-06-14');
+        const currentDate = new Date('2025-06-14T00:00:00Z');
         const result = DateOfBirth.create(invalidDate, currentDate);
 
         expect(result.success).toBe(false);
