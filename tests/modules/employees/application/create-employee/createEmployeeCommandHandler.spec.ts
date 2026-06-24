@@ -1,18 +1,19 @@
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
 import { Employee } from 'src/modules/employees/domain/employee';
+import { mock, MockProxy } from 'vitest-mock-extended';
 
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
-  let mockRepository: EmployeeRepository;
-  let mockClock: Clock;
+  let mockRepository: MockProxy<EmployeeRepository>;
+  let mockClock: MockProxy<Clock>;
 
   beforeEach(() => {
-    mockRepository = { create: vi.fn() };
-    mockClock = { now: vi.fn().mockReturnValue(new Date('2026-06-13T00:00:00.000Z')) };
+    mockRepository = mock<EmployeeRepository>();
+    mockClock = mock<Clock>();
     handler = new CreateEmployeeCommandHandler(mockRepository, mockClock);
   });
 
@@ -24,6 +25,7 @@ describe('CreateEmployeeCommandHandler', () => {
       '12345678K',
       '1991-06-13T00:00:00.000Z',
     );
+    mockClock.now.mockReturnValue(new Date('2026-06-13T00:00:00.000Z'));
 
     await handler.execute(command);
 
@@ -41,6 +43,7 @@ describe('CreateEmployeeCommandHandler', () => {
       '12345678K',
       '2008-06-14T00:00:00Z',
     );
+    mockClock.now.mockReturnValue(new Date('2026-06-13T00:00:00.000Z'));
 
     const result = await handler.execute(command);
 
