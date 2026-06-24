@@ -17,9 +17,8 @@ export class CreateEmployeeCommandHandler {
   constructor(private readonly employeeRepository: EmployeeRepository, private readonly clock: Clock) {}
   
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
-    const retrievedEmployee = await this.employeeRepository.getBy(command.id);
 
-    if (retrievedEmployee != null) {
+    if (await this.employeeAlreadyExist(command)) {
       return Ok();
     }
 
@@ -32,5 +31,9 @@ export class CreateEmployeeCommandHandler {
     await this.employeeRepository.create(employeeResult.value);
     
     return Ok();
+  }
+
+  private async employeeAlreadyExist(command: CreateEmployeeCommand) {
+    return await this.employeeRepository.getBy(command.id) != null;
   }
 }
