@@ -39,7 +39,7 @@ export class TestcontainerSetup {
         SA_PASSWORD: this.password
       })
       .withExposedPorts(this.config.sqlServer.exposedPort)
-      .withWaitStrategy(Wait.forLogMessage(new RegExp(this.config.sqlServer.waitStrategy.message)))
+      .withWaitStrategy(Wait.forListeningPorts())
       .start();
 
     this.testContainer = container;
