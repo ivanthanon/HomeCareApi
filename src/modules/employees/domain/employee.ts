@@ -57,4 +57,13 @@ export class Employee {
       )
     );
   }
+
+  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: string): Employee {
+        return new Employee(
+            new EmployeeId(id),
+            new Name(firstName),
+            new Name(lastName),
+            new DocumentNumber(documentNumber),
+            new DateOfBirth(new Date(dateOfBirth)));
+    }
 }
