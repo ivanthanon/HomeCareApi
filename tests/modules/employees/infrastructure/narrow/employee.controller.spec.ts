@@ -40,7 +40,7 @@ describe('EmployeesController', () => {
                 firstName: '',
                 lastName: 'Doe',
                 documentNumber: '12345678',
-                dateOfBirth: '1990-01-01',
+                dateOfBirth: '1990-01-01T00:00:00Z',
             };
             createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
 
@@ -64,7 +64,7 @@ describe('EmployeesController', () => {
                 firstName: 'Juanito',
                 lastName: '',
                 documentNumber: '12345678',
-                dateOfBirth: '1990-01-01',
+                dateOfBirth: '1990-01-01T00:00:00Z',
             };
             createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
 
@@ -88,7 +88,7 @@ describe('EmployeesController', () => {
                 firstName: 'Juan',
                 lastName: 'Doe',
                 documentNumber: '12345678',
-                dateOfBirth: '1990-01-01',
+                dateOfBirth: '1990-01-01T00:00:00Z',
             };
             createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
 
@@ -112,7 +112,7 @@ describe('EmployeesController', () => {
                 firstName: 'Juan',
                 lastName: 'Doe',
                 documentNumber: '',
-                dateOfBirth: '1990-01-01',
+                dateOfBirth: '1990-01-01T00:00:00Z',
             };
             createEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: false, error: new Error() });
 

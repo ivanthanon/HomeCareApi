@@ -3,7 +3,7 @@ import { EmployeeRepository } from 'src/modules/employees/domain/repositories/em
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
-import { EmployeeFactory } from 'tests/modules/employees/domain/EmployeeFactory';
+import { Employee } from 'src/modules/employees/domain/employee';
 
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
@@ -27,7 +27,7 @@ describe('CreateEmployeeCommandHandler', () => {
 
     await handler.execute(command);
 
-    const expectedEmployee = EmployeeFactory.fromPrimitives(
+    const expectedEmployee = Employee.reconstitute(
       command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth
     )
     expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);
@@ -39,7 +39,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '2008-06-14',
+      '2008-06-14T00:00:00Z',
     );
 
     const result = await handler.execute(command);
