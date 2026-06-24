@@ -20,12 +20,15 @@ REST API for managing home care employees. Built with **NestJS** + **TypeScript*
 
 ```
 HomeCareApi/
+├── .github/
+│   └── workflows/
+│       └── pr.yml                       # CI pipeline on pull request
 ├── src/
 │   ├── main.ts                          # Entry point
 │   ├── employees.module.ts              # Root NestJS module
 │   ├── config/
-│   │   └── app.config.ts                # Configuration
-│   ├── database/                        # Database layer
+│   │   └── app.config.ts               
+│   ├── database/                       
 │   │   ├── config.ts
 │   │   ├── connection.ts
 │   │   ├── IMigration.ts
@@ -61,7 +64,7 @@ HomeCareApi/
 │                   └── create-employee/
 │                       └── employee.controller.ts
 │
-├── tests/                               # Tests
+├── tests/                               
 │   ├── base/
 │   │   ├── artifact-test.base.ts
 │   │   ├── testcontainer-setup.ts
@@ -70,13 +73,14 @@ HomeCareApi/
 │       └── employees/
 │           ├── application/
 │           │   └── create-employee/
-│           │       └── createEmployeeCommandHandler.spec.ts
+│           │       ├── createEmployeeCommandHandler.spec.ts
+│           │       ├── createEmployeeCommandHandlerFake.spec.ts
+│           │       └── EmployeeInMemoryRepository.ts
 │           ├── domain/
 │           │   ├── EmployeeId.spec.ts
 │           │   ├── Name.spec.ts
 │           │   ├── DocumentNumber.spec.ts
-│           │   ├── DateOfBirth.spec.ts
-│           │   └── EmployeeFactory.ts
+│           │   └── DateOfBirth.spec.ts
 │           └── infrastructure/
 │               ├── narrow/
 │               │   ├── sqlServerEmployeeRepository.spec.ts
@@ -89,10 +93,12 @@ HomeCareApi/
 ├── vitest.config.ts                     # Vitest configuration
 ├── nest-cli.json                        # NestJS CLI configuration
 ├── tsconfig.json                        # TypeScript configuration
+├── tsconfig.build.json                  # TypeScript build configuration
 ├── package.json
 ├── pnpm-lock.yaml
 ├── docker-compose.yml                   # MSSQL 2022 for local development
 ├── eslint.config.mjs                    # ESLint flat config
+├── .prettierrc                          # Prettier config
 └── .env.example                         # Environment variable template
 ```
 
@@ -123,7 +129,8 @@ pnpm test:artifact        # Only artifact tests (artifact-spec)
 
 - **Testcontainers** spins up a real MSSQL 2019 container for integration and E2E tests.
 - `DateClockStub` allows controlling time in tests that depend on the current date.
-- Mocks via `vi.fn()` to isolate the application layer from the real repository.
+- Mocks via `MockProxy<EmployeeRepository>` to isolate the application layer from the real repository.
+- Fake via `EmployeeInMemoryRepository` to isolate the application layer from the real repository.
 
 ## API
 
