@@ -21,7 +21,7 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
     {
       provide: ConnectionPool,
       useFactory: async (configService: ConfigService) => {
-        const dbConfig = configService.get('settings.database');
+        const dbConfig = configService.get('database');
         const pool = new ConnectionPool(dbConfig);
         return pool.connect();
       },
