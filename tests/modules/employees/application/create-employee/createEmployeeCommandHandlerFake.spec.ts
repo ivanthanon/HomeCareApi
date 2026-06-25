@@ -1,6 +1,6 @@
 import { CreateEmployeeCommand, CreateEmployeeCommandHandler } from "src/modules/employees/application/create-employee/createEmployeeCommandHandler"
 import { DateClockStub } from "../../infrastructure/stubs/dateClockStub";
-import { EmployeeInMemoryRepository } from "./EmployeeInMemoryRepository";
+import { EmployeeInMemoryRepository } from "../../infrastructure/contract/EmployeeInMemoryRepository";
 import { Clock } from "src/modules/employees/domain/shared/clock";
 import { Employee } from "src/modules/employees/domain/employee";
 import { Failure } from "src/modules/employees/domain/shared/result";
