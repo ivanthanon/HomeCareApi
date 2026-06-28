@@ -6,6 +6,11 @@ export class EmployeeInMemoryRepository implements EmployeeRepository {
 
     public constructor() { }
 
+    async getBy(id: string): Promise<Employee | null> {
+        const employee = this.employeeList.find(emp => emp.id.value === id);
+        return employee || null;    
+    }
+
     async create(employee: Employee): Promise<void> {
         this.employeeList.push(employee);
     }

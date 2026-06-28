@@ -18,12 +18,17 @@ export class CreateEmployeeCommandHandler {
   constructor(private readonly employeeRepository: EmployeeRepository, private readonly clock: Clock, private readonly configService: ConfigService) {}
   
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
+
+    if (await this.employeeAlreadyExist(command)) {
+      return Ok();
+    }
+
     const ageOfMajority = this.configService.get<number>('app.ageOfMajority');
 
     if (ageOfMajority === undefined) {
       throw new Error("The value of AgeOfMajority doesn't exist in configuration")
     }
-
+    
     const employeeResult = Employee.create(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth, this.clock.now(), ageOfMajority);
 
     if (employeeResult.success === false) {
@@ -33,5 +38,9 @@ export class CreateEmployeeCommandHandler {
     await this.employeeRepository.create(employeeResult.value);
     
     return Ok();
+  }
+
+  private async employeeAlreadyExist(command: CreateEmployeeCommand) {
+    return await this.employeeRepository.getBy(command.id) != null;
   }
 }

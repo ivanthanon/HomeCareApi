@@ -53,6 +53,24 @@ describe('CreateEmployeeCommandHandler', () => {
     expect(failure.error.message).toBe('Employee must be an adult');
   });
 
+  it('should not call to save when employee already exists and return success', async () => {
+    const command = new CreateEmployeeCommand(
+      '550e8400-e29b-41d4-a716-446655440000',
+      'John',
+      'Doe',
+      '12345678K',
+      '1991-06-14',
+    );
+    mockRepository.getBy.mockResolvedValue(
+      Employee.reconstitute(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth)
+    );
+
+    const result = await handler.execute(command);
+
+    expect(result.success).toBe(true);
+    expect(mockRepository.create).toHaveBeenCalledTimes(0);
+  })
+
   it('should throw an exception when configuration of age majority does not exist', async () => {
     const command = new CreateEmployeeCommand(
       '550e8400-e29b-41d4-a716-446655440000',

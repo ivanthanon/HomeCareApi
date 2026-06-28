@@ -81,4 +81,47 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       expect(query.recordset).toHaveLength(0);
     });
   });
+
+  describe('when employee already exists', () => {
+    it('should return 201 created and dont duplicate it', async () => {
+      const alreadyExistEmployee = {
+        id: '550E8400-E29B-41D4-A716-446655440000',
+        firstName: 'María',
+        lastName: 'García López',
+        documentNumber: '12345678A',
+        dateOfBirth: '1985-03-15',
+      };
+      await testCase.executeQuery(
+        `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth) 
+        VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)`,
+        {
+          id: alreadyExistEmployee.id,
+          firstName: alreadyExistEmployee.firstName,
+          lastName: alreadyExistEmployee.lastName,
+          documentNumber: alreadyExistEmployee.documentNumber,
+          dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
+        }
+      );
+
+
+      await request(testCase['app'].getHttpServer())
+        .post(path)
+        .send(alreadyExistEmployee)
+        .expect(201);
+
+      const query = await testCase.executeQuery(
+        'SELECT * FROM employees WHERE id = @id',
+        { id: alreadyExistEmployee.id },
+      );
+      expect(query.recordset).toHaveLength(1);
+      const employeeFromDatabase = query.recordset[0];
+      expect(employeeFromDatabase).toMatchObject({
+        id: alreadyExistEmployee.id,
+        firstName: alreadyExistEmployee.firstName,
+        lastName: alreadyExistEmployee.lastName,
+        documentNumber: alreadyExistEmployee.documentNumber,
+        dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
+      });
+    });
+  });
 });

@@ -5,6 +5,23 @@ import { Employee } from "src/modules/employees/domain/employee";
 export class SqlServerEmployeeRepository implements EmployeeRepository {
     constructor(private readonly pool: ConnectionPool) {}
 
+
+    async getBy(id: string): Promise<Employee | null> {
+        const result = await this.pool.request()
+        .input('id', UniqueIdentifier, id)
+        .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
+            FROM Employees 
+            WHERE id = @id`);
+
+        if (!result.recordset || result.recordset.length === 0) {
+            return null;
+        }
+
+        const rawEmployee = result.recordset[0];
+
+        return Employee.reconstitute(rawEmployee.id, rawEmployee.firstName, rawEmployee.lastName, rawEmployee.documentNumber, rawEmployee.dateOfBirth);
+    }
+
     async create(employee: Employee): Promise<void> {
         await this.pool.request()
             .input('id', UniqueIdentifier, employee.id.value)
