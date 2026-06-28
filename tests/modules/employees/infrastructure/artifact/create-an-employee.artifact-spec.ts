@@ -120,10 +120,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: alreadyExistEmployee.firstName,
         lastName: alreadyExistEmployee.lastName,
         documentNumber: alreadyExistEmployee.documentNumber,
+        dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
       });
-      const expectedDate = new Date(alreadyExistEmployee.dateOfBirth).toISOString().split('T')[0];
-      const actualDate = employeeFromDatabase.dateOfBirth.toISOString().split('T')[0];
-      expect(actualDate).toBe(expectedDate);
     });
   });
 });
