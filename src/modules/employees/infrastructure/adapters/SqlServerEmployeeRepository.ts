@@ -1,7 +1,6 @@
 import { ConnectionPool, Date, NVarChar, UniqueIdentifier } from 'mssql';
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
 import { Employee } from "src/modules/employees/domain/employee";
-import { EmployeeFactory } from 'tests/modules/employees/domain/EmployeeFactory';
 
 export class SqlServerEmployeeRepository implements EmployeeRepository {
     constructor(private readonly pool: ConnectionPool) {}
@@ -20,7 +19,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
 
         const rawEmployee = result.recordset[0];
 
-        return EmployeeFactory.fromPrimitives(rawEmployee.id, rawEmployee.firstName, rawEmployee.lastName, rawEmployee.documentNumber, rawEmployee.dateOfBirth);
+        return Employee.reconstitute(rawEmployee.id, rawEmployee.firstName, rawEmployee.lastName, rawEmployee.documentNumber, rawEmployee.dateOfBirth);
     }
 
     async create(employee: Employee): Promise<void> {

@@ -39,7 +39,14 @@ export class TestcontainerSetup {
         SA_PASSWORD: this.password
       })
       .withExposedPorts(this.config.sqlServer.exposedPort)
-      .withWaitStrategy(Wait.forLogMessage(new RegExp(this.config.sqlServer.waitStrategy.message)))
+      .withHealthCheck({
+        test: ["CMD-SHELL", `/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${this.password}" -C -Q "SELECT 1" || exit 1`],
+        interval: 2000,
+        timeout: 5000,
+        retries: 10,
+        startPeriod: 5000
+      })
+      .withWaitStrategy(Wait.forHealthCheck())
       .start();
 
     this.testContainer = container;

@@ -20,6 +20,7 @@ export class Employee {
     documentNumber: string,
     dateOfBirth: string,
     currentDate: Date,
+    ageOfMajority: number
   ): Result<Employee, Error> {
 
     const employeeIdValueObject = EmployeeId.create(id);
@@ -42,7 +43,7 @@ export class Employee {
       return Err(new Error(documentNumberValueObject.error.message));
     }
 
-    const dateOfBirthValueObject = DateOfBirth.create(dateOfBirth, currentDate);
+    const dateOfBirthValueObject = DateOfBirth.create(dateOfBirth, currentDate, ageOfMajority);
     if (dateOfBirthValueObject.success === false) {
       return Err(new Error(dateOfBirthValueObject.error.message));
     }
@@ -57,4 +58,13 @@ export class Employee {
       )
     );
   }
+
+  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: string): Employee {
+        return new Employee(
+            new EmployeeId(id),
+            new Name(firstName),
+            new Name(lastName),
+            new DocumentNumber(documentNumber),
+            new DateOfBirth(new Date(dateOfBirth)));
+    }
 }

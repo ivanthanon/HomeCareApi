@@ -117,6 +117,9 @@ importers:
       vitest:
         specifier: ^4.0.13
         version: 4.0.13(@types/node@22.19.1)(jsdom@22.1.0)(terser@5.44.1)(yaml@2.8.1)
+      vitest-mock-extended:
+        specifier: ^4.0.0
+        version: 4.0.0(typescript@5.9.3)(vitest@4.0.13(@types/node@22.19.1)(jsdom@22.1.0)(terser@5.44.1)(yaml@2.8.1))
 
 packages:
 
@@ -4238,6 +4241,14 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-essentials@10.2.1:
+    resolution: {integrity: sha512-+Id1fRkuir+CsgK2x04/icS2b4V1hQmq7ObzIrDjhN0ozfRYivnP7aaKMVJfLApQm0trjR39A6NIMVchiB9Erw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   ts-loader@9.5.4:
     resolution: {integrity: sha512-nCz0rEwunlTZiy6rXFByQU1kVVpCIgUpc/psFiKVrUwrizdnIbRFu8w7bxhUF0X613DYwT4XzrZHpVyMe758hQ==}
     engines: {node: '>=12.0.0'}
@@ -4449,6 +4460,12 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  vitest-mock-extended@4.0.0:
+    resolution: {integrity: sha512-m2FmH8JYfxzZoLsHuhXRY+Pv++a3zd91HYpSz81tpRLEHbtFkEL2QcWvJowucWuNTirzQURKfWbJJSXbYqkTsA==}
+    peerDependencies:
+      typescript: 3.x || 4.x || 5.x || 6.x
+      vitest: '>=4.0.0'
 
   vitest@4.0.13:
     resolution: {integrity: sha512-QSD4I0fN6uZQfftryIXuqvqgBxTvJ3ZNkF6RWECd82YGAYAfhcppBLFXzXJHQAAhVFyYEuFTrq6h0hQqjB7jIQ==}
@@ -9260,6 +9277,10 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
+  ts-essentials@10.2.1(typescript@5.9.3):
+    optionalDependencies:
+      typescript: 5.9.3
+
   ts-loader@9.5.4(typescript@5.9.3)(webpack@5.100.2(@swc/core@1.15.41)):
     dependencies:
       chalk: 4.1.2
@@ -9466,6 +9487,12 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.44.1
       yaml: 2.8.1
+
+  vitest-mock-extended@4.0.0(typescript@5.9.3)(vitest@4.0.13(@types/node@22.19.1)(jsdom@22.1.0)(terser@5.44.1)(yaml@2.8.1)):
+    dependencies:
+      ts-essentials: 10.2.1(typescript@5.9.3)
+      typescript: 5.9.3
+      vitest: 4.0.13(@types/node@22.19.1)(jsdom@22.1.0)(terser@5.44.1)(yaml@2.8.1)
 
   vitest@4.0.13(@types/node@22.19.1)(jsdom@22.1.0)(terser@5.44.1)(yaml@2.8.1):
     dependencies:

@@ -29,7 +29,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: 'María',
         lastName: 'García López',
         documentNumber: '12345678A',
-        dateOfBirth: '1985-03-15',
+        dateOfBirth: '1985-03-15T00:00:00Z',
       };
 
       await request(testCase['app'].getHttpServer())
@@ -48,10 +48,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: employee.firstName,
         lastName: employee.lastName,
         documentNumber: employee.documentNumber,
+        dateOfBirth: new Date(employee.dateOfBirth)
       });
-      const expectedDate = new Date(employee.dateOfBirth).toISOString().split('T')[0];
-      const actualDate = employeeFromDatabase.dateOfBirth.toISOString().split('T')[0];
-      expect(actualDate).toBe(expectedDate);
     });
   });
 

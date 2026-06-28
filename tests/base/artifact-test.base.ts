@@ -3,10 +3,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionPool } from 'mssql';
 import { EmployeesModule } from 'src/employees.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
-import { ConfigModule } from '@nestjs/config/dist/config.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { DateClockStub } from 'tests/modules/employees/infrastructure/stubs/dateClockStub';
+import testConfig from 'tests/base/test.config.json';
 
 const testContainerSettings = require('./testContainerSettings.json');
 const config = testContainerSettings as ITestContainerConfig;
@@ -23,7 +24,8 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [EmployeesModule, ConfigModule.forRoot({
-        envFilePath: '.test.settings.env'
+        envFilePath: '.test.settings.env',
+        load: [() => testConfig],
       })],      
     })
       .overrideProvider(ConnectionPool)
@@ -32,7 +34,8 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
       .useFactory({
         factory: () => new CreateEmployeeCommandHandler(
         new SqlServerEmployeeRepository(this.dbConnection),
-        new DateClockStub()
+        new DateClockStub(),
+        new ConfigService(testConfig)
     )
   })
       .compile();

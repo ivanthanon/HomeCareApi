@@ -21,7 +21,7 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
     {
       provide: ConnectionPool,
       useFactory: async (configService: ConfigService) => {
-        const dbConfig = configService.get('settings.database');
+        const dbConfig = configService.get('database');
         const pool = new ConnectionPool(dbConfig);
         return pool.connect();
       },
@@ -34,8 +34,8 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
     },
     {
       provide: CreateEmployeeCommandHandler, 
-      useFactory: (employeeRepository: EmployeeRepository, clock: DateClock) => new CreateEmployeeCommandHandler(employeeRepository, new DateClock()),
-      inject: [SqlServerEmployeeRepository],
+      useFactory: (employeeRepository: EmployeeRepository, configService: ConfigService) => new CreateEmployeeCommandHandler(employeeRepository, new DateClock(), configService),
+      inject: [SqlServerEmployeeRepository, ConfigService]
     },
   ],
 })

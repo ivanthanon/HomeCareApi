@@ -1,19 +1,21 @@
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
-import { EmployeeFactory } from 'tests/modules/employees/domain/EmployeeFactory';
+import { Employee } from 'src/modules/employees/domain/employee';
+import { mock, MockProxy } from 'vitest-mock-extended';
+import { ConfigService } from '@nestjs/config';
 
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
-  let mockRepository: EmployeeRepository;
-  let mockClock: Clock;
+  let mockRepository: MockProxy<EmployeeRepository>;
+  let mockClock: MockProxy<Clock>;
 
   beforeEach(() => {
-    mockRepository = { create: vi.fn(), getBy: vi.fn() };
-    mockClock = { now: vi.fn().mockReturnValue(new Date('2026-06-13T00:00:00.000Z')) };
-    handler = new CreateEmployeeCommandHandler(mockRepository, mockClock);
+    mockRepository = mock<EmployeeRepository>();
+    mockClock = mock<Clock>();
+    handler = new CreateEmployeeCommandHandler(mockRepository, mockClock, new ConfigService({app: {ageOfMajority: 18}}));
   });
 
   it('should call repository.create', async () => {
@@ -24,10 +26,11 @@ describe('CreateEmployeeCommandHandler', () => {
       '12345678K',
       '1991-06-13T00:00:00.000Z',
     );
+    mockClock.now.mockReturnValue(new Date('2026-06-13T00:00:00.000Z'));
 
     await handler.execute(command);
 
-    const expectedEmployee = EmployeeFactory.fromPrimitives(
+    const expectedEmployee = Employee.reconstitute(
       command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth
     )
     expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);
@@ -39,8 +42,9 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '2008-06-14',
+      '2008-06-14T00:00:00Z',
     );
+    mockClock.now.mockReturnValue(new Date('2026-06-13T00:00:00.000Z'));
 
     const result = await handler.execute(command);
 
@@ -57,13 +61,29 @@ describe('CreateEmployeeCommandHandler', () => {
       '12345678K',
       '1991-06-14',
     );
-    vi.mocked(mockRepository.getBy).mockResolvedValue(
-      EmployeeFactory.fromPrimitives(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth)
+    mockRepository.getBy.mockResolvedValue(
+      Employee.reconstitute(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth)
     );
 
     const result = await handler.execute(command);
 
     expect(result.success).toBe(true);
     expect(mockRepository.create).toHaveBeenCalledTimes(0);
+  })
+
+  it('should throw an exception when configuration of age majority does not exist', async () => {
+    const command = new CreateEmployeeCommand(
+      '550e8400-e29b-41d4-a716-446655440000',
+      'John',
+      'Doe',
+      '12345678K',
+      '2008-06-14T00:00:00Z',
+    );
+    const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(mockRepository, mockClock, new ConfigService());
+
+
+    await expect(handlerWithoutConfigAgeMajority.execute(command)).rejects.toThrow(
+    "The value of AgeOfMajority doesn't exist in configuration"
+    );
   })
 })
