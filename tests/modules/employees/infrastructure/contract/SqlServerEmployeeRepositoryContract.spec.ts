@@ -24,6 +24,20 @@ class SqlServerEmployeeRepositoryContract extends EmployeeRepositoryContractTest
     await this.containerSetup.cleanTable('employees');
   }
 
+  protected async customArrange(employee: Employee): Promise<void> {
+      await this.containerSetup.executeQuery(
+        `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth) 
+        VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)`,
+        {
+          id: employee.id.value,
+          firstName: employee.firstName.value,
+          lastName: employee.lastName.value,
+          documentNumber: employee.documentNumber.value,
+          dateOfBirth: new Date(employee.dateOfBirth.value)
+        }
+      );
+  }
+
   protected async customAssert(expectedEmployee: Employee): Promise<void> {
     const result = await this.containerSetup.executeQuery(
       'SELECT * FROM employees WHERE id = @id',

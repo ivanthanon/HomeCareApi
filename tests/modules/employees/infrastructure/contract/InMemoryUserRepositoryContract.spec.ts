@@ -12,6 +12,10 @@ class InMemoryUserRepositoryContract extends EmployeeRepositoryContractTest {
         return this.employeeInMemoryRepository;
     }
 
+    protected async customArrange(employee: Employee): Promise<void> {
+        this.employeeInMemoryRepository.employeeList.push(employee);
+    }
+
     protected async cleanUp(): Promise<void> { 
         this.employeeInMemoryRepository.employeeList = [];
      }
