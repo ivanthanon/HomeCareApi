@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConnectionPool } from 'mssql';
 import { EmployeesModule } from './employees.module';
 import { MigrationRunner } from './database/migrationRunner';
@@ -23,6 +24,15 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(EmployeesModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('HomeCare API')
+    .setDescription('API for managing home care employees')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
