@@ -49,7 +49,7 @@ describe('EmployeesController', () => {
                 .send(createEmployeeRequest)
                 .expect(400);
 
-            expect(response.body).toMatchObject({
+            expect(response.body).toEqual({
                 "error": "Bad Request",
                 "message": "Employee name must not be empty",
                 "statusCode": 400,
@@ -73,7 +73,7 @@ describe('EmployeesController', () => {
                 .send(createEmployeeRequest)
                 .expect(400);
 
-            expect(response.body).toMatchObject({
+            expect(response.body).toEqual({
                 "error": "Bad Request",
                 "message": "Employee lastname must not be empty",
                 "statusCode": 400,
@@ -97,7 +97,7 @@ describe('EmployeesController', () => {
                 .send(createEmployeeRequest)
                 .expect(400);
 
-            expect(response.body).toMatchObject({
+            expect(response.body).toEqual({
                 "error": "Bad Request",
                 "message": "Employee id must be a valid guid",
                 "statusCode": 400,
@@ -121,7 +121,7 @@ describe('EmployeesController', () => {
                 .send(createEmployeeRequest)
                 .expect(400);
 
-            expect(response.body).toMatchObject({
+            expect(response.body).toEqual({
                 "error": "Bad Request",
                 "message": "Employee document number must not be empty",
                 "statusCode": 400,
@@ -145,7 +145,7 @@ describe('EmployeesController', () => {
                 .send(createEmployeeRequest)
                 .expect(400);
 
-            expect(response.body).toMatchObject({
+            expect(response.body).toEqual({
                 "error": "Bad Request",
                 "message": "Employee date of birth number must be a valid date",
                 "statusCode": 400,

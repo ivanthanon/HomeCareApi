@@ -44,7 +44,7 @@ class SqlServerEmployeeRepositoryContract extends EmployeeRepositoryContractTest
       { id: expectedEmployee.id.value },
     );
     expect(result.recordset).toHaveLength(1);
-    expect(result.recordset[0]).toMatchObject({
+    expect(result.recordset[0]).toEqual({
       id: expectedEmployee.id.value,
       firstName: expectedEmployee.firstName.value,
       lastName: expectedEmployee.lastName.value,

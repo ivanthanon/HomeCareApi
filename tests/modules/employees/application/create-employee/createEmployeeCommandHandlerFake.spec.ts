@@ -33,7 +33,7 @@ describe('CreateEmployeeCommandHandler', () => {
             command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth
         )
         expect(inMemoryRepository.employeeList.length).toBe(1);
-        expect(inMemoryRepository.employeeList[0]).toMatchObject(expectedEmployee);
+        expect(inMemoryRepository.employeeList[0]).toEqual(expectedEmployee);
     });
 
     it('should throw an error if given employee is not an adult', async () => {
