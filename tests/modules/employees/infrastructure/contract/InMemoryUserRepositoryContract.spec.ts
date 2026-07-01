@@ -22,7 +22,7 @@ class InMemoryUserRepositoryContract extends EmployeeRepositoryContractTest {
 
     protected async customAssert(expectedEmployee: Employee): Promise<void> {
         expect(this.employeeInMemoryRepository.employeeList).toHaveLength(1);
-        expect(this.employeeInMemoryRepository.employeeList[0]).toMatchObject(expectedEmployee);
+        expect(this.employeeInMemoryRepository.employeeList[0]).toEqual(expectedEmployee);
     }
 }
 

@@ -45,7 +45,7 @@ describe('SqlServerEmployeeRepository', () => {
       );
       expect(result.recordset).toHaveLength(1);
       const fromDb = result.recordset[0];
-      expect(fromDb).toMatchObject({
+      expect(fromDb).toEqual({
         id: employeeToCreate.id.value,
         firstName: employeeToCreate.firstName.value,
         lastName: employeeToCreate.lastName.value,
@@ -85,7 +85,7 @@ describe('SqlServerEmployeeRepository', () => {
         alreadyExistEmployee.documentNumber,
         alreadyExistEmployee.dateOfBirth,
       );
-      expect(employee).toMatchObject(expectedEmployee);
+      expect(employee).toEqual(expectedEmployee);
     });
 
     it('should return a null when employee not exists', async () => {

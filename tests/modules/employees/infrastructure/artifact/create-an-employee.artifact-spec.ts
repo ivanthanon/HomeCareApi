@@ -43,7 +43,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       );
       expect(query.recordset).toHaveLength(1);
       const employeeFromDatabase = query.recordset[0];
-      expect(employeeFromDatabase).toMatchObject({
+      expect(employeeFromDatabase).toEqual({
         id: employee.id,
         firstName: employee.firstName,
         lastName: employee.lastName,
@@ -115,7 +115,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       );
       expect(query.recordset).toHaveLength(1);
       const employeeFromDatabase = query.recordset[0];
-      expect(employeeFromDatabase).toMatchObject({
+      expect(employeeFromDatabase).toEqual({
         id: alreadyExistEmployee.id,
         firstName: alreadyExistEmployee.firstName,
         lastName: alreadyExistEmployee.lastName,

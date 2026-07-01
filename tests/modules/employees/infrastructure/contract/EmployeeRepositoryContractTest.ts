@@ -37,7 +37,7 @@ export abstract class EmployeeRepositoryContractTest {
 
             const employee = await this.repository.getBy(anExistingEmployee.id.value);
 
-            expect(employee).toMatchObject(anExistingEmployee);
+            expect(employee).toEqual(anExistingEmployee);
         })
     }
 }
