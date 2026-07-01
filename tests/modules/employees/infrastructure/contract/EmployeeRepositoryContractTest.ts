@@ -24,7 +24,7 @@ export abstract class EmployeeRepositoryContractTest {
         });
 
         it('should create an employee', async () => {
-            const expectedEmployee = Employee.reconstitute("60503836-989C-48D0-AC81-D1CC61C221A4", "Juan", "Lopez", "42332233X", "1985-03-15T00:00:00Z")
+            const expectedEmployee = Employee.reconstitute("60503836-989C-48D0-AC81-D1CC61C221A4", "Juan", "Lopez", "42332233X", new Date("1985-03-15T00:00:00Z"))
 
             await this.repository.create(expectedEmployee);
 
@@ -32,7 +32,7 @@ export abstract class EmployeeRepositoryContractTest {
         });
 
         it('should get an employee', async () => {
-            const anExistingEmployee = Employee.reconstitute("60503836-989C-48D0-AC81-D1CC61C221A4", "Juan", "Lopez", "42332233X", "1985-03-15T00:00:00Z")
+            const anExistingEmployee = Employee.reconstitute("60503836-989C-48D0-AC81-D1CC61C221A4", "Juan", "Lopez", "42332233X", new Date("1985-03-15T00:00:00Z"))
             await this.customArrange(anExistingEmployee);
 
             const employee = await this.repository.getBy(anExistingEmployee.id.value);

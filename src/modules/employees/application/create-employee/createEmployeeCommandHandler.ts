@@ -10,7 +10,7 @@ export class CreateEmployeeCommand {
     readonly firstName: string,
     readonly lastName: string,
     readonly documentNumber: string,
-    readonly dateOfBirth: string,
+    readonly dateOfBirth: Date,
   ) {}
 }
 

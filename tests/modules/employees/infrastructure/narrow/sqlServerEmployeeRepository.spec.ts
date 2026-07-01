@@ -34,7 +34,7 @@ describe('SqlServerEmployeeRepository', () => {
         'María',
         'García López',
         '12345678A',
-        '1985-03-15T00:00:00Z',
+        new Date('1985-03-15T00:00:00Z'),
       );
     
       await repository.create(employeeToCreate);
@@ -62,7 +62,7 @@ describe('SqlServerEmployeeRepository', () => {
         firstName: 'María',
         lastName: 'García López',
         documentNumber: '12345678A',
-        dateOfBirth: '1985-03-15',
+        dateOfBirth: new Date('1985-03-15'),
       };
       await setup.executeQuery(
         `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth) 
@@ -72,7 +72,7 @@ describe('SqlServerEmployeeRepository', () => {
           firstName: alreadyExistEmployee.firstName,
           lastName: alreadyExistEmployee.lastName,
           documentNumber: alreadyExistEmployee.documentNumber,
-          dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
+          dateOfBirth: alreadyExistEmployee.dateOfBirth
         }
       );
     

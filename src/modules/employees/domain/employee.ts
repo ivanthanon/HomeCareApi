@@ -22,7 +22,7 @@ export class Employee {
     firstName: string,
     lastName: string,
     documentNumber: string,
-    dateOfBirth: string,
+    dateOfBirth: Date,
     currentDate: Date,
     ageOfMajority: number
   ): Result<Employee, Error> {
@@ -80,12 +80,12 @@ export class Employee {
     return events;
   }
 
-  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: string): Employee {
+  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: Date): Employee {
         return new Employee(
             new EmployeeId(id),
             new Name(firstName),
             new Name(lastName),
             new DocumentNumber(documentNumber),
-            new DateOfBirth(new Date(dateOfBirth)));
+            new DateOfBirth(dateOfBirth));
     }
 }
