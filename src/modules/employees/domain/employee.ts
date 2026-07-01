@@ -3,6 +3,8 @@ import { DateOfBirth } from "./value-objects/DateOfBirth";
 import { DocumentNumber } from "./value-objects/DocumentNumber";
 import { EmployeeId } from "./value-objects/EmployeeId";
 import { Name } from "./value-objects/Name";
+import { DomainEvent } from "./shared/domainevent";
+import { EmployeeCreatedV1 } from "./events/EmployeeCreatedV1";
 
 export class Employee {
   public constructor(
@@ -12,6 +14,8 @@ export class Employee {
     readonly documentNumber: DocumentNumber,
     readonly dateOfBirth: DateOfBirth,
   ) { }
+
+  public DomainEvents: DomainEvent[] = [];
 
   public static create(
     id: string,
@@ -48,15 +52,32 @@ export class Employee {
       return Err(new Error(dateOfBirthValueObject.error.message));
     }
 
-    return Ok(
-      new Employee(
-        employeeIdValueObject.value,
-        firstNameValueObject.value,
-        lastNameValueObject.value,
-        documentNumberValueObject.value,
-        dateOfBirthValueObject.value
+    const employee = new Employee(
+      employeeIdValueObject.value,
+      firstNameValueObject.value,
+      lastNameValueObject.value,
+      documentNumberValueObject.value,
+      dateOfBirthValueObject.value
+    );
+
+    employee.DomainEvents.push(
+      new EmployeeCreatedV1(
+        employee.id.value,
+        employee.firstName.value,
+        employee.lastName.value,
+        employee.documentNumber.value,
+        employee.dateOfBirth.value,
+        currentDate
       )
     );
+
+    return Ok(employee);
+  }
+
+  public pullDomainEvents(): DomainEvent[] {
+    const events = this.DomainEvents;
+    this.DomainEvents = [];
+    return events;
   }
 
   public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: string): Employee {

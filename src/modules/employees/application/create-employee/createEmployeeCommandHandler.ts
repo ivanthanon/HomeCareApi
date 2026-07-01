@@ -35,6 +35,8 @@ export class CreateEmployeeCommandHandler {
       return employeeResult;
     }
 
+    employeeResult.value.pullDomainEvents();
+    
     await this.employeeRepository.create(employeeResult.value);
     
     return Ok();

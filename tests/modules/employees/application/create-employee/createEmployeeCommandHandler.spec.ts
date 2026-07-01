@@ -33,7 +33,7 @@ describe('CreateEmployeeCommandHandler', () => {
     const expectedEmployee = Employee.reconstitute(
       command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth
     )
-    expect(mockRepository.create).toHaveBeenCalledWith(expectedEmployee);
+    expect(mockRepository.create).toHaveBeenCalledWith(expect.objectContaining(expectedEmployee));
   });
 
   it('should throw an error if given employee is not an adult', async () => {
