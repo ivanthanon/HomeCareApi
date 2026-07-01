@@ -13,18 +13,20 @@ const resource = resourceFromAttributes({
   'service.version': '1.0.0',
 });
 
+const otelEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4317';
+
 const traceExporter = new OTLPTraceExporter({
-  url: 'http://localhost:4317',
+  url: otelEndpoint,
 });
 
 const metricReader = new PeriodicExportingMetricReader({
   exporter: new OTLPMetricExporter({
-    url: 'http://localhost:4317',
+    url: otelEndpoint,
   }),
 });
 
 const logExporter = new OTLPLogExporter({
-  url: 'http://localhost:4317',
+  url: otelEndpoint,
 });
 
 const loggerProvider = new LoggerProvider({

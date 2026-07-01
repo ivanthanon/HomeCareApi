@@ -1,0 +1,11 @@
+packages:
+  - '*'
+
+allowBuilds:
+  '@nestjs/core': true
+  '@swc/core': true
+  esbuild: true
+  protobufjs: true
+  cpu-features: true
+  ssh2: true
+  '@scarf/scarf': true
