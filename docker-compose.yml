@@ -17,6 +17,31 @@ services:
       MSSQL_AGENT_ENABLED: "true"
     restart: unless-stopped
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: HomeCareAPI
+    hostname: homecare-api
+    ports:
+      - "3006:3006"
+    expose:
+      - "3006"
+    networks:
+      - homecare-network
+    environment:
+      NODE_ENV: "development"
+      PORT: "3006"
+      DB_SERVER: "homecare-db"
+      DB_PORT: "1433"
+      DB_USER: "sa"
+      DB_PASSWORD: "HomeCare2025"
+      DB_NAME: "HomeCare"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://host.docker.internal:4317"
+    depends_on:
+      - mssql
+    restart: unless-stopped
+
 volumes:
   mssql_data:
 
