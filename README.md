@@ -119,7 +119,7 @@ https://miro.com/app/board/uXjVHCdydrQ=/
 | Type | Description |
 |------|-------------|
 | **Unit** | Validates Value Objects and Command Handlers in isolation using mocked dependencies. — fast, no dependencies |
-| **Social Unit (fake)** | Application layer tested with `InMemoryRepository` fake |
+| **Social Unit** | Application layer tested with `InMemoryRepository` fake |
 | **Narrow Integration** | Repository and Controller tested against real dependencies (API / TestContainer) |
 | **Contract** | Ensures the fake repository satisfies the same contract as the real one |
 | **Artifact** | Full HTTP (Supertest) + NestJS + real MSSQL in Docker container |
