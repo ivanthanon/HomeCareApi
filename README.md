@@ -14,7 +14,8 @@ REST API for managing home care employees. Built with **NestJS** + **TypeScript*
 | Vitest | ^4.0 | Test runner |
 | Testcontainers | ^11.8 | Docker containers for integration tests |
 | Supertest | ^7.0 | HTTP assertions for E2E tests |
-| Docker Compose | - | MSSQL 2022 for local development |
+| OpenTelemetry | ^1.22 | Observability (traces, metrics, logs) |
+| Docker Compose | - | MSSQL 2022 + app for local development |
 
 ## Folder Structure
 
@@ -96,7 +97,7 @@ HomeCareApi/
 ├── tsconfig.build.json                  # TypeScript build configuration
 ├── package.json
 ├── pnpm-lock.yaml
-├── docker-compose.yml                   # MSSQL 2022 for local development
+├── docker-compose.yml                   # MSSQL 2022 + app for local development
 ├── eslint.config.mjs                    # ESLint flat config
 ├── .prettierrc                          # Prettier config
 └── .env.example                         # Environment variable template
@@ -110,44 +111,24 @@ The project follows **Domain-Driven Design (DDD)** with **Hexagonal Architecture
 
 ### Framework: **Vitest** v4.0
 
-Three types of tests are used:
+Testing strategy: 
+```
+https://miro.com/app/board/uXjVHCdydrQ=/
+```
 
-| Type | Pattern | Description |
-|------|---------|-------------|
-| **Unit** | `*.spec.ts` | Value Object validation and use case logic with mocks |
-| **Integration** | `*.spec.ts` | Repository against real MSSQL via Testcontainers |
-| **Artifact / Acceptance** | `*.artifact-spec.ts` | Full HTTP (Supertest) + NestJS + real MSSQL in Docker container |
+| Type | Description |
+|------|-------------|
+| **Unit** | Validates Value Objects and Command Handlers in isolation using mocked dependencies. — fast, no dependencies |
+| **Social Unit (fake)** | Application layer tested with `InMemoryRepository` fake |
+| **Narrow Integration** | Repository and Controller tested against real dependencies (API / TestContainer) |
+| **Contract** | Ensures the fake repository satisfies the same contract as the real one |
+| **Artifact** | Full HTTP (Supertest) + NestJS + real MSSQL in Docker container |
 
 ### Commands
 
 ```bash
 pnpm test            # Run all tests
 pnpm test:artifact        # Only artifact tests (artifact-spec)
-```
-
-### Test infrastructure
-
-- **Testcontainers** spins up a real MSSQL 2019 container for integration and E2E tests.
-- `DateClockStub` allows controlling time in tests that depend on the current date.
-- Mocks via `MockProxy<EmployeeRepository>` to isolate the application layer from the real repository.
-- Fake via `EmployeeInMemoryRepository` to isolate the application layer from the real repository.
-
-## API
-
-| Method | Path | Description | Status codes |
-|--------|------|-------------|--------------|
-| `POST` | `/employees` | Create an employee | `201` OK, `400` validation error |
-
-### Example body
-
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "firstName": "Juan",
-  "lastName": "Pérez",
-  "documentNumber": "12345678A",
-  "dateOfBirth": "1990-05-15"
-}
 ```
 
 ### Swagger / OpenAPI
@@ -170,6 +151,6 @@ Powered by `@nestjs/swagger`. The OpenAPI specification is auto-generated from d
 
 ```bash
 pnpm install
-docker compose up -d    # Start MSSQL 2022
-pnpm run start:dev      # Start development server
+docker compose up -d    # Start MSSQL 2022 + the app
+# Or rely on docker-compose.yml which now starts both services
 ```
