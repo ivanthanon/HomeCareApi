@@ -1,6 +1,6 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
-RUN npm i -g pnpm@latest
+RUN npm i -g pnpm@9
 COPY package.json pnpm-lock.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
 COPY . .
