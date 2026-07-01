@@ -24,7 +24,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '1991-06-13T00:00:00.000Z',
+      new Date('1991-06-13T00:00:00.000Z'),
     );
     mockClock.now.mockReturnValue(new Date('2026-06-13T00:00:00.000Z'));
 
@@ -42,7 +42,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '2008-06-14T00:00:00Z',
+      new Date('2008-06-14T00:00:00Z'),
     );
     mockClock.now.mockReturnValue(new Date('2026-06-13T00:00:00.000Z'));
 
@@ -59,7 +59,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '1991-06-14',
+      new Date('1991-06-14'),
     );
     mockRepository.getBy.mockResolvedValue(
       Employee.reconstitute(command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth)
@@ -77,7 +77,7 @@ describe('CreateEmployeeCommandHandler', () => {
       'John',
       'Doe',
       '12345678K',
-      '2008-06-14T00:00:00Z',
+      new Date('2008-06-14T00:00:00Z'),
     );
     const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(mockRepository, mockClock, new ConfigService());
 

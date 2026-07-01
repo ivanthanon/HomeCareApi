@@ -24,7 +24,7 @@ describe('CreateEmployeeCommandHandler', () => {
             'John',
             'Doe',
             '12345678K',
-            '1991-06-13T00:00:00.000Z',
+            new Date('1991-06-13T00:00:00.000Z'),
         );
 
         await handler.execute(command);
@@ -42,7 +42,7 @@ describe('CreateEmployeeCommandHandler', () => {
             'John',
             'Doe',
             '12345678K',
-            '2008-06-14T00:00:00Z',
+            new Date('2008-06-14T00:00:00Z'),
         );
 
         const result = await handler.execute(command);
@@ -59,7 +59,7 @@ describe('CreateEmployeeCommandHandler', () => {
             'John',
             'Doe',
             '12345678K',
-            '2008-06-14T00:00:00Z',
+            new Date('2008-06-14T00:00:00Z'),
         );
         const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(inMemoryRepository, mockClock, new ConfigService());
 

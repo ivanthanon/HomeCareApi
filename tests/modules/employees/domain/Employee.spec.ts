@@ -8,7 +8,7 @@ describe("When creating an employee", () =>  {
             "Juan",
             "Perez",
             "12345678K",
-            "1991-06-13",
+            new Date("1991-06-13"),
             new Date("2026-06-13"),
             18
         );
@@ -26,7 +26,7 @@ describe("When pull events from employee", () =>  {
             "Juan",
             "Perez",
             "12345678K",
-            "1991-06-13",
+            new Date("1991-06-13"),
             new Date("2026-06-13"),
             18
         );

@@ -41,7 +41,7 @@ export class EmployeesController {
       createEmployeeRequest.firstName,
       createEmployeeRequest.lastName,
       createEmployeeRequest.documentNumber,
-      createEmployeeRequest.dateOfBirth,
+      new Date(createEmployeeRequest.dateOfBirth),
     );
     const result = await this.createEmployeeCommandHandler.execute(command);
 
