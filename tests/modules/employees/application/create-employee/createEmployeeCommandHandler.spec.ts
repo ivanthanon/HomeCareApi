@@ -1,5 +1,6 @@
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
+import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
@@ -10,12 +11,14 @@ import { ConfigService } from '@nestjs/config';
 describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
   let mockRepository: MockProxy<EmployeeRepository>;
+  let mockOutboxRepository: MockProxy<OutboxRepository>;
   let mockClock: MockProxy<Clock>;
 
   beforeEach(() => {
     mockRepository = mock<EmployeeRepository>();
+    mockOutboxRepository = mock<OutboxRepository>();
     mockClock = mock<Clock>();
-    handler = new CreateEmployeeCommandHandler(mockRepository, mockClock, new ConfigService({app: {ageOfMajority: 18}}));
+    handler = new CreateEmployeeCommandHandler(mockRepository, mockOutboxRepository, mockClock, new ConfigService({app: {ageOfMajority: 18}}));
   });
 
   it('should call repository.create', async () => {
@@ -79,7 +82,7 @@ describe('CreateEmployeeCommandHandler', () => {
       '12345678K',
       new Date('2008-06-14T00:00:00Z'),
     );
-    const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(mockRepository, mockClock, new ConfigService());
+    const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(mockRepository, mockOutboxRepository, mockClock, new ConfigService());
 
 
     await expect(handlerWithoutConfigAgeMajority.execute(command)).rejects.toThrow(

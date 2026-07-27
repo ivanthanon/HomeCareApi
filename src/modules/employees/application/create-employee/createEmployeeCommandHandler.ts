@@ -1,4 +1,5 @@
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
+import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
 import { Employee } from 'src/modules/employees/domain/employee';
 import { Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
@@ -15,7 +16,7 @@ export class CreateEmployeeCommand {
 }
 
 export class CreateEmployeeCommandHandler {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly clock: Clock, private readonly configService: ConfigService) {}
+  constructor(private readonly employeeRepository: EmployeeRepository, private readonly outboxRepository: OutboxRepository, private readonly clock: Clock, private readonly configService: ConfigService) {}
   
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
 
@@ -35,8 +36,12 @@ export class CreateEmployeeCommandHandler {
       return employeeResult;
     }
 
-    employeeResult.value.pullDomainEvents();
-    
+    const domainEvents = employeeResult.value.pullDomainEvents();
+  
+    for (const event of domainEvents) {
+      await this.outboxRepository.save(event);
+    }
+
     await this.employeeRepository.create(employeeResult.value);
     
     return Ok();

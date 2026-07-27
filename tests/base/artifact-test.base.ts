@@ -6,8 +6,10 @@ import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup'
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
+import { OutboxFakeRepository } from 'tests/modules/employees/infrastructure/contract/OutboxFakeRepository';
 import { DateClockStub } from 'tests/modules/employees/infrastructure/stubs/dateClockStub';
 import testConfig from 'tests/base/test.config.json';
+import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 
 const testContainerSettings = require('./testContainerSettings.json');
 const config = testContainerSettings as ITestContainerConfig;
@@ -34,6 +36,7 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
       .useFactory({
         factory: () => new CreateEmployeeCommandHandler(
         new SqlServerEmployeeRepository(this.dbConnection),
+        new SqlServerOutboxRepository(this.dbConnection),
         new DateClockStub(),
         new ConfigService(testConfig)
     )

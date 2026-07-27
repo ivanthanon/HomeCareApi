@@ -19,6 +19,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
   });
 
   afterEach(async () => {
+    await testCase.cleanTable('outboxMessages');
     await testCase.cleanTable('employees');
   });
 
@@ -50,6 +51,27 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         documentNumber: employee.documentNumber,
         dateOfBirth: new Date(employee.dateOfBirth)
       });
+
+      const outboxQuery = await testCase.executeQuery(
+        'SELECT * FROM outboxMessages WHERE aggregateId = @id',
+        { id: employee.id },
+      );
+      expect(outboxQuery.recordset).toHaveLength(1);
+      const outboxMessage = outboxQuery.recordset[0];
+      expect(outboxMessage.type).toBe('EmployeeCreated.v1');
+      expect(outboxMessage.aggregateId).toBe(employee.id);
+      expect(outboxMessage.aggregateType).toBe('Employee');
+      expect(outboxMessage.processed).toBe(false);
+      expect(outboxMessage.processedAt).toBeNull();
+
+      const payload = JSON.parse(outboxMessage.payload);
+      expect(payload.eventName).toBe('EmployeeCreated.v1');
+      expect(payload.id).toBe(employee.id);
+      expect(payload.firstName).toBe(employee.firstName);
+      expect(payload.lastName).toBe(employee.lastName);
+      expect(payload.documentNumber).toBe(employee.documentNumber);
+      expect(payload.dateOfBirth).toBe('1985-03-15T00:00:00.000Z');
+      expect(payload.occurredOn).toBe('2026-01-01T00:00:00.000Z');
     });
   });
 
