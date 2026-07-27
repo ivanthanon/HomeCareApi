@@ -1,7 +1,8 @@
-import { describe, it, beforeAll, afterAll, expect } from 'vitest';
+import { describe, it, beforeAll, afterAll } from 'vitest';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
+import { assertOutboxMessageInDatabase } from 'tests/base/helpers/OutboxTestHelper';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 
 class SqlServerOutboxRepositoryTest extends TestcontainerSetup {
@@ -44,23 +45,21 @@ describe('SqlServerOutboxRepository', () => {
         'SELECT * FROM outboxMessages WHERE aggregateId = @id',
         { id: event.id },
       );
-      expect(result.recordset).toHaveLength(1);
-      const fromDb = result.recordset[0];
-      expect(fromDb.type).toBe('EmployeeCreated.v1');
-      expect(fromDb.aggregateId).toBe(event.id);
-      expect(fromDb.aggregateType).toBe('Employee');
 
-      const payload = JSON.parse(fromDb.payload);
-      expect(payload.eventName).toBe('EmployeeCreated.v1');
-      expect(payload.id).toBe(event.id);
-      expect(payload.firstName).toBe(event.firstName);
-      expect(payload.lastName).toBe(event.lastName);
-      expect(payload.documentNumber).toBe(event.documentNumber);
-      expect(payload.dateOfBirth).toBe('1985-03-15T00:00:00.000Z');
-      expect(payload.occurredOn).toBe('2026-01-01T00:00:00.000Z');
-
-      expect(fromDb.processed).toBe(false);
-      expect(fromDb.processedAt).toBeNull();
+      assertOutboxMessageInDatabase(result.recordset, {
+        type: event.eventName,
+        aggregateId: event.id,
+        aggregateType: 'Employee',
+        payload: {
+          eventName: event.eventName,
+          id: event.id,
+          firstName: event.firstName,
+          lastName: event.lastName,
+          documentNumber: event.documentNumber,
+          dateOfBirth: '1985-03-15T00:00:00.000Z',
+          occurredOn: '2026-01-01T00:00:00.000Z',
+        },
+      });
     });
   });
 });
