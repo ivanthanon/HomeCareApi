@@ -1,8 +1,8 @@
 import { CreateEmployeeCommand, CreateEmployeeCommandHandler } from "src/modules/employees/application/create-employee/createEmployeeCommandHandler"
-import { DateClockStub } from "../../infrastructure/stubs/dateClockStub";
-import { EmployeeInMemoryRepository } from "../../infrastructure/contract/InMemoryRepositories/EmployeeInMemoryRepository";
-import { OutboxInMemoryRepository as OutboxInMemoryRepository } from "../../infrastructure/contract/InMemoryRepositories/OutboxFakeRepository";
-import { assertOutboxEventInMemory } from "../../../../base/helpers/OutboxTestHelper";
+import { DateClockStub } from "../../infrastructure/helpers/stub/dateClockStub";
+import { EmployeeInMemoryRepository } from "../../infrastructure/helpers/fake/EmployeeInMemoryRepository";
+import { OutboxInMemoryRepository as OutboxInMemoryRepository } from "../../infrastructure/helpers/fake/OutboxFakeRepository";
+import { assertOutboxEventInMemory } from "../../infrastructure/helpers/assert/OutboxTestHelper";
 import { Clock } from "src/modules/employees/domain/shared/clock";
 import { Employee } from "src/modules/employees/domain/employee";
 import { Failure } from "src/modules/employees/domain/shared/result";

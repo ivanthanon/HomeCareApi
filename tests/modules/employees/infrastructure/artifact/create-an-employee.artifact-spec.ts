@@ -1,7 +1,7 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
 import { ArtifactTestBase } from 'tests/base/artifact-test.base';
-import { assertOutboxMessageInDatabase } from 'tests/base/helpers/OutboxTestHelper';
+import { assertOutboxMessageInDatabase } from 'tests/modules/employees/infrastructure/helpers/assert/OutboxTestHelper';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {

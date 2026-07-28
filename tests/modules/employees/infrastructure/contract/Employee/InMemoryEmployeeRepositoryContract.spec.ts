@@ -1,9 +1,9 @@
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
-import { EmployeeRepositoryContractTest } from "tests/modules/employees/infrastructure/contract/EmployeeRepositoryContractTest";
-import { EmployeeInMemoryRepository } from "./InMemoryRepositories/EmployeeInMemoryRepository";
+import { EmployeeRepositoryContractTest } from "tests/modules/employees/infrastructure/contract/Employee/EmployeeRepositoryContractTest";
+import { EmployeeInMemoryRepository } from "../../helpers/fake/EmployeeInMemoryRepository";
 import { Employee } from "src/modules/employees/domain/employee";
 
-class InMemoryUserRepositoryContract extends EmployeeRepositoryContractTest {
+class InMemoryEmployeeRepositoryContract extends EmployeeRepositoryContractTest {
 
     public employeeInMemoryRepository!: EmployeeInMemoryRepository;
 
@@ -26,4 +26,4 @@ class InMemoryUserRepositoryContract extends EmployeeRepositoryContractTest {
     }
 }
 
-new InMemoryUserRepositoryContract().runContractTest();
+new InMemoryEmployeeRepositoryContract().runContractTest();
