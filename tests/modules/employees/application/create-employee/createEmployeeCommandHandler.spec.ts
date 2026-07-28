@@ -1,6 +1,7 @@
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
 import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
+import { UnitOfWork } from 'src/modules/employees/domain/shared/unitofwork';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Failure } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
@@ -12,16 +13,27 @@ describe('CreateEmployeeCommandHandler', () => {
   let handler: CreateEmployeeCommandHandler;
   let mockRepository: MockProxy<EmployeeRepository>;
   let mockOutboxRepository: MockProxy<OutboxRepository>;
+  let mockUnitOfWork: MockProxy<UnitOfWork>;
   let mockClock: MockProxy<Clock>;
 
   beforeEach(() => {
     mockRepository = mock<EmployeeRepository>();
     mockOutboxRepository = mock<OutboxRepository>();
+    mockUnitOfWork = mock<UnitOfWork>();
     mockClock = mock<Clock>();
-    handler = new CreateEmployeeCommandHandler(mockRepository, mockOutboxRepository, mockClock, new ConfigService({app: {ageOfMajority: 18}}));
+
+    mockUnitOfWork.transaction.mockImplementation(async (work) => work());
+
+    handler = new CreateEmployeeCommandHandler(
+      mockRepository,
+      mockOutboxRepository,
+      mockUnitOfWork,
+      mockClock,
+      new ConfigService({ app: { ageOfMajority: 18 } }),
+    );
   });
 
-  it('should call repository.create', async () => {
+  it('should call repository.create inside a transaction', async () => {
     const command = new CreateEmployeeCommand(
       '550e8400-e29b-41d4-a716-446655440000',
       'John',
@@ -35,7 +47,9 @@ describe('CreateEmployeeCommandHandler', () => {
 
     const expectedEmployee = Employee.reconstitute(
       command.id, command.firstName, command.lastName, command.documentNumber, command.dateOfBirth
-    )
+    );
+
+    expect(mockUnitOfWork.transaction).toHaveBeenCalledTimes(1);
     expect(mockRepository.create).toHaveBeenCalledWith(expect.objectContaining(expectedEmployee));
   });
 
@@ -72,7 +86,8 @@ describe('CreateEmployeeCommandHandler', () => {
 
     expect(result.success).toBe(true);
     expect(mockRepository.create).toHaveBeenCalledTimes(0);
-  })
+    expect(mockUnitOfWork.transaction).toHaveBeenCalledTimes(0);
+  });
 
   it('should throw an exception when configuration of age majority does not exist', async () => {
     const command = new CreateEmployeeCommand(
@@ -82,11 +97,12 @@ describe('CreateEmployeeCommandHandler', () => {
       '12345678K',
       new Date('2008-06-14T00:00:00Z'),
     );
-    const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(mockRepository, mockOutboxRepository, mockClock, new ConfigService());
-
+    const handlerWithoutConfigAgeMajority = new CreateEmployeeCommandHandler(
+      mockRepository, mockOutboxRepository, mockUnitOfWork, mockClock, new ConfigService()
+    );
 
     await expect(handlerWithoutConfigAgeMajority.execute(command)).rejects.toThrow(
-    "The value of AgeOfMajority doesn't exist in configuration"
+      "The value of AgeOfMajority doesn't exist in configuration"
     );
-  })
-})
+  });
+});

@@ -4,7 +4,8 @@ import { ConnectionPool } from 'mssql';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
-import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
+import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
+import { SqlServerUnitOfWork } from 'src/modules/employees/infrastructure/adapters/sqlServerUnitOfWork';
 import appConfig from './config/app.config';
 import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
 
@@ -15,7 +16,6 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
       envFilePath: '.env',
       load: [appConfig],
     }),
-    EmployeesModule,
   ],
   providers: [
     {
@@ -33,9 +33,24 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
       inject: [ConnectionPool],
     },
     {
+      provide: SqlServerOutboxRepository,
+      useFactory: (pool: ConnectionPool) => new SqlServerOutboxRepository(pool),
+      inject: [ConnectionPool],
+    },
+    {
+      provide: SqlServerUnitOfWork,
+      useFactory: (pool: ConnectionPool) => new SqlServerUnitOfWork(pool),
+      inject: [ConnectionPool],
+    },
+    {
       provide: CreateEmployeeCommandHandler, 
-      useFactory: (employeeRepository: EmployeeRepository, configService: ConfigService) => new CreateEmployeeCommandHandler(employeeRepository, new DateClock(), configService),
-      inject: [SqlServerEmployeeRepository, ConfigService]
+      useFactory: (
+        employeeRepository: SqlServerEmployeeRepository,
+        outboxRepository: SqlServerOutboxRepository,
+        unitOfWork: SqlServerUnitOfWork,
+        configService: ConfigService,
+      ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configService),
+      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerUnitOfWork, ConfigService]
     },
   ],
 })
