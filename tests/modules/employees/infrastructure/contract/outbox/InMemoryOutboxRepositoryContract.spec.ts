@@ -1,8 +1,8 @@
-﻿import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
+﻿import { OutboxRepository } from 'src/modules/employees/application/ports/outbox.repository';
 import { OutboxRepositoryContractTest } from 'tests/modules/employees/infrastructure/contract/outbox/OutboxRepositoryContractTest';
-import { OutboxInMemoryRepository } from '../../helpers/fake/OutboxFakeRepository';
+import { OutboxInMemoryRepository } from '../../../../../doubles/fake/OutboxInMemoryRepository';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
-import { assertOutboxEventInMemory } from 'tests/modules/employees/infrastructure/helpers/assert/OutboxTestHelper';
+import { assertOutboxEventInMemory } from 'tests/helpers/assert/OutboxTestHelper';
 
 class InMemoryOutboxRepositoryContract extends OutboxRepositoryContractTest {
 

@@ -4,7 +4,7 @@ import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
-import { assertOutboxMessageInDatabase } from 'tests/modules/employees/infrastructure/helpers/assert/OutboxTestHelper';
+import { assertOutboxMessageInDatabase } from 'tests/helpers/assert/OutboxTestHelper';
 
 class SqlServerOutboxRepositoryContract extends OutboxRepositoryContractTest {
   private containerSetup = new TestcontainerSetup(testContainerSettings);

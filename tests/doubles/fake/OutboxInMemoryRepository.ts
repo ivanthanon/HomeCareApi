@@ -1,5 +1,5 @@
 import { DomainEvent } from "src/modules/employees/domain/shared/domainevent";
-import { OutboxRepository } from "src/modules/employees/domain/repositories/outbox.repository";
+import { OutboxRepository } from "src/modules/employees/application/ports/outbox.repository";
 
 export class OutboxInMemoryRepository implements OutboxRepository {
     public events: DomainEvent[] = [];

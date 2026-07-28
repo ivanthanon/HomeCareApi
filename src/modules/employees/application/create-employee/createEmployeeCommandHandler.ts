@@ -1,9 +1,9 @@
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
-import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
+import { OutboxRepository } from 'src/modules/employees/application/ports/outbox.repository';
 import { Employee } from 'src/modules/employees/domain/employee';
 import { Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
-import { UnitOfWork } from 'src/modules/employees/domain/shared/unitofwork';
+import { UnitOfWork } from 'src/modules/employees/application/ports/unitofwork';
 import { ConfigService } from '@nestjs/config';
 
 export class CreateEmployeeCommand {

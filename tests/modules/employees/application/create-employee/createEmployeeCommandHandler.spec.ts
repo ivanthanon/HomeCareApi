@@ -1,10 +1,10 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { CreateEmployeeCommand, CreateEmployeeCommandHandler } from "src/modules/employees/application/create-employee/createEmployeeCommandHandler"
 import { SqlServerUnitOfWork } from "src/modules/employees/infrastructure/adapters/sqlServerUnitOfWork";
-import { EmployeeInMemoryRepository } from "../../infrastructure/helpers/fake/EmployeeInMemoryRepository";
-import { OutboxInMemoryRepository } from "../../infrastructure/helpers/fake/OutboxFakeRepository";
-import { DateClockStub } from "../../infrastructure/helpers/stub/dateClockStub";
-import { assertOutboxEventInMemory } from "../../infrastructure/helpers/assert/OutboxTestHelper";
+import { EmployeeInMemoryRepository } from "../../../../doubles/fake/EmployeeInMemoryRepository";
+import { OutboxInMemoryRepository } from "../../../../doubles/fake/OutboxInMemoryRepository";
+import { DateClockStub } from "../../../../doubles/stub/dateClockStub";
+import { assertOutboxEventInMemory } from "../../../../helpers/assert/OutboxTestHelper";
 import { Clock } from "src/modules/employees/domain/shared/clock";
 import { Employee } from "src/modules/employees/domain/employee";
 import { EmployeeCreatedV1 } from "src/modules/employees/domain/events/EmployeeCreatedV1";

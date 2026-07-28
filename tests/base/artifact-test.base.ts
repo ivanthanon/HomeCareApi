@@ -8,7 +8,7 @@ import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { SqlServerUnitOfWork } from 'src/modules/employees/infrastructure/adapters/sqlServerUnitOfWork';
-import { DateClockStub } from 'tests/modules/employees/infrastructure/helpers/stub/dateClockStub';
+import { DateClockStub } from 'tests/doubles/stub/dateClockStub';
 import testConfig from 'tests/base/test.config.json';
 
 const testContainerSettings = require('./testContainerSettings.json');

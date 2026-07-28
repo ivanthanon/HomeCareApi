@@ -1,5 +1,5 @@
 import { ConnectionPool, NVarChar, UniqueIdentifier } from 'mssql';
-import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
+import { OutboxRepository } from 'src/modules/employees/application/ports/outbox.repository';
 import { DomainEvent } from 'src/modules/employees/domain/shared/domainevent';
 import { SqlServerUnitOfWork } from './sqlServerUnitOfWork';
 

@@ -1,5 +1,5 @@
 import { it, afterEach } from 'vitest';
-import { OutboxRepository } from 'src/modules/employees/domain/repositories/outbox.repository';
+import { OutboxRepository } from 'src/modules/employees/application/ports/outbox.repository';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
 
 export abstract class OutboxRepositoryContractTest {

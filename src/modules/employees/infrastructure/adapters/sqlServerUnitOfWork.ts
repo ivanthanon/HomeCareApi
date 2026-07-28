@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { ConnectionPool, Transaction as MssqlTransaction } from 'mssql';
-import { UnitOfWork } from 'src/modules/employees/domain/shared/unitofwork';
+import { UnitOfWork } from 'src/modules/employees/application/ports/unitofwork';
 
 
 const transactionStorage = new AsyncLocalStorage<MssqlTransaction>();

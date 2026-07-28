@@ -2,7 +2,7 @@ import { describe, it, beforeAll, afterAll } from 'vitest';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
-import { assertOutboxMessageInDatabase } from 'tests/modules/employees/infrastructure/helpers/assert/OutboxTestHelper';
+import { assertOutboxMessageInDatabase } from 'tests/helpers/assert/OutboxTestHelper';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 
 class SqlServerOutboxRepositoryTest extends TestcontainerSetup {
