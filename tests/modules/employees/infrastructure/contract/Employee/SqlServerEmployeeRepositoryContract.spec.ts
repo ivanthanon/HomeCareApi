@@ -1,5 +1,5 @@
 import { describe, beforeAll, afterAll, expect } from 'vitest';
-import { EmployeeRepositoryContractTest } from 'tests/modules/employees/infrastructure/contract/EmployeeRepositoryContractTest';
+import { EmployeeRepositoryContractTest } from 'tests/modules/employees/infrastructure/contract/Employee/EmployeeRepositoryContractTest';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import testContainerSettings from 'tests/base/testContainerSettings.json';

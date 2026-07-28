@@ -1,6 +1,8 @@
 import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
 import { ArtifactTestBase } from 'tests/base/artifact-test.base';
+import { assertOutboxMessageInDatabase } from 'tests/helpers/assert/OutboxTestHelper';
+import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
   class EmployeesArtifactTest extends ArtifactTestBase { }
@@ -19,6 +21,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
   });
 
   afterEach(async () => {
+    await testCase.cleanTable('outboxMessages');
     await testCase.cleanTable('employees');
   });
 
@@ -29,7 +32,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: 'María',
         lastName: 'García López',
         documentNumber: '12345678A',
-        dateOfBirth: '1985-03-15T00:00:00Z',
+        dateOfBirth: '1985-03-15T00:00:00.000Z',
       };
 
       await request(testCase['app'].getHttpServer())
@@ -49,6 +52,24 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         lastName: employee.lastName,
         documentNumber: employee.documentNumber,
         dateOfBirth: new Date(employee.dateOfBirth)
+      });
+
+      const outboxQuery = await testCase.executeQuery(
+        'SELECT * FROM outboxMessages WHERE aggregateId = @id',
+        { id: employee.id },
+      );
+
+      assertOutboxMessageInDatabase(outboxQuery.recordset, {
+        aggregateId: employee.id,
+        aggregateType: 'Employee',
+        event: new EmployeeCreatedV1(
+          employee.id,
+          employee.firstName,
+          employee.lastName,
+          employee.documentNumber,
+          new Date(employee.dateOfBirth),
+          new Date('2026-01-01T00:00:00.000Z'),
+        ),
       });
     });
   });
@@ -79,11 +100,17 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         { id: employee.id },
       );
       expect(query.recordset).toHaveLength(0);
+
+      const outboxQuery = await testCase.executeQuery(
+        'SELECT * FROM outboxMessages WHERE aggregateId = @id',
+        { id: employee.id },
+      );
+      expect(outboxQuery.recordset).toHaveLength(0);
     });
   });
 
   describe('when employee already exists', () => {
-    it('should return 201 created and dont duplicate it', async () => {
+    it('should return 201 created and doesnt duplicate it', async () => {
       const alreadyExistEmployee = {
         id: '550E8400-E29B-41D4-A716-446655440000',
         firstName: 'María',

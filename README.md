@@ -36,7 +36,8 @@ HomeCareApi/
 │   │   ├── migrationRunner.ts
 │   │   ├── runMigrations.ts
 │   │   └── migrations/
-│   │       └── 001_create_workers_table.ts
+│   │       ├── 001_create_workers_table.ts
+│   │       └── 002_create_outbox_tables.ts
 │   └── modules/
 │       └── employees/                   # Bounded context
 │           ├── domain/                  # Domain layer
@@ -48,18 +49,26 @@ HomeCareApi/
 │           │   │   ├── Name.ts
 │           │   │   ├── DocumentNumber.ts
 │           │   │   └── DateOfBirth.ts
+│           │   ├── events/
+│           │   │   └── EmployeeCreatedV1.ts
 │           │   └── shared/
 │           │       ├── clock.ts
+│           │       ├── domainevent.ts
 │           │       ├── result.ts
 │           │       └── utils.ts
 │           │
 │           ├── application/
-│           │   └── create-employee/
-│           │       └── createEmployeeCommandHandler.ts
+│           │   ├── create-employee/
+│           │   │   └── createEmployeeCommandHandler.ts
+│           │   └── ports/
+│           │       ├── outbox.repository.ts
+│           │       └── unitofwork.ts
 │           │
 │           └── infrastructure/
 │               ├── adapters/
 │               │   ├── SqlServerEmployeeRepository.ts
+│               │   ├── SqlServerOutboxRepository.ts
+│               │   ├── sqlServerUnitOfWork.ts
 │               │   └── dateClock.ts
 │               └── restapi/
 │                   └── create-employee/
@@ -106,6 +115,25 @@ HomeCareApi/
 ## Architecture
 
 The project follows **Domain-Driven Design (DDD)** with **Hexagonal Architecture** across 3 layers:
+
+### Outbox Pattern
+
+Domain events are persisted using the **Outbox Pattern** to guarantee atomicity between domain state changes and event publication. When an aggregate changes, the resulting domain event is stored in the `outboxMessages` table within the same transaction as the business data. A background process (not yet implemented) will poll the outbox and dispatch events to downstream consumers.
+
+This ensures **at-least-once delivery** and avoids the dual-write problem without relying on distributed transactions.
+
+| Component | File | Description |
+|-----------|------|-------------|
+| `OutboxRepository` | `src/modules/employees/application/ports/outbox.repository.ts` | Port (interface) for persisting domain events |
+| `SqlServerOutboxRepository` | `src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository.ts` | SQL Server implementation of the outbox port |
+| `EmployeeCreatedV1` | `src/modules/employees/domain/events/EmployeeCreatedV1.ts` | Domain event emitted when an employee is created |
+| `outboxMessages` table | `src/database/migrations/002_create_outbox_tables.ts` | Migration that creates the outbox table |
+
+**Flow:**
+1. `CreateEmployeeCommandHandler` creates the `Employee` aggregate
+2. Domain events are pulled from the aggregate via `pullDomainEvents()`
+3. Each event is saved to `outboxMessages` and the employee is persisted — both inside the same `UnitOfWork` transaction
+4. A future dispatcher will read unprocessed messages and publish them
 
 ## Testing
 
