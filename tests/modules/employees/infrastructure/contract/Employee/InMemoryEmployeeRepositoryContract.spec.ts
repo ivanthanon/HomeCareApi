@@ -1,5 +1,5 @@
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
-import { EmployeeRepositoryContractTest } from "tests/modules/employees/infrastructure/contract/Employee/EmployeeRepositoryContractTest";
+import { EmployeeRepositoryContractTest } from "tests/modules/employees/infrastructure/contract/employee/EmployeeRepositoryContractTest";
 import { EmployeeInMemoryRepository } from "../../helpers/fake/EmployeeInMemoryRepository";
 import { Employee } from "src/modules/employees/domain/employee";
 
