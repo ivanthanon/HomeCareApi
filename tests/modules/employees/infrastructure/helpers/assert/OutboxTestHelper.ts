@@ -8,9 +8,9 @@ export function assertEvent<T extends DomainEvent>(
   expect(actual).toEqual(expected);
 }
 
-export function assertOutboxEventInMemory(
-  events: any[],
-  expectedEvent: Record<string, unknown>,
+export function assertOutboxEventInMemory<T extends DomainEvent>(
+  events: T[],
+  expectedEvent: T,
 ): void {
   expect(events).toHaveLength(1);
   expect(events[0]).toEqual(expectedEvent);
