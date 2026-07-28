@@ -2,6 +2,7 @@ import { describe, it, beforeAll, afterAll, afterEach, expect } from 'vitest';
 import request from 'supertest';
 import { ArtifactTestBase } from 'tests/base/artifact-test.base';
 import { assertOutboxMessageInDatabase } from 'tests/base/helpers/OutboxTestHelper';
+import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
   class EmployeesArtifactTest extends ArtifactTestBase { }
@@ -59,18 +60,16 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       );
 
       assertOutboxMessageInDatabase(outboxQuery.recordset, {
-        type: 'EmployeeCreated.v1',
         aggregateId: employee.id,
         aggregateType: 'Employee',
-        payload: {
-          eventName: 'EmployeeCreated.v1',
-          id: employee.id,
-          firstName: employee.firstName,
-          lastName: employee.lastName,
-          documentNumber: employee.documentNumber,
-          dateOfBirth: employee.dateOfBirth,
-          occurredOn: '2026-01-01T00:00:00.000Z',
-        },
+        event: new EmployeeCreatedV1(
+          employee.id,
+          employee.firstName,
+          employee.lastName,
+          employee.documentNumber,
+          new Date(employee.dateOfBirth),
+          new Date('2026-01-01T00:00:00.000Z'),
+        ),
       });
     });
   });

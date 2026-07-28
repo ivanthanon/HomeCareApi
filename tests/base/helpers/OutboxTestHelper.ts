@@ -16,23 +16,23 @@ export function assertOutboxEventInMemory(
   expect(events[0]).toEqual(expectedEvent);
 }
 
-export function assertOutboxMessageInDatabase(
+export function assertOutboxMessageInDatabase<T extends DomainEvent>(
   recordset: any[],
   expected: {
-    type: string;
     aggregateId: string;
     aggregateType: string;
-    payload: Record<string, unknown>;
+    event: T;
   },
 ): void {
   expect(recordset).toHaveLength(1);
   const outboxMessage = recordset[0];
-  expect(outboxMessage.type).toBe(expected.type);
+  expect(outboxMessage.type).toBe(expected.event.eventName);
   expect(outboxMessage.aggregateId).toBe(expected.aggregateId);
   expect(outboxMessage.aggregateType).toBe(expected.aggregateType);
   expect(outboxMessage.processed).toBe(false);
   expect(outboxMessage.processedAt).toBeNull();
 
   const payload = JSON.parse(outboxMessage.payload as string);
-  expect(payload).toEqual(expected.payload);
+  const expectedPayload = JSON.parse(JSON.stringify(expected.event));
+  expect(payload).toEqual(expectedPayload);
 }

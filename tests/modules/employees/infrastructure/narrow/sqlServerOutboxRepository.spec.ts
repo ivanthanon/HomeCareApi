@@ -47,18 +47,9 @@ describe('SqlServerOutboxRepository', () => {
       );
 
       assertOutboxMessageInDatabase(result.recordset, {
-        type: event.eventName,
         aggregateId: event.id,
         aggregateType: 'Employee',
-        payload: {
-          eventName: event.eventName,
-          id: event.id,
-          firstName: event.firstName,
-          lastName: event.lastName,
-          documentNumber: event.documentNumber,
-          dateOfBirth: '1985-03-15T00:00:00.000Z',
-          occurredOn: '2026-01-01T00:00:00.000Z',
-        },
+        event,
       });
     });
   });
