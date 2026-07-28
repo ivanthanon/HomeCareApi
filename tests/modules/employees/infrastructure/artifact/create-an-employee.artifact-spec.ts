@@ -100,11 +100,17 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         { id: employee.id },
       );
       expect(query.recordset).toHaveLength(0);
+
+      const outboxQuery = await testCase.executeQuery(
+        'SELECT * FROM outboxMessages WHERE aggregateId = @id',
+        { id: employee.id },
+      );
+      expect(outboxQuery.recordset).toHaveLength(0);
     });
   });
 
   describe('when employee already exists', () => {
-    it('should return 201 created and dont duplicate it', async () => {
+    it('should return 201 created and doesnt duplicate it', async () => {
       const alreadyExistEmployee = {
         id: '550E8400-E29B-41D4-A716-446655440000',
         firstName: 'María',
