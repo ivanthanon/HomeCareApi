@@ -1,6 +1,6 @@
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
 import { EmployeeRepositoryContractTest } from "tests/modules/employees/infrastructure/contract/EmployeeRepositoryContractTest";
-import { EmployeeInMemoryRepository } from "./EmployeeInMemoryRepository";
+import { EmployeeInMemoryRepository } from "./InMemoryRepositories/EmployeeInMemoryRepository";
 import { Employee } from "src/modules/employees/domain/employee";
 
 class InMemoryUserRepositoryContract extends EmployeeRepositoryContractTest {
