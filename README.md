@@ -62,13 +62,13 @@ HomeCareApi/
 │           │   │   └── createEmployeeCommandHandler.ts
 │           │   └── ports/
 │           │       ├── outbox.repository.ts
-│           │       └── unitofwork.ts
+│           │       └── transactionScope.ts
 │           │
 │           └── infrastructure/
 │               ├── adapters/
 │               │   ├── SqlServerEmployeeRepository.ts
 │               │   ├── SqlServerOutboxRepository.ts
-│               │   ├── sqlServerUnitOfWork.ts
+│               │   ├── sqlServerTransactionScope.ts
 │               │   └── dateClock.ts
 │               └── restapi/
 │                   └── create-employee/
@@ -78,27 +78,46 @@ HomeCareApi/
 │   ├── base/
 │   │   ├── artifact-test.base.ts
 │   │   ├── testcontainer-setup.ts
+│   │   ├── test.config.json
 │   │   └── testContainerSettings.json
+│   ├── doubles/
+│   │   ├── fake/
+│   │   │   ├── EmployeeInMemoryRepository.ts
+│   │   │   └── OutboxInMemoryRepository.ts
+│   │   └── stub/
+│   │       └── dateClockStub.ts
+│   ├── helpers/
+│   │   └── assert/
+│   │       └── OutboxTestHelper.ts
 │   └── modules/
 │       └── employees/
+│           ├── domain/
+│           │   ├── Employee.spec.ts
+│           │   └── valueobjects/
+│           │       ├── EmployeeId.spec.ts
+│           │       ├── Name.spec.ts
+│           │       ├── DocumentNumber.spec.ts
+│           │       └── DateOfBirth.spec.ts
 │           ├── application/
 │           │   └── create-employee/
-│           │       ├── createEmployeeCommandHandler.spec.ts
-│           │       ├── createEmployeeCommandHandlerFake.spec.ts
-│           │       └── EmployeeInMemoryRepository.ts
-│           ├── domain/
-│           │   ├── EmployeeId.spec.ts
-│           │   ├── Name.spec.ts
-│           │   ├── DocumentNumber.spec.ts
-│           │   └── DateOfBirth.spec.ts
+│           │       └── createEmployeeCommandHandler.spec.ts
 │           └── infrastructure/
 │               ├── narrow/
 │               │   ├── sqlServerEmployeeRepository.spec.ts
+│               │   ├── sqlServerOutboxRepository.spec.ts
+│               │   ├── sqlServerTransactionScope.spec.ts
 │               │   └── employee.controller.spec.ts
-│               ├── artifact/
-│               │   └── create-an-employee.artifact-spec.ts
-│               └── stubs/
-│                   └── dateClockStub.ts
+│               ├── contract/
+│               │   ├── Employee/
+│               │   │   ├── EmployeeRepositoryContractTest.ts
+│               │   │   ├── InMemoryEmployeeRepositoryContract.spec.ts
+│               │   │   └── SqlServerEmployeeRepositoryContract.spec.ts
+│               │   └── outbox/
+│               │       ├── OutboxRepositoryContractTest.ts
+│               │       ├── InMemoryOutboxRepositoryContract.spec.ts
+│               │       └── SqlServerOutboxRepositoryContract.spec.ts
+│               └── artifact/
+│                   └── create-an-employee.artifact-spec.ts
 │
 ├── vitest.config.ts                     # Vitest configuration
 ├── nest-cli.json                        # NestJS CLI configuration
@@ -126,13 +145,15 @@ This ensures **at-least-once delivery** and avoids the dual-write problem withou
 |-----------|------|-------------|
 | `OutboxRepository` | `src/modules/employees/application/ports/outbox.repository.ts` | Port (interface) for persisting domain events |
 | `SqlServerOutboxRepository` | `src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository.ts` | SQL Server implementation of the outbox port |
+| `TransactionScope` | `src/modules/employees/application/ports/transactionScope.ts` | Port (interface) for transactional execution |
+| `SqlServerTransactionScope` | `src/modules/employees/infrastructure/adapters/sqlServerTransactionScope.ts` | SQL Server implementation of transaction scope |
 | `EmployeeCreatedV1` | `src/modules/employees/domain/events/EmployeeCreatedV1.ts` | Domain event emitted when an employee is created |
 | `outboxMessages` table | `src/database/migrations/002_create_outbox_tables.ts` | Migration that creates the outbox table |
 
 **Flow:**
 1. `CreateEmployeeCommandHandler` creates the `Employee` aggregate
 2. Domain events are pulled from the aggregate via `pullDomainEvents()`
-3. Each event is saved to `outboxMessages` and the employee is persisted — both inside the same `UnitOfWork` transaction
+3. Each event is saved to `outboxMessages` and the employee is persisted — both inside the same `TransactionScope` execution
 4. A future dispatcher will read unprocessed messages and publish them
 
 ## Testing
@@ -148,15 +169,24 @@ https://miro.com/app/board/uXjVHCdydrQ=/
 |------|-------------|
 | **Unit** | Validates Value Objects and Command Handlers in isolation using mocked dependencies. — fast, no dependencies |
 | **Social Unit** | Application layer tested with `InMemoryRepository` fake |
-| **Narrow Integration** | Repository and Controller tested against real dependencies (API / TestContainer) |
-| **Contract** | Ensures the fake repository satisfies the same contract as the real one |
+| **Narrow Integration** | Repository, TransactionScope and Controller tested against real dependencies (TestContainer / NestJS) |
+| **Contract** | Abstract base classes ensuring both fake and real implementations satisfy the same behavioral contract |
 | **Artifact** | Full HTTP (Supertest) + NestJS + real MSSQL in Docker container |
+
+### Test Doubles
+
+| Type | Location | Description |
+|------|----------|-------------|
+| **Fakes** | `tests/doubles/fake/` | Working in-memory implementations (`EmployeeInMemoryRepository`, `OutboxInMemoryRepository`) |
+| **Stubs** | `tests/doubles/stub/` | Fixed-value replacements (`DateClockStub`) |
+| **Mocks** | Inline `vi.fn()` | Vitest mocks for verifying interactions |
 
 ### Commands
 
 ```bash
-pnpm test            # Run all tests
-pnpm test:artifact        # Only artifact tests (artifact-spec)
+pnpm test            # Run all tests (unit + integration + artifact)
+pnpm test:unit       # Unit + integration tests (excludes artifact)
+pnpm test:artifact   # Only artifact tests (artifact-spec)
 ```
 
 ### Swagger / OpenAPI
