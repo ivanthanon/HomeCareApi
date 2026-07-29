@@ -5,18 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConnectionPool } from 'mssql';
 import { EmployeesModule } from './employees.module';
 import { MigrationRunner } from './database/migrationRunner';
-
-
-function dbConfig() {
-  return {
-    server: process.env.DB_SERVER || 'localhost',
-    port: parseInt(process.env.DB_PORT ?? '1433', 10),
-    database: process.env.DB_NAME || 'HomeCare',
-    user: process.env.DB_USER || 'sa',
-    password: process.env.DB_PASSWORD || 'HomeCare2025',
-    options: { encrypt: true, trustServerCertificate: true },
-  };
-}
+import appConfig from './config/app.config';
 
 async function bootstrap() {
   const env = process.env.NODE_ENV || 'development';
@@ -40,8 +29,8 @@ async function bootstrap() {
 bootstrap();
 
 async function applyMigrations() {
-  const config = dbConfig();
-  const pool = new ConnectionPool(config);
+  const { database } = appConfig();
+  const pool = new ConnectionPool(database);
   await pool.connect();
 
   const migrationRunner = new MigrationRunner(pool);
