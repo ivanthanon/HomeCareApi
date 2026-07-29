@@ -1,4 +1,6 @@
+import { Request } from 'mssql';
+
 export interface IMigration {
-  up: (request: any) => Promise<void>;
-  down: (request: any) => Promise<void>;
+  up: (request: Request) => Promise<void>;
+  down: (request: Request) => Promise<void>;
 }

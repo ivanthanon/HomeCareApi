@@ -1,6 +1,15 @@
 import { expect } from 'vitest';
 import { DomainEvent } from 'src/modules/employees/domain/shared/domainevent';
 
+interface OutboxMessageRecord {
+  type: string;
+  aggregateId: string;
+  aggregateType: string;
+  payload: string;
+  processed: boolean;
+  processedAt: Date | null;
+}
+
 export function assertEvent<T extends DomainEvent>(
   actual: T,
   expected: T,
@@ -17,7 +26,7 @@ export function assertOutboxEventInMemory<T extends DomainEvent>(
 }
 
 export function assertOutboxMessageInDatabase<T extends DomainEvent>(
-  recordset: any[],
+  recordset: OutboxMessageRecord[],
   expected: {
     aggregateId: string;
     aggregateType: string;
