@@ -3,7 +3,7 @@ import { OutboxRepository } from 'src/modules/employees/application/ports/outbox
 import { Employee } from 'src/modules/employees/domain/employee';
 import { Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
-import { UnitOfWork } from 'src/modules/employees/application/ports/unitofwork';
+import { TransactionScope } from 'src/modules/employees/application/ports/transactionScope';
 import { ConfigService } from '@nestjs/config';
 
 export class CreateEmployeeCommand {
@@ -20,7 +20,7 @@ export class CreateEmployeeCommandHandler {
   constructor(
     private readonly employeeRepository: EmployeeRepository,
     private readonly outboxRepository: OutboxRepository,
-    private readonly unitOfWork: UnitOfWork,
+    private readonly transactionScope: TransactionScope,
     private readonly clock: Clock,
     private readonly configService: ConfigService,
   ) {}
@@ -51,7 +51,7 @@ export class CreateEmployeeCommandHandler {
       return employeeResult;
     }
 
-    await this.unitOfWork.transaction(async () => {
+    await this.transactionScope.execute(async () => {
       const domainEvents = employeeResult.value.pullDomainEvents();
   
       for (const event of domainEvents) {

@@ -1,6 +1,7 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
+import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 import { Employee } from 'src/modules/employees/domain/employee';
 
@@ -16,7 +17,8 @@ describe('SqlServerEmployeeRepository', () => {
 
   beforeAll(async () => {
     await setup.startDatabaseTestContainer();
-    repository = new SqlServerEmployeeRepository(setup.dbConnection);
+    const transactionScope = new SqlServerTransactionScope(setup.dbConnection);
+    repository = new SqlServerEmployeeRepository(transactionScope);
   }, 60000);
 
   afterAll(async () => {

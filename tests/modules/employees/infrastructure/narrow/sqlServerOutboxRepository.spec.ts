@@ -1,6 +1,7 @@
 import { describe, it, beforeAll, afterAll } from 'vitest';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
+import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
 import { assertOutboxMessageInDatabase } from 'tests/helpers/assert/OutboxTestHelper';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
@@ -17,7 +18,8 @@ describe('SqlServerOutboxRepository', () => {
 
   beforeAll(async () => {
     await setup.startDatabaseTestContainer();
-    repository = new SqlServerOutboxRepository(setup.dbConnection);
+    const transactionScope = new SqlServerTransactionScope(setup.dbConnection);
+    repository = new SqlServerOutboxRepository(transactionScope);
   }, 60000);
 
   afterAll(async () => {

@@ -5,7 +5,7 @@ import { EmployeesController } from 'src/modules/employees/infrastructure/restap
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
-import { SqlServerUnitOfWork } from 'src/modules/employees/infrastructure/adapters/sqlServerUnitOfWork';
+import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import appConfig from './config/app.config';
 import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
 
@@ -28,29 +28,29 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
       inject: [ConfigService],
     },
     {
-      provide: SqlServerEmployeeRepository,
-      useFactory: (pool: ConnectionPool) => new SqlServerEmployeeRepository(pool),
+      provide: SqlServerTransactionScope,
+      useFactory: (pool: ConnectionPool) => new SqlServerTransactionScope(pool),
       inject: [ConnectionPool],
+    },
+    {
+      provide: SqlServerEmployeeRepository,
+      useFactory: (transactionScope: SqlServerTransactionScope) => new SqlServerEmployeeRepository(transactionScope),
+      inject: [SqlServerTransactionScope],
     },
     {
       provide: SqlServerOutboxRepository,
-      useFactory: (pool: ConnectionPool) => new SqlServerOutboxRepository(pool),
-      inject: [ConnectionPool],
-    },
-    {
-      provide: SqlServerUnitOfWork,
-      useFactory: (pool: ConnectionPool) => new SqlServerUnitOfWork(pool),
-      inject: [ConnectionPool],
+      useFactory: (transactionScope: SqlServerTransactionScope) => new SqlServerOutboxRepository(transactionScope),
+      inject: [SqlServerTransactionScope],
     },
     {
       provide: CreateEmployeeCommandHandler, 
       useFactory: (
         employeeRepository: SqlServerEmployeeRepository,
         outboxRepository: SqlServerOutboxRepository,
-        unitOfWork: SqlServerUnitOfWork,
+        unitOfWork: SqlServerTransactionScope,
         configService: ConfigService,
       ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configService),
-      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerUnitOfWork, ConfigService]
+      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, ConfigService]
     },
   ],
 })

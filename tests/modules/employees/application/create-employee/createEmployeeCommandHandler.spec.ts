@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { CreateEmployeeCommand, CreateEmployeeCommandHandler } from "src/modules/employees/application/create-employee/createEmployeeCommandHandler"
-import { SqlServerUnitOfWork } from "src/modules/employees/infrastructure/adapters/sqlServerUnitOfWork";
+import { SqlServerTransactionScope } from "src/modules/employees/infrastructure/adapters/sqlServerTransactionScope";
 import { EmployeeInMemoryRepository } from "../../../../doubles/fake/EmployeeInMemoryRepository";
 import { OutboxInMemoryRepository } from "../../../../doubles/fake/OutboxInMemoryRepository";
 import { DateClockStub } from "../../../../doubles/stub/dateClockStub";
@@ -40,7 +40,7 @@ describe('CreateEmployeeCommandHandler', () => {
     let handler: CreateEmployeeCommandHandler;
     let inMemoryRepository: EmployeeInMemoryRepository;
     let outboxInMemoryRepository: OutboxInMemoryRepository;
-    let unitOfWork: SqlServerUnitOfWork;
+    let unitOfWork: SqlServerTransactionScope;
     let mockClock: Clock;
 
     beforeEach(() => {
@@ -49,7 +49,7 @@ describe('CreateEmployeeCommandHandler', () => {
         mockRollback.mockClear();
         inMemoryRepository = new EmployeeInMemoryRepository();
         outboxInMemoryRepository = new OutboxInMemoryRepository();
-        unitOfWork = new SqlServerUnitOfWork(null as any);
+        unitOfWork = new SqlServerTransactionScope(null as any);
         mockClock = new DateClockStub();
         handler = new CreateEmployeeCommandHandler(
             inMemoryRepository,

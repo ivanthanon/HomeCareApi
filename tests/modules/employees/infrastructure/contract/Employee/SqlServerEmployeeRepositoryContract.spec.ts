@@ -1,6 +1,7 @@
 import { describe, beforeAll, afterAll, expect } from 'vitest';
 import { EmployeeRepositoryContractTest } from 'tests/modules/employees/infrastructure/contract/Employee/EmployeeRepositoryContractTest';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
+import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 import { Employee } from 'src/modules/employees/domain/employee';
@@ -17,7 +18,8 @@ class SqlServerEmployeeRepositoryContract extends EmployeeRepositoryContractTest
   }
 
   protected createRepository(): SqlServerEmployeeRepository {
-    return new SqlServerEmployeeRepository(this.containerSetup.dbConnection);
+    const transactionScope = new SqlServerTransactionScope(this.containerSetup.dbConnection);
+    return new SqlServerEmployeeRepository(transactionScope);
   }
 
   protected async cleanUp(): Promise<void> {

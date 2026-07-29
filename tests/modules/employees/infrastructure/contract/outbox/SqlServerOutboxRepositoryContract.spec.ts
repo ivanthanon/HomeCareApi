@@ -1,6 +1,7 @@
 ﻿import { describe, beforeAll, afterAll, expect } from 'vitest';
 import { OutboxRepositoryContractTest } from 'tests/modules/employees/infrastructure/contract/outbox/OutboxRepositoryContractTest';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
+import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import { TestcontainerSetup } from 'tests/base/testcontainer-setup';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
@@ -18,7 +19,8 @@ class SqlServerOutboxRepositoryContract extends OutboxRepositoryContractTest {
   }
 
   protected createRepository(): SqlServerOutboxRepository {
-    return new SqlServerOutboxRepository(this.containerSetup.dbConnection);
+    const transactionScope = new SqlServerTransactionScope(this.containerSetup.dbConnection);
+    return new SqlServerOutboxRepository(transactionScope);
   }
 
   protected async cleanUp(): Promise<void> {

@@ -1,16 +1,13 @@
-import { ConnectionPool, Date, NVarChar, UniqueIdentifier } from 'mssql';
+import { Date, NVarChar, UniqueIdentifier } from 'mssql';
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
 import { Employee } from "src/modules/employees/domain/employee";
-import { SqlServerUnitOfWork } from "./sqlServerUnitOfWork";
+import { SqlServerTransactionScope } from "./sqlServerTransactionScope";
 
 export class SqlServerEmployeeRepository implements EmployeeRepository {
-    constructor(private readonly pool: ConnectionPool) {}
+    constructor(private readonly transactionScope: SqlServerTransactionScope) {}
 
     async getBy(id: string): Promise<Employee | null> {
-        const activeTransaction = SqlServerUnitOfWork.getCurrentTransaction();
-        const request = (activeTransaction ?? this.pool).request();
-
-        const result = await request
+        const result = await this.transactionScope.getRequest()
             .input('id', UniqueIdentifier, id)
             .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
                 FROM Employees 
@@ -32,10 +29,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
     }
 
     async create(employee: Employee): Promise<void> {
-        const activeTransaction = SqlServerUnitOfWork.getCurrentTransaction();
-        const request = (activeTransaction ?? this.pool).request();
-
-        await request
+        await this.transactionScope.getRequest()
             .input('id', UniqueIdentifier, employee.id.value)
             .input('firstName', NVarChar, employee.firstName.value)
             .input('lastName', NVarChar, employee.lastName.value)
