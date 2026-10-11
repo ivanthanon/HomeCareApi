@@ -13,7 +13,7 @@ export class GetEmployeeByIdQueryHandler {
 
   async execute(
     query: GetEmployeeByIdQuery,
-  ): Promise<Result<Employee, EmployeeNotFoundError>> {
+  ): Promise<Result<Employee, Error>> {
     const employee = await this.employeeRepository.getBy(
       new EmployeeId(query.id),
     );

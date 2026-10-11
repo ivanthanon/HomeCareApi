@@ -9,3 +9,4 @@ allowBuilds:
   cpu-features: true
   ssh2: true
   '@scarf/scarf': true
+  '@parcel/watcher': false
