@@ -2,13 +2,15 @@ import { Date, NVarChar, UniqueIdentifier } from 'mssql';
 import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
 import { Employee } from "src/modules/employees/domain/employee";
 import { SqlServerTransactionScope } from "./sqlServerTransactionScope";
+import { EmployeeId } from "src/modules/employees/domain/value-objects/EmployeeId";
+import { DocumentNumber } from "src/modules/employees/domain/value-objects/DocumentNumber";
 
 export class SqlServerEmployeeRepository implements EmployeeRepository {
     constructor(private readonly transactionScope: SqlServerTransactionScope) {}
 
-    async getBy(id: string): Promise<Employee | null> {
+    async getBy(id: EmployeeId): Promise<Employee | null> {
         const result = await this.transactionScope.getRequest()
-            .input('id', UniqueIdentifier, id)
+            .input('id', UniqueIdentifier, id.value)
             .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
                 FROM Employees 
                 WHERE id = @id`);
@@ -28,9 +30,11 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
         );
     }
 
-    async getByDocumentNumber(documentNumber: string): Promise<Employee | null> {
+    async getByDocumentNumber(
+        documentNumber: DocumentNumber,
+    ): Promise<Employee | null> {
         const result = await this.transactionScope.getRequest()
-            .input('documentNumber', NVarChar, documentNumber)
+            .input('documentNumber', NVarChar, documentNumber.value)
             .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth
                 FROM Employees
                 WHERE documentNumber = @documentNumber`);

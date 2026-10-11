@@ -4,6 +4,8 @@ import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructur
 import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import testContainerSettings from 'tests/base/testContainerSettings.json';
 import { Employee } from 'src/modules/employees/domain/employee';
+import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
+import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
 
 class SqlServerEmployeeRepositoryTest extends TestcontainerSetup {
   constructor() {
@@ -78,7 +80,9 @@ describe('SqlServerEmployeeRepository', () => {
         }
       );
     
-      const employee = await repository.getBy(alreadyExistEmployee.id);
+      const employee = await repository.getBy(
+        new EmployeeId(alreadyExistEmployee.id),
+      );
 
       const expectedEmployee = Employee.reconstitute(
         alreadyExistEmployee.id,
@@ -91,7 +95,9 @@ describe('SqlServerEmployeeRepository', () => {
     });
 
     it('should return a null when employee not exists', async () => {
-      const employee = await repository.getBy('220E2200-E29B-41D4-A716-442255440000');
+      const employee = await repository.getBy(
+        new EmployeeId('220E2200-E29B-41D4-A716-442255440000'),
+      );
 
       expect(employee).toBe(null);
     })
@@ -113,7 +119,7 @@ describe('SqlServerEmployeeRepository', () => {
       );
 
       const employee = await repository.getByDocumentNumber(
-        employeeToFind.documentNumber,
+        new DocumentNumber(employeeToFind.documentNumber),
       );
 
       expect(employee).toEqual(
@@ -128,7 +134,9 @@ describe('SqlServerEmployeeRepository', () => {
     });
 
     it('should return null when no employee has the document number', async () => {
-      const employee = await repository.getByDocumentNumber('99999999Z');
+      const employee = await repository.getByDocumentNumber(
+        new DocumentNumber('99999999Z'),
+      );
 
       expect(employee).toBeNull();
     });
