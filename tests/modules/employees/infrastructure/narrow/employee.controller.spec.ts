@@ -3,17 +3,20 @@ import { INestApplication } from '@nestjs/common';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import request from 'supertest';
-import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi, Mock } from 'vitest';
+import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 
 describe('EmployeesController', () => {
     let app: INestApplication;
     let createEmployeeCommandHandler: CreateEmployeeCommandHandler;
     let mockExecute: Mock;
+    let getEmployeeQueryHandlerExecute: Mock;
 
     const path = '/employees';
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         mockExecute = vi.fn();
+        getEmployeeQueryHandlerExecute = vi.fn();
         const mockCreateEmployeeUseCase = {
             execute: mockExecute,
         };
@@ -25,12 +28,24 @@ describe('EmployeesController', () => {
                     provide: CreateEmployeeCommandHandler,
                     useValue: mockCreateEmployeeUseCase,
                 },
+                {
+                    provide: GetEmployeeByIdQueryHandler,
+                    useValue: { execute: getEmployeeQueryHandlerExecute },
+                },
             ],
         }).compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
         createEmployeeCommandHandler = app.get<CreateEmployeeCommandHandler>(CreateEmployeeCommandHandler);
+    });
+
+    afterAll(async () => {
+        await app.close();
+    });
+
+    beforeEach(() => {
+        getEmployeeQueryHandlerExecute.mockReset();
     });
 
     describe('When employee has a empty name', () => {
@@ -149,6 +164,49 @@ describe('EmployeesController', () => {
                 "error": "Bad Request",
                 "message": "Employee date of birth number must be a valid date",
                 "statusCode": 400,
+            });
+        });
+    });
+
+    describe('When getting an employee by ID', () => {
+        it('should return 400 when the ID is missing', async () => {
+            const response = await request(app.getHttpServer())
+                .get(path)
+                .expect(400);
+
+            expect(response.body).toEqual({
+                error: 'Bad Request',
+                message: 'Employee id is required',
+                statusCode: 400,
+            });
+        });
+
+        it('should return 400 when the ID is not a GUID', async () => {
+            const response = await request(app.getHttpServer())
+                .get(`${path}/not-a-guid`)
+                .expect(400);
+
+            expect(response.body).toEqual({
+                error: 'Bad Request',
+                message: 'Employee id must be a valid guid',
+                statusCode: 400,
+            });
+        });
+
+        it('should return 500 with the unexpected error message', async () => {
+            getEmployeeQueryHandlerExecute.mockResolvedValue({
+                success: false,
+                error: new Error('Database connection failed'),
+            });
+
+            const response = await request(app.getHttpServer())
+                .get(`${path}/550e8400-e29b-41d4-a716-446655440000`)
+                .expect(500);
+
+            expect(response.body).toEqual({
+                statusCode: 500,
+                message: 'Database connection failed',
+                error: 'Internal Server Error',
             });
         });
     });

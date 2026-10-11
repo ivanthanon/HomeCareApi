@@ -73,44 +73,40 @@ The **domain must never import** from `application` or `infrastructure`, and mus
 
 Runner: **Vitest v4** (`vitest.config.ts`, globals enabled, node environment). Test files are `*.spec.ts` (unit/narrow/contract) or `*.artifact-spec.ts` (E2E). Tests mirror the source path under `tests/`.
 
-### Test pyramid — pick the right level
+### Test strategy
 
 | Level | Location | Dependencies | Purpose |
 |-------|----------|--------------|---------|
-| **Unit** | `tests/modules/.../domain/**` | none | Validate Value Objects and the aggregate in isolation |
-| **Social unit** | `tests/modules/.../application/**` | in-memory fakes + stubs + `vi.fn()` | Exercise the command handler with real collaborators |
-| **Narrow integration** | `tests/modules/.../infrastructure/narrow/**` | real (Testcontainers MSSQL / Nest `TestingModule`) | One adapter/controller against real deps |
-| **Contract** | `tests/modules/.../infrastructure/contract/**` | InMemory **and** SqlServer | Prove fake and real implementations share the same behavior |
 | **Artifact (E2E)** | `tests/modules/.../infrastructure/artifact/*.artifact-spec.ts` | full HTTP (supertest) + Nest + real MSSQL | Acceptance of the whole slice |
+| **Controller contract** | `tests/modules/.../infrastructure/narrow/*controller.spec.ts` | Nest `TestingModule` + handler double | Validate HTTP request contract failures only |
 
 ### Rules
 
-- **Contract tests are mandatory for ports/repositories.** Write an abstract `*ContractTest` (with `createRepository`, `customArrange`, `customAssert`, `cleanUp` hooks and a `runContractTest()`) and run it from **both** an `InMemory*Contract.spec.ts` and a `SqlServer*Contract.spec.ts`. Adding behavior to one implementation without the other breaks the contract suite.
-- **Use the right double**: working in-memory implementation → `tests/doubles/fake/`; fixed-value replacement → `tests/doubles/stub/` (e.g. `DateClockStub`); interaction verification → inline `vi.fn()`. Never hit a real DB in unit/social tests.
-- **Independent arrange**: do not call the command handler/use case under test to arrange its own preconditions. Seed fakes directly (for example, push a reconstituted entity into `EmployeeInMemoryRepository.employeeList`) so arrange does not invoke repository behavior or create unrelated outbox effects.
-- **Repository arrange**: do not use the repository method under test to arrange persisted state. For SQL Server narrow/contract tests, arrange existing rows with direct SQL through `TestcontainerSetup.executeQuery`; for in-memory tests, seed the fake directly. Use the repository method only in the act phase.
-- **Determinism**: inject `DateClockStub` and fixed dates. No wall-clock or unseeded randomness in assertions.
-- **Infrastructure bases**: extend `TestcontainerSetup` (`tests/base/testcontainer-setup.ts`) for raw container access, or `ArtifactTestBase` (`tests/base/artifact-test.base.ts`) for a booted Nest app. Both create an isolated DB, run migrations, and expose `executeQuery` / `cleanTable`.
-- **Isolation**: clean the tables you touch (`afterEach`/`beforeEach` via `cleanTable`) so narrow/contract/artifact tests do not leak state.
-- **Docker**: narrow/contract/artifact tests require Docker; give container setup a `60000` ms timeout. Keep them out of `test:unit` (already excluded by `--exclude='**/*.artifact-spec.ts'`).
-- **Assertions**: use shared helpers from `tests/helpers/assert/` (e.g. `assertOutboxEventInMemory`, `assertOutboxMessageInDatabase`) instead of re-implementing outbox checks.
+- **Artifact tests are the default and sole acceptance coverage for application behavior and persistence.** Use the real HTTP app and SQL Server through `ArtifactTestBase`; do not add domain unit, social-unit, adapter narrow, or repository contract tests for a feature unless explicitly requested.
+- **Controller tests are the exception for HTTP request-contract failures only** (for example, a required path/query/body field is missing or has the wrong representation). Keep successful behavior, use-case outcomes, and persistence assertions in artifact tests.
+- **Request contract validation belongs in `ValidateRequests` in the controller.** Reject malformed/missing/wrongly typed contract values with `BadRequestException` (400). Do not test domain rules such as string lengths or other business invariants as controller validation.
+- **Failure mapping:** expected not-found outcomes from a use case map to HTTP 404. Do not convert unrelated exceptions or infrastructure failures into 400/404; allow them to reach Nest's unhandled 500 response.
+- **Repository arrange:** for artifact tests, arrange persisted state with direct SQL through `ArtifactTestBase.executeQuery`; do not use the repository/use case under test to seed its own preconditions.
+- **Infrastructure base:** extend `ArtifactTestBase` (`tests/base/artifact-test.base.ts`) for a booted Nest app and isolated SQL Server database; it exposes `executeQuery` and `cleanTable`.
+- **Isolation:** clean tables touched by artifact tests so database state does not leak between cases.
+- **Docker:** artifact tests require Docker; give container setup a `60000` ms timeout. They are excluded from `test:unit` by `--exclude='**/*.artifact-spec.ts'`.
+- **Assertions:** use shared helpers from `tests/helpers/assert/` (e.g. `assertOutboxMessageInDatabase`) instead of re-implementing established assertions.
 - **Naming**: `describe("When ...")` for scenarios, `it("should ...")` for outcomes. One behavior per test.
-- **New feature checklist — coverage required, not authoring order** (see *Development workflow* below for the order): domain VO/aggregate unit tests → handler social-unit test with fakes → contract coverage for any new port → narrow test for a new adapter → artifact test for the end-to-end HTTP slice. Keep docs (`README.md`) in sync.
+- **New feature checklist — coverage required:** artifact acceptance tests for positive HTTP behavior, persistence, and use-case outcomes; controller tests only for request-contract rejection. Keep docs (`README.md`) in sync when endpoint documentation changes.
 
-## Development workflow: Double Loop Outside-In TDD
+## Development workflow: Artifact-First Outside-In TDD
 
-Default workflow for a new feature slice (Freeman & Pryce, *GOOS*): an **outer acceptance loop** and a fast **inner unit loop**.
+Default workflow for a new feature slice: drive implementation from HTTP artifact acceptance. Controller tests are reserved for the boundary's malformed-request contract.
 
-1. **Outer loop (red):** write ONE failing `*.artifact-spec.ts` describing the positive acceptance behavior of the slice. It must fail as an **assertion** failure for the right reason — not because Nest cannot boot or DI cannot resolve. Keep the outer test red as the goal.
-2. **Inner loop (fast):** drive inward from the failing behavior. Add one failing unit/social test using fakes and stubs, make it pass, refactor on green, repeat. The next thing to test is **the collaboration that is failing**, not a fixed layer. Controller tests cover only negative contract cases; positive controller behavior belongs in the artifact test.
-3. **Close the loop:** stop when the outer artifact test goes green. Run the artifact test at checkpoints and at the end — not on every micro-step (it needs Docker).
+1. **Artifact red:** write a failing `*.artifact-spec.ts` describing the positive HTTP behavior. It must fail as an assertion for the right reason—not because Nest cannot boot or DI cannot resolve.
+2. **Implement inward:** add the minimum domain/application/adapter/controller wiring needed to satisfy the behavior, preserving hexagonal dependency direction. Do not add lower-level test layers for the feature.
+3. **Contract cases:** add controller tests only when validating missing, malformed, or incorrectly represented HTTP inputs; keep business/domain validation out of this layer.
+4. **Close the loop:** stop when artifact acceptance is green. Run it at checkpoints and at the end; it requires Docker.
 
 Guardrails:
 
 - **Meaningful red:** override providers at the composition boundary (as `ArtifactTestBase` does). A Nest boot/DI error is not an acceptable "red".
-- **Controller contract cases:** test negative HTTP contract behavior at the controller level (for example, invalid input or mapped failures). Keep successful/positive HTTP behavior in the artifact acceptance test.
+- **Controller contract cases:** test negative HTTP request representation at the controller level only. Do not test use-case result mapping there; verify positive and not-found outcomes through artifacts.
 - **Cost:** the outer loop is slow (Docker, `60000` ms). Iterate in the inner loop; run the outer loop when the slice is plausibly complete.
-- **Contracts still mandatory:** outside-in does not replace the InMemory + SqlServer contract test required for every port.
 - **Refactor only on green.**
-- **Exception — domain-only changes:** for a new Value Object or invariant with no new I/O, inside-out (domain unit tests first) is faster and the outer loop adds nothing.
-- **Relationship to the checklist:** the *New feature checklist* above lists the coverage that must exist by the end; this workflow defines the order in which you author it.
+- **Relationship to the checklist:** the *New feature checklist* above defines required coverage; this workflow defines the order in which to author it.

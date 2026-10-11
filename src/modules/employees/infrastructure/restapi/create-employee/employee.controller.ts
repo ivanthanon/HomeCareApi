@@ -1,8 +1,10 @@
-import { Controller, Post, Body, HttpCode, BadRequestException, ConflictException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiProperty } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, BadRequestException, ConflictException, Get, Param, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiProperty, ApiOkResponse, ApiNotFoundResponse, ApiParam } from '@nestjs/swagger';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
 import { isAValidDate, isAValidGuid } from 'src/modules/employees/domain/shared/utils';
+import { GetEmployeeByIdQueryHandler, GetEmployeeByIdQuery } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
+import { EmployeeNotFoundError } from 'src/modules/employees/application/errors/employeeNotFoundError';
 
 export class CreateEmployeeRequest {
   @ApiProperty({ description: 'Employee unique identifier (GUID)', example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -26,7 +28,43 @@ export class CreateEmployeeRequest {
 export class EmployeesController {
   constructor(
     private readonly createEmployeeCommandHandler: CreateEmployeeCommandHandler,
+    private readonly getEmployeeByIdQueryHandler: GetEmployeeByIdQueryHandler,
   ) {}
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get an employee by ID' })
+  @ApiParam({ name: 'id', description: 'Employee unique identifier (GUID)' })
+  @ApiOkResponse({ description: 'Employee found' })
+  @ApiBadRequestResponse({ description: 'Employee ID is not a valid GUID' })
+  @ApiNotFoundResponse({ description: 'Employee not found' })
+  async getEmployeeById(@Param('id') id: string) {
+    this.ValidateRequests(id);
+
+    const result = await this.getEmployeeByIdQueryHandler.execute(
+      new GetEmployeeByIdQuery(id),
+    );
+
+    if (result.success === false) {
+      if (result.error instanceof EmployeeNotFoundError) {
+        throw new NotFoundException(result.error.message);
+      }
+
+      throw new InternalServerErrorException(result.error.message);
+    }
+
+    return {
+      id: result.value.id.value.toLowerCase(),
+      firstName: result.value.firstName.value,
+      lastName: result.value.lastName.value,
+      documentNumber: result.value.documentNumber.value,
+      dateOfBirth: result.value.dateOfBirth.value.toISOString(),
+    };
+  }
+
+  @Get()
+  async getEmployeeWithoutId() {
+    throw new BadRequestException('Employee id is required');
+  }
 
   @Post()
   @HttpCode(201)
@@ -35,7 +73,7 @@ export class EmployeesController {
   @ApiBadRequestResponse()
   async createEmployee(@Body() createEmployeeRequest: CreateEmployeeRequest) {
 
-    this.validateRequest(createEmployeeRequest);
+    this.validateCreateEmployeeRequest(createEmployeeRequest);
 
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
@@ -56,7 +94,13 @@ export class EmployeesController {
     return;
   }
 
-  private validateRequest(createEmployeeRequest: CreateEmployeeRequest) {
+  private ValidateRequests(id: string) {
+    if (typeof id !== 'string' || !isAValidGuid(id)) {
+      throw new BadRequestException('Employee id must be a valid guid');
+    }
+  }
+
+  private validateCreateEmployeeRequest(createEmployeeRequest: CreateEmployeeRequest) {
     if (!createEmployeeRequest.firstName) {
       throw new BadRequestException('Employee name must not be empty');
     }
