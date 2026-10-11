@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, BadRequestException, ConflictException, Get, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, BadRequestException, ConflictException, Get, Param, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiProperty, ApiOkResponse, ApiNotFoundResponse, ApiParam } from '@nestjs/swagger';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
@@ -49,7 +49,7 @@ export class EmployeesController {
         throw new NotFoundException(result.error.message);
       }
 
-      throw new Error(result.error.message);
+      throw new InternalServerErrorException(result.error.message);
     }
 
     return {
@@ -59,6 +59,11 @@ export class EmployeesController {
       documentNumber: result.value.documentNumber.value,
       dateOfBirth: result.value.dateOfBirth.value.toISOString(),
     };
+  }
+
+  @Get()
+  async getEmployeeWithoutId() {
+    throw new BadRequestException('Employee id is required');
   }
 
   @Post()
