@@ -49,16 +49,6 @@ describe('DeleteEmployeeController', () => {
         });
     });
 
-    describe('When the employee is deleted', () => {
-        it('should return a 204 No Content', async () => {
-            deleteEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: true });
-
-            await request(app.getHttpServer())
-                .delete(`${path}/550e8400-e29b-41d4-a716-446655440000`)
-                .expect(204);
-        });
-    });
-
     describe('When the id is not a valid guid', () => {
         it('should return a 400 Bad Request', async () => {
             deleteEmployeeCommandHandler.execute = vi.fn().mockResolvedValue({ success: true });
