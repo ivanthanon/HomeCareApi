@@ -155,5 +155,39 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
       });
     });
+
+    it('should return 409 conflict when the document number belongs to another employee', async () => {
+      const existingEmployee = {
+        id: '550E8400-E29B-41D4-A716-446655440000',
+        firstName: 'María',
+        lastName: 'García López',
+        documentNumber: '12345678A',
+        dateOfBirth: '1985-03-15',
+      };
+      await testCase.executeQuery(
+        `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth)
+        VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)`,
+        {
+          ...existingEmployee,
+          dateOfBirth: new Date(existingEmployee.dateOfBirth),
+        },
+      );
+
+      await request(testCase['app'].getHttpServer())
+        .post(path)
+        .send({ ...existingEmployee, id: '650E8400-E29B-41D4-A716-446655440000' })
+        .expect(409)
+        .expect({
+          error: 'Conflict',
+          message: 'Employee already exists',
+          statusCode: 409,
+        });
+
+      const query = await testCase.executeQuery(
+        'SELECT * FROM employees WHERE documentNumber = @documentNumber',
+        { documentNumber: existingEmployee.documentNumber },
+      );
+      expect(query.recordset).toHaveLength(1);
+    });
   });
 });

@@ -81,5 +81,6 @@ docker-compose.override.yml
 .AppleDB
 Thumbs.db
 
-# AI tooling (auto-generated, machine-specific)
+# AI tooling (auto-generated or workflow-specific)
 .atl/
+odd/

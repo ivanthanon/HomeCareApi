@@ -6,6 +6,8 @@ import { Clock } from 'src/modules/employees/domain/shared/clock';
 import { TransactionScope } from 'src/modules/employees/application/ports/transactionScope';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
 import { ConfigService } from '@nestjs/config';
+import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
+import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
 
 export class CreateEmployeeCommand {
   constructor(
@@ -66,6 +68,17 @@ export class CreateEmployeeCommandHandler {
   }
 
   private async employeeAlreadyExist(command: CreateEmployeeCommand) {
-    return await this.employeeRepository.getBy(command.id) != null;
+    const employeeWithId = await this.employeeRepository.getBy(
+      new EmployeeId(command.id),
+    );
+    if (employeeWithId !== null) {
+      return true;
+    }
+
+    return (
+      (await this.employeeRepository.getByDocumentNumber(
+        new DocumentNumber(command.documentNumber),
+      )) !== null
+    );
   }
 }

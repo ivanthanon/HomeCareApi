@@ -64,6 +64,7 @@ The **domain must never import** from `application` or `infrastructure`, and mus
 ## Code style
 
 - Prettier: `singleQuote: true`, `trailingComma: all`. ESLint flat config (`eslint.config.mjs`).
+- **Keep formatting changes scoped**: do not reformat or adjust indentation/whitespace in unrelated existing code. Format only changed lines or files when needed; avoid noisy formatting-only diffs.
 - Prefer `Result` and explicit types at layer boundaries.
 - Imports may use the `src/`, `tests/`, `@/` aliases (see `vitest.config.ts`) or relative paths; follow the surrounding file.
 - Do not add comments unless they carry non-obvious intent.
@@ -86,6 +87,8 @@ Runner: **Vitest v4** (`vitest.config.ts`, globals enabled, node environment). T
 
 - **Contract tests are mandatory for ports/repositories.** Write an abstract `*ContractTest` (with `createRepository`, `customArrange`, `customAssert`, `cleanUp` hooks and a `runContractTest()`) and run it from **both** an `InMemory*Contract.spec.ts` and a `SqlServer*Contract.spec.ts`. Adding behavior to one implementation without the other breaks the contract suite.
 - **Use the right double**: working in-memory implementation → `tests/doubles/fake/`; fixed-value replacement → `tests/doubles/stub/` (e.g. `DateClockStub`); interaction verification → inline `vi.fn()`. Never hit a real DB in unit/social tests.
+- **Independent arrange**: do not call the command handler/use case under test to arrange its own preconditions. Seed fakes directly (for example, push a reconstituted entity into `EmployeeInMemoryRepository.employeeList`) so arrange does not invoke repository behavior or create unrelated outbox effects.
+- **Repository arrange**: do not use the repository method under test to arrange persisted state. For SQL Server narrow/contract tests, arrange existing rows with direct SQL through `TestcontainerSetup.executeQuery`; for in-memory tests, seed the fake directly. Use the repository method only in the act phase.
 - **Determinism**: inject `DateClockStub` and fixed dates. No wall-clock or unseeded randomness in assertions.
 - **Infrastructure bases**: extend `TestcontainerSetup` (`tests/base/testcontainer-setup.ts`) for raw container access, or `ArtifactTestBase` (`tests/base/artifact-test.base.ts`) for a booted Nest app. Both create an isolated DB, run migrations, and expose `executeQuery` / `cleanTable`.
 - **Isolation**: clean the tables you touch (`afterEach`/`beforeEach` via `cleanTable`) so narrow/contract/artifact tests do not leak state.
@@ -98,13 +101,14 @@ Runner: **Vitest v4** (`vitest.config.ts`, globals enabled, node environment). T
 
 Default workflow for a new feature slice (Freeman & Pryce, *GOOS*): an **outer acceptance loop** and a fast **inner unit loop**.
 
-1. **Outer loop (red):** write ONE failing `*.artifact-spec.ts` describing the acceptance behavior of the slice. It must fail as an **assertion** failure for the right reason — not because Nest cannot boot or DI cannot resolve. Keep the outer test red as the goal.
-2. **Inner loop (fast):** drive inward from the failing behavior. Add one failing unit/social test using fakes and stubs, make it pass, refactor on green, repeat. The next thing to test is **the collaboration that is failing**, not a fixed layer.
+1. **Outer loop (red):** write ONE failing `*.artifact-spec.ts` describing the positive acceptance behavior of the slice. It must fail as an **assertion** failure for the right reason — not because Nest cannot boot or DI cannot resolve. Keep the outer test red as the goal.
+2. **Inner loop (fast):** drive inward from the failing behavior. Add one failing unit/social test using fakes and stubs, make it pass, refactor on green, repeat. The next thing to test is **the collaboration that is failing**, not a fixed layer. Controller tests cover only negative contract cases; positive controller behavior belongs in the artifact test.
 3. **Close the loop:** stop when the outer artifact test goes green. Run the artifact test at checkpoints and at the end — not on every micro-step (it needs Docker).
 
 Guardrails:
 
 - **Meaningful red:** override providers at the composition boundary (as `ArtifactTestBase` does). A Nest boot/DI error is not an acceptable "red".
+- **Controller contract cases:** test negative HTTP contract behavior at the controller level (for example, invalid input or mapped failures). Keep successful/positive HTTP behavior in the artifact acceptance test.
 - **Cost:** the outer loop is slow (Docker, `60000` ms). Iterate in the inner loop; run the outer loop when the slice is plausibly complete.
 - **Contracts still mandatory:** outside-in does not replace the InMemory + SqlServer contract test required for every port.
 - **Refactor only on green.**
