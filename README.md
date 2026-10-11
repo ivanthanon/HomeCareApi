@@ -6,13 +6,13 @@ REST API for managing home care employees. Built with **NestJS** + **TypeScript*
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| Node.js | - | Runtime environment |
-| TypeScript | ^5.7 | Language |
-| NestJS | ^11.0 | Web framework |
-| mssql | ^9.1 | SQL Server client |
-| SWC | ^1.15 | Fast TypeScript/JS compiler |
-| Vitest | ^4.0 | Test runner |
-| Testcontainers | ^11.8 | Docker containers for integration tests |
+| Node.js | 26 | Runtime environment |
+| TypeScript | ~6.0 | Language |
+| NestJS | ^12.1 | Web framework |
+| mssql | ^12.7 | SQL Server client |
+| SWC | ^1.16 | Fast TypeScript/JS compiler |
+| Vitest | ^5.0 | Test runner |
+| Testcontainers | ^12.2 | Docker containers for integration tests |
 | Supertest | ^7.0 | HTTP assertions for E2E tests |
 | OpenTelemetry | ^1.22 | Observability (traces, metrics, logs) |
 | Docker Compose | - | MSSQL 2022 + app for local development |
@@ -201,7 +201,7 @@ Powered by `@nestjs/swagger`. The OpenAPI specification is auto-generated from d
 
 ## Local development requirements
 
-- Node.js >= 18
+- Node.js >= 26
 - pnpm
 - Docker (for local MSSQL)
 

@@ -7,7 +7,7 @@ Guidance for agents working in this repository.
 REST API for managing home care employees. **NestJS** + **TypeScript**, structured as **Domain-Driven Design (DDD)** with **Hexagonal Architecture (Ports & Adapters)**.
 
 - Package manager: **pnpm** (do not use npm/yarn; lockfile is `pnpm-lock.yaml`).
-- Runtime: Node.js >= 18 (CI uses Node 24). DB: SQL Server via `mssql`.
+- Runtime: Node.js >= 26 (CI and Docker use Node 26). DB: SQL Server via `mssql`.
 
 ## Commands
 
