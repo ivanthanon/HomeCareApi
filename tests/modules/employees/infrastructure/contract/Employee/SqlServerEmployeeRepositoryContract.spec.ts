@@ -52,6 +52,7 @@ class SqlServerEmployeeRepositoryContract extends EmployeeRepositoryContractTest
       lastName: expectedEmployee.lastName.value,
       documentNumber: expectedEmployee.documentNumber.value,
       dateOfBirth: expectedEmployee.dateOfBirth.value,
+      deletedAt: null,
     });
   }
 }

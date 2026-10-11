@@ -39,5 +39,17 @@ export abstract class EmployeeRepositoryContractTest {
 
             expect(employee).toEqual(anExistingEmployee);
         })
+
+        it('should soft delete an employee so it is no longer returned by getBy', async () => {
+            const anExistingEmployee = Employee.reconstitute("60503836-989C-48D0-AC81-D1CC61C221A4", "Juan", "Lopez", "42332233X", new Date("1985-03-15T00:00:00Z"))
+            await this.customArrange(anExistingEmployee);
+
+            anExistingEmployee.delete(new Date("2026-01-01T00:00:00.000Z"));
+            await this.repository.softDelete(anExistingEmployee);
+
+            const deletedEmployee = await this.repository.getBy(anExistingEmployee.id.value);
+
+            expect(deletedEmployee).toBeNull();
+        })
     }
 }

@@ -11,7 +11,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
             .input('id', UniqueIdentifier, id)
             .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
                 FROM Employees 
-                WHERE id = @id`);
+                WHERE id = @id AND deletedAt IS NULL`);
 
         if (!result.recordset || result.recordset.length === 0) {
             return null;
@@ -38,6 +38,17 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
             .query(`
                 INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth)
                 VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)
+            `);
+    }
+
+    async softDelete(employee: Employee): Promise<void> {
+        await this.transactionScope.getRequest()
+            .input('id', UniqueIdentifier, employee.id.value)
+            .input('deletedAt', Date, employee.deletedAt)
+            .query(`
+                UPDATE employees
+                SET deletedAt = @deletedAt
+                WHERE id = @id
             `);
     }
 }

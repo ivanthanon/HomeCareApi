@@ -51,7 +51,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: employee.firstName,
         lastName: employee.lastName,
         documentNumber: employee.documentNumber,
-        dateOfBirth: new Date(employee.dateOfBirth)
+        dateOfBirth: new Date(employee.dateOfBirth),
+        deletedAt: null,
       });
 
       const outboxQuery = await testCase.executeQuery(
@@ -147,7 +148,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: alreadyExistEmployee.firstName,
         lastName: alreadyExistEmployee.lastName,
         documentNumber: alreadyExistEmployee.documentNumber,
-        dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
+        dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth),
+        deletedAt: null,
       });
     });
   });

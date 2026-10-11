@@ -5,6 +5,7 @@ import { EmployeeId } from "./value-objects/EmployeeId";
 import { Name } from "./value-objects/Name";
 import { DomainEvent } from "./shared/domainevent";
 import { EmployeeCreatedV1 } from "./events/EmployeeCreatedV1";
+import { EmployeeDeletedV1 } from "./events/EmployeeDeletedV1";
 
 export class Employee {
   public constructor(
@@ -13,6 +14,7 @@ export class Employee {
     readonly lastName: Name,
     readonly documentNumber: DocumentNumber,
     readonly dateOfBirth: DateOfBirth,
+    public deletedAt: Date | null = null,
   ) { }
 
   public DomainEvents: DomainEvent[] = [];
@@ -80,12 +82,26 @@ export class Employee {
     return events;
   }
 
-  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: Date): Employee {
+  public delete(currentDate: Date): Result<void, Error> {
+    if (this.deletedAt !== null) {
+      return Err(new Error('Employee is already deleted'));
+    }
+
+    this.deletedAt = currentDate;
+    this.DomainEvents.push(
+      new EmployeeDeletedV1(this.id.value, currentDate)
+    );
+
+    return Ok();
+  }
+
+  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: Date, deletedAt: Date | null = null): Employee {
         return new Employee(
             new EmployeeId(id),
             new Name(firstName),
             new Name(lastName),
             new DocumentNumber(documentNumber),
-            new DateOfBirth(dateOfBirth));
+            new DateOfBirth(dateOfBirth),
+            deletedAt);
     }
 }

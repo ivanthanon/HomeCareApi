@@ -52,7 +52,8 @@ describe('SqlServerEmployeeRepository', () => {
         firstName: employeeToCreate.firstName.value,
         lastName: employeeToCreate.lastName.value,
         documentNumber: employeeToCreate.documentNumber.value,
-        dateOfBirth: employeeToCreate.dateOfBirth.value
+        dateOfBirth: employeeToCreate.dateOfBirth.value,
+        deletedAt: null,
       });
     });
   });
