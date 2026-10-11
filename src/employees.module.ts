@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConnectionPool } from 'mssql';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
+import { DeleteEmployeeController } from 'src/modules/employees/infrastructure/restapi/delete-employee/employee.controller';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { DeleteEmployeeCommandHandler } from 'src/modules/employees/application/delete-employee/deleteEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
@@ -10,7 +12,7 @@ import appConfig from './config/app.config';
 import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
 
 @Module({
-  controllers: [EmployeesController],
+  controllers: [EmployeesController, DeleteEmployeeController],
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
@@ -51,6 +53,15 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
         configService: ConfigService,
       ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configService),
       inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, ConfigService]
+    },
+    {
+      provide: DeleteEmployeeCommandHandler,
+      useFactory: (
+        employeeRepository: SqlServerEmployeeRepository,
+        outboxRepository: SqlServerOutboxRepository,
+        transactionScope: SqlServerTransactionScope,
+      ) => new DeleteEmployeeCommandHandler(employeeRepository, outboxRepository, transactionScope, new DateClock()),
+      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope]
     },
   ],
 })

@@ -5,6 +5,7 @@ import { EmployeesModule } from 'src/employees.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { DeleteEmployeeCommandHandler } from 'src/modules/employees/application/delete-employee/deleteEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
@@ -42,6 +43,15 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
           transactionScope,
           new DateClockStub(),
           new ConfigService(testConfig),
+        )
+      })
+      .overrideProvider(DeleteEmployeeCommandHandler)
+      .useFactory({
+        factory: () => new DeleteEmployeeCommandHandler(
+          new SqlServerEmployeeRepository(transactionScope),
+          new SqlServerOutboxRepository(transactionScope),
+          transactionScope,
+          new DateClockStub(),
         )
       })
       .compile();

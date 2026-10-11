@@ -37,7 +37,8 @@ HomeCareApi/
 │   │   ├── runMigrations.ts
 │   │   └── migrations/
 │   │       ├── 001_create_workers_table.ts
-│   │       └── 002_create_outbox_tables.ts
+│   │       ├── 002_create_outbox_tables.ts
+│   │       └── 003_add_deletedAt_to_employees.ts
 │   └── modules/
 │       └── employees/                   # Bounded context
 │           ├── domain/                  # Domain layer
@@ -50,7 +51,8 @@ HomeCareApi/
 │           │   │   ├── DocumentNumber.ts
 │           │   │   └── DateOfBirth.ts
 │           │   ├── events/
-│           │   │   └── EmployeeCreatedV1.ts
+│           │   │   ├── EmployeeCreatedV1.ts
+│           │   │   └── EmployeeDeletedV1.ts
 │           │   └── shared/
 │           │       ├── clock.ts
 │           │       ├── domainevent.ts
@@ -60,6 +62,8 @@ HomeCareApi/
 │           ├── application/
 │           │   ├── create-employee/
 │           │   │   └── createEmployeeCommandHandler.ts
+│           │   ├── delete-employee/
+│           │   │   └── deleteEmployeeCommandHandler.ts
 │           │   └── ports/
 │           │       ├── outbox.repository.ts
 │           │       └── transactionScope.ts
@@ -71,7 +75,9 @@ HomeCareApi/
 │               │   ├── sqlServerTransactionScope.ts
 │               │   └── dateClock.ts
 │               └── restapi/
-│                   └── create-employee/
+│                   ├── create-employee/
+│                   │   └── employee.controller.ts
+│                   └── delete-employee/
 │                       └── employee.controller.ts
 │
 ├── tests/                               
@@ -101,12 +107,15 @@ HomeCareApi/
 │           ├── application/
 │           │   └── create-employee/
 │           │       └── createEmployeeCommandHandler.spec.ts
+│           │   └── delete-employee/
+│           │       └── deleteEmployeeCommandHandler.spec.ts
 │           └── infrastructure/
 │               ├── narrow/
 │               │   ├── sqlServerEmployeeRepository.spec.ts
 │               │   ├── sqlServerOutboxRepository.spec.ts
 │               │   ├── sqlServerTransactionScope.spec.ts
-│               │   └── employee.controller.spec.ts
+│               │   ├── employee.controller.spec.ts
+│               │   └── deleteEmployee.controller.spec.ts
 │               ├── contract/
 │               │   ├── Employee/
 │               │   │   ├── EmployeeRepositoryContractTest.ts
@@ -117,7 +126,8 @@ HomeCareApi/
 │               │       ├── InMemoryOutboxRepositoryContract.spec.ts
 │               │       └── SqlServerOutboxRepositoryContract.spec.ts
 │               └── artifact/
-│                   └── create-an-employee.artifact-spec.ts
+│                   ├── create-an-employee.artifact-spec.ts
+│                   └── delete-an-employee.artifact-spec.ts
 │
 ├── vitest.config.ts                     # Vitest configuration
 ├── nest-cli.json                        # NestJS CLI configuration
@@ -148,6 +158,7 @@ This ensures **at-least-once delivery** and avoids the dual-write problem withou
 | `TransactionScope` | `src/modules/employees/application/ports/transactionScope.ts` | Port (interface) for transactional execution |
 | `SqlServerTransactionScope` | `src/modules/employees/infrastructure/adapters/sqlServerTransactionScope.ts` | SQL Server implementation of transaction scope |
 | `EmployeeCreatedV1` | `src/modules/employees/domain/events/EmployeeCreatedV1.ts` | Domain event emitted when an employee is created |
+| `EmployeeDeletedV1` | `src/modules/employees/domain/events/EmployeeDeletedV1.ts` | Domain event emitted when an employee is soft deleted |
 | `outboxMessages` table | `src/database/migrations/002_create_outbox_tables.ts` | Migration that creates the outbox table |
 
 **Flow:**
@@ -155,6 +166,17 @@ This ensures **at-least-once delivery** and avoids the dual-write problem withou
 2. Domain events are pulled from the aggregate via `pullDomainEvents()`
 3. Each event is saved to `outboxMessages` and the employee is persisted — both inside the same `TransactionScope` execution
 4. A future dispatcher will read unprocessed messages and publish them
+
+Deletion follows the same flow: `DeleteEmployeeCommandHandler` loads the employee, marks it
+soft deleted (`deletedAt`), pulls `EmployeeDeleted.v1`, and persists the event and the state
+change in the same `TransactionScope`. Soft-deleted employees are excluded from `getBy`.
+
+### Endpoints
+
+| Method | Path | Success | Errors |
+|--------|------|---------|--------|
+| `POST` | `/employees` | `201 Created` | `400 Bad Request` |
+| `DELETE` | `/employees/:id` | `204 No Content` | `400` invalid guid, `404` not found |
 
 ## Testing
 
