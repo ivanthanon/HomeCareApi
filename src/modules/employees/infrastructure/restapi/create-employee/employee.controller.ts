@@ -1,6 +1,7 @@
-import { Controller, Post, Body, HttpCode, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, BadRequestException, ConflictException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiProperty } from '@nestjs/swagger';
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
 import { isAValidDate, isAValidGuid } from 'src/modules/employees/domain/shared/utils';
 
 export class CreateEmployeeRequest {
@@ -46,6 +47,9 @@ export class EmployeesController {
     const result = await this.createEmployeeCommandHandler.execute(command);
 
     if (result.success === false) {
+      if (result.error instanceof EmployeeAlreadyExistsError) {
+        throw new ConflictException(result.error.message);
+      }
       throw new BadRequestException(result.error.message);
     }
 

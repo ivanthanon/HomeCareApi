@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { CreateEmployeeCommand, CreateEmployeeCommandHandler } from "src/modules/employees/application/create-employee/createEmployeeCommandHandler"
+import { EmployeeAlreadyExistsError } from "src/modules/employees/application/errors/employeeAlreadyExistsError";
 import { TransactionScope } from "src/modules/employees/application/ports/transactionScope";
 import { EmployeeInMemoryRepository } from "../../../../doubles/fake/EmployeeInMemoryRepository";
 import { OutboxInMemoryRepository } from "../../../../doubles/fake/OutboxInMemoryRepository";
@@ -95,5 +96,19 @@ describe('CreateEmployeeCommandHandler', () => {
         await handler.execute(validCommand());
 
         expect(transactionScope.execute).toHaveBeenCalledOnce();
+    });
+
+    it('should return a duplicate employee failure when employee already exists', async () => {
+        await handler.execute(validCommand());
+
+        const result = await handler.execute(validCommand());
+
+        expect(result).toEqual({
+            success: false,
+            error: expect.any(EmployeeAlreadyExistsError),
+        });
+        expect((result as Failure<Error>).error.message).toBe('Employee already exists');
+        expect(inMemoryRepository.employeeList).toHaveLength(1);
+        expect(outboxInMemoryRepository.events).toHaveLength(1);
     });
 });
