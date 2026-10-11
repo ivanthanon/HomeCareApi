@@ -80,19 +80,53 @@ describe("When deleting an employee", () => {
     });
 });
 
-describe("When reconstituting a deleted employee", () => {
-    it("should carry the deletedAt value", () => {
+describe("When reconstituting an employee", () => {
+    it("should rebuild every field from persisted data", () => {
+        const id = "550e8400-e29b-41d4-a716-446655440000";
+        const firstName = "Juan";
+        const lastName = "Perez";
+        const documentNumber = "12345678K";
+        const dateOfBirth = new Date("1991-06-13T00:00:00.000Z");
         const deletedAt = new Date("2025-12-31T00:00:00.000Z");
 
+        const employee = Employee.reconstitute(
+            id,
+            firstName,
+            lastName,
+            documentNumber,
+            dateOfBirth,
+            deletedAt,
+        );
+
+        expect(employee.id.value).toBe(id);
+        expect(employee.firstName.value).toBe(firstName);
+        expect(employee.lastName.value).toBe(lastName);
+        expect(employee.documentNumber.value).toBe(documentNumber);
+        expect(employee.dateOfBirth.value).toEqual(dateOfBirth);
+        expect(employee.deletedAt).toEqual(deletedAt);
+    });
+
+    it("should rebuild an active employee with deletedAt defaulting to null", () => {
         const employee = Employee.reconstitute(
             "550e8400-e29b-41d4-a716-446655440000",
             "Juan",
             "Perez",
             "12345678K",
             new Date("1991-06-13T00:00:00.000Z"),
-            deletedAt,
         );
 
-        expect(employee.deletedAt).toEqual(deletedAt);
+        expect(employee.deletedAt).toBeNull();
+    });
+
+    it("should not raise any domain event", () => {
+        const employee = Employee.reconstitute(
+            "550e8400-e29b-41d4-a716-446655440000",
+            "Juan",
+            "Perez",
+            "12345678K",
+            new Date("1991-06-13T00:00:00.000Z"),
+        );
+
+        expect(employee.DomainEvents.length).toBe(0);
     });
 });
