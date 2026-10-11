@@ -98,13 +98,14 @@ Runner: **Vitest v4** (`vitest.config.ts`, globals enabled, node environment). T
 
 Default workflow for a new feature slice (Freeman & Pryce, *GOOS*): an **outer acceptance loop** and a fast **inner unit loop**.
 
-1. **Outer loop (red):** write ONE failing `*.artifact-spec.ts` describing the acceptance behavior of the slice. It must fail as an **assertion** failure for the right reason — not because Nest cannot boot or DI cannot resolve. Keep the outer test red as the goal.
-2. **Inner loop (fast):** drive inward from the failing behavior. Add one failing unit/social test using fakes and stubs, make it pass, refactor on green, repeat. The next thing to test is **the collaboration that is failing**, not a fixed layer.
+1. **Outer loop (red):** write ONE failing `*.artifact-spec.ts` describing the positive acceptance behavior of the slice. It must fail as an **assertion** failure for the right reason — not because Nest cannot boot or DI cannot resolve. Keep the outer test red as the goal.
+2. **Inner loop (fast):** drive inward from the failing behavior. Add one failing unit/social test using fakes and stubs, make it pass, refactor on green, repeat. The next thing to test is **the collaboration that is failing**, not a fixed layer. Controller tests cover only negative contract cases; positive controller behavior belongs in the artifact test.
 3. **Close the loop:** stop when the outer artifact test goes green. Run the artifact test at checkpoints and at the end — not on every micro-step (it needs Docker).
 
 Guardrails:
 
 - **Meaningful red:** override providers at the composition boundary (as `ArtifactTestBase` does). A Nest boot/DI error is not an acceptable "red".
+- **Controller contract cases:** test negative HTTP contract behavior at the controller level (for example, invalid input or mapped failures). Keep successful/positive HTTP behavior in the artifact acceptance test.
 - **Cost:** the outer loop is slow (Docker, `60000` ms). Iterate in the inner loop; run the outer loop when the slice is plausibly complete.
 - **Contracts still mandatory:** outside-in does not replace the InMemory + SqlServer contract test required for every port.
 - **Refactor only on green.**
