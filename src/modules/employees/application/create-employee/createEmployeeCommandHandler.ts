@@ -1,9 +1,10 @@
 import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
 import { OutboxRepository } from 'src/modules/employees/application/ports/outbox.repository';
 import { Employee } from 'src/modules/employees/domain/employee';
-import { Ok, Result } from 'src/modules/employees/domain/shared/result';
+import { Err, Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
 import { TransactionScope } from 'src/modules/employees/application/ports/transactionScope';
+import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
 import { ConfigService } from '@nestjs/config';
 
 export class CreateEmployeeCommand {
@@ -28,7 +29,7 @@ export class CreateEmployeeCommandHandler {
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
 
     if (await this.employeeAlreadyExist(command)) {
-      return Ok();
+      return Err(new EmployeeAlreadyExistsError());
     }
 
     const ageOfMajority = this.configService.get<number>('app.ageOfMajority');

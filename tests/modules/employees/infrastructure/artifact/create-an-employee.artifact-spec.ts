@@ -110,7 +110,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
   });
 
   describe('when employee already exists', () => {
-    it('should return 201 created and doesnt duplicate it', async () => {
+    it('should return 409 conflict and doesnt duplicate it', async () => {
       const alreadyExistEmployee = {
         id: '550E8400-E29B-41D4-A716-446655440000',
         firstName: 'María',
@@ -134,7 +134,12 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       await request(testCase['app'].getHttpServer())
         .post(path)
         .send(alreadyExistEmployee)
-        .expect(201);
+        .expect(409)
+        .expect({
+          error: 'Conflict',
+          message: 'Employee already exists',
+          statusCode: 409,
+        });
 
       const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
