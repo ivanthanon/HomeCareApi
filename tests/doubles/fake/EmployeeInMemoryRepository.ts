@@ -11,6 +11,11 @@ export class EmployeeInMemoryRepository implements EmployeeRepository {
         return employee || null;    
     }
 
+    async getByDocumentNumber(documentNumber: string): Promise<Employee | null> {
+        const employee = this.employeeList.find(emp => emp.documentNumber.value === documentNumber);
+        return employee || null;
+    }
+
     async create(employee: Employee): Promise<void> {
         this.employeeList.push(employee);
     }

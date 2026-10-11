@@ -66,6 +66,11 @@ export class CreateEmployeeCommandHandler {
   }
 
   private async employeeAlreadyExist(command: CreateEmployeeCommand) {
-    return await this.employeeRepository.getBy(command.id) != null;
+    const employeeWithId = await this.employeeRepository.getBy(command.id);
+    if (employeeWithId !== null) {
+      return true;
+    }
+
+    return await this.employeeRepository.getByDocumentNumber(command.documentNumber) != null;
   }
 }

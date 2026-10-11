@@ -99,7 +99,13 @@ describe('CreateEmployeeCommandHandler', () => {
     });
 
     it('should return a duplicate employee failure when employee already exists', async () => {
-        await handler.execute(validCommand());
+        await inMemoryRepository.create(Employee.reconstitute(
+            '550e8400-e29b-41d4-a716-446655440000',
+            'John',
+            'Doe',
+            '12345678K',
+            new Date('1991-06-13T00:00:00.000Z'),
+        ));
 
         const result = await handler.execute(validCommand());
 
@@ -109,6 +115,33 @@ describe('CreateEmployeeCommandHandler', () => {
         });
         expect((result as Failure<Error>).error.message).toBe('Employee already exists');
         expect(inMemoryRepository.employeeList).toHaveLength(1);
-        expect(outboxInMemoryRepository.events).toHaveLength(1);
+        expect(outboxInMemoryRepository.events).toHaveLength(0);
+    });
+
+    it('should return a duplicate employee failure when document number already exists', async () => {
+        await inMemoryRepository.create(Employee.reconstitute(
+            '550e8400-e29b-41d4-a716-446655440000',
+            'John',
+            'Doe',
+            '12345678K',
+            new Date('1991-06-13T00:00:00.000Z'),
+        ));
+        const commandWithExistingDocumentNumber = new CreateEmployeeCommand(
+            '650e8400-e29b-41d4-a716-446655440000',
+            'Jane',
+            'Doe',
+            '12345678K',
+            new Date('1991-06-13T00:00:00.000Z'),
+        );
+
+        const result = await handler.execute(commandWithExistingDocumentNumber);
+
+        expect(result).toEqual({
+            success: false,
+            error: expect.any(EmployeeAlreadyExistsError),
+        });
+        expect((result as Failure<Error>).error.message).toBe('Employee already exists');
+        expect(inMemoryRepository.employeeList).toHaveLength(1);
+        expect(outboxInMemoryRepository.events).toHaveLength(0);
     });
 });

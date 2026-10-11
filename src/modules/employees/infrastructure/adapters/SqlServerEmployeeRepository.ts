@@ -28,6 +28,28 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
         );
     }
 
+    async getByDocumentNumber(documentNumber: string): Promise<Employee | null> {
+        const result = await this.transactionScope.getRequest()
+            .input('documentNumber', NVarChar, documentNumber)
+            .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth
+                FROM Employees
+                WHERE documentNumber = @documentNumber`);
+
+        if (!result.recordset || result.recordset.length === 0) {
+            return null;
+        }
+
+        const rawEmployee = result.recordset[0];
+
+        return Employee.reconstitute(
+            rawEmployee.id,
+            rawEmployee.firstName,
+            rawEmployee.lastName,
+            rawEmployee.documentNumber,
+            rawEmployee.dateOfBirth,
+        );
+    }
+
     async create(employee: Employee): Promise<void> {
         await this.transactionScope.getRequest()
             .input('id', UniqueIdentifier, employee.id.value)

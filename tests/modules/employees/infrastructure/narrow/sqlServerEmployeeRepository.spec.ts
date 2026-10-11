@@ -96,4 +96,41 @@ describe('SqlServerEmployeeRepository', () => {
       expect(employee).toBe(null);
     })
   });
+
+  describe('getByDocumentNumber', () => {
+    it('should recover the employee with the matching document number', async () => {
+      const employeeToFind = {
+        id: '550E8400-E29B-41D4-A716-446655440000',
+        firstName: 'María',
+        lastName: 'García López',
+        documentNumber: '12345678A',
+        dateOfBirth: new Date('1985-03-15T00:00:00Z'),
+      };
+      await setup.executeQuery(
+        `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth)
+        VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)`,
+        employeeToFind,
+      );
+
+      const employee = await repository.getByDocumentNumber(
+        employeeToFind.documentNumber,
+      );
+
+      expect(employee).toEqual(
+        Employee.reconstitute(
+          employeeToFind.id,
+          employeeToFind.firstName,
+          employeeToFind.lastName,
+          employeeToFind.documentNumber,
+          employeeToFind.dateOfBirth,
+        ),
+      );
+    });
+
+    it('should return null when no employee has the document number', async () => {
+      const employee = await repository.getByDocumentNumber('99999999Z');
+
+      expect(employee).toBeNull();
+    });
+  });
 });

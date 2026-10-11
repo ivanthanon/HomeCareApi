@@ -39,5 +39,14 @@ export abstract class EmployeeRepositoryContractTest {
 
             expect(employee).toEqual(anExistingEmployee);
         })
+
+        it('should get an employee by document number', async () => {
+            const anExistingEmployee = Employee.reconstitute("60503836-989C-48D0-AC81-D1CC61C221A4", "Juan", "Lopez", "42332233X", new Date("1985-03-15T00:00:00Z"))
+            await this.customArrange(anExistingEmployee);
+
+            const employee = await this.repository.getByDocumentNumber(anExistingEmployee.documentNumber.value);
+
+            expect(employee).toEqual(anExistingEmployee);
+        })
     }
 }
