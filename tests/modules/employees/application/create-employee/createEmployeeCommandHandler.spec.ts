@@ -99,7 +99,7 @@ describe('CreateEmployeeCommandHandler', () => {
     });
 
     it('should return a duplicate employee failure when employee already exists', async () => {
-        await inMemoryRepository.create(Employee.reconstitute(
+        inMemoryRepository.employeeList.push(Employee.reconstitute(
             '550e8400-e29b-41d4-a716-446655440000',
             'John',
             'Doe',
@@ -119,7 +119,7 @@ describe('CreateEmployeeCommandHandler', () => {
     });
 
     it('should return a duplicate employee failure when document number already exists', async () => {
-        await inMemoryRepository.create(Employee.reconstitute(
+        inMemoryRepository.employeeList.push(Employee.reconstitute(
             '550e8400-e29b-41d4-a716-446655440000',
             'John',
             'Doe',
