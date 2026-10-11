@@ -8,6 +8,7 @@ import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/
 import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
 import appConfig from './config/app.config';
 import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
+import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 
 @Module({
   controllers: [EmployeesController],
@@ -51,6 +52,12 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
         configService: ConfigService,
       ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configService),
       inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, ConfigService]
+    },
+    {
+      provide: GetEmployeeByIdQueryHandler,
+      useFactory: (employeeRepository: SqlServerEmployeeRepository) =>
+        new GetEmployeeByIdQueryHandler(employeeRepository),
+      inject: [SqlServerEmployeeRepository],
     },
   ],
 })

@@ -4,6 +4,7 @@ import { EmployeesController } from 'src/modules/employees/infrastructure/restap
 import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import request from 'supertest';
 import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
+import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 
 describe('EmployeesController', () => {
     let app: INestApplication;
@@ -24,6 +25,10 @@ describe('EmployeesController', () => {
                 {
                     provide: CreateEmployeeCommandHandler,
                     useValue: mockCreateEmployeeUseCase,
+                },
+                {
+                    provide: GetEmployeeByIdQueryHandler,
+                    useValue: { execute: vi.fn() },
                 },
             ],
         }).compile();
