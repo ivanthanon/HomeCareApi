@@ -9,6 +9,7 @@ import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/
 import appConfig from './config/app.config';
 import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
 import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
+import { NestConfigurationProvider } from 'src/modules/employees/infrastructure/adapters/nestConfigurationProvider';
 
 @Module({
   controllers: [EmployeesController],
@@ -44,14 +45,19 @@ import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/g
       inject: [SqlServerTransactionScope],
     },
     {
+      provide: NestConfigurationProvider,
+      useFactory: (configService: ConfigService) => new NestConfigurationProvider(configService),
+      inject: [ConfigService],
+    },
+    {
       provide: CreateEmployeeCommandHandler, 
       useFactory: (
         employeeRepository: SqlServerEmployeeRepository,
         outboxRepository: SqlServerOutboxRepository,
         unitOfWork: SqlServerTransactionScope,
-        configService: ConfigService,
-      ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configService),
-      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, ConfigService]
+        configurationProvider: NestConfigurationProvider,
+      ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configurationProvider),
+      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, NestConfigurationProvider]
     },
     {
       provide: GetEmployeeByIdQueryHandler,

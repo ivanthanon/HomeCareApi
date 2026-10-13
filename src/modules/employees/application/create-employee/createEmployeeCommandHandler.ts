@@ -5,7 +5,7 @@ import { Err, Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
 import { TransactionScope } from 'src/modules/employees/application/ports/transactionScope';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
-import { ConfigService } from '@nestjs/config';
+import { ConfigurationProvider } from 'src/modules/employees/application/ports/configurationProvider';
 import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
 import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
 
@@ -25,7 +25,7 @@ export class CreateEmployeeCommandHandler {
     private readonly outboxRepository: OutboxRepository,
     private readonly transactionScope: TransactionScope,
     private readonly clock: Clock,
-    private readonly configService: ConfigService,
+    private readonly configurationProvider: ConfigurationProvider,
   ) {}
   
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
@@ -34,10 +34,10 @@ export class CreateEmployeeCommandHandler {
       return Err(new EmployeeAlreadyExistsError());
     }
 
-    const ageOfMajority = this.configService.get<number>('app.ageOfMajority');
+    const ageOfMajority = this.configurationProvider.getAgeOfMajority();
 
     if (ageOfMajority === undefined) {
-      throw new Error("The value of AgeOfMajority doesn't exist in configuration")
+      throw new Error("The value of AgeOfMajority doesn't exist in configuration");
     }
     
     const employeeResult = Employee.create(
