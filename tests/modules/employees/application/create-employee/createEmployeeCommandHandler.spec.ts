@@ -68,7 +68,7 @@ describe('CreateEmployeeCommandHandler', () => {
         ));
     });
 
-    it('should throw an error if given employee is not an adult', async () => {
+    it('should return a failure if given employee is not an adult', async () => {
         const command = new CreateEmployeeCommand(
             '550e8400-e29b-41d4-a716-446655440000',
             'John', 'Doe', '12345678K',
