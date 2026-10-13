@@ -27,44 +27,45 @@ export class CreateEmployeeCommandHandler {
     private readonly clock: Clock,
     private readonly configurationProvider: ForRetrievingMajorityAge,
   ) {}
-  
+
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
+    return this.transactionScope.execute(async () => {
+      if (await this.employeeAlreadyExist(command)) {
+        return Err(new EmployeeAlreadyExistsError());
+      }
 
-    if (await this.employeeAlreadyExist(command)) {
-      return Err(new EmployeeAlreadyExistsError());
-    }
+      const ageOfMajority = this.configurationProvider.getAgeOfMajority();
 
-    const ageOfMajority = this.configurationProvider.getAgeOfMajority();
+      if (ageOfMajority === undefined) {
+        throw new Error(
+          "The value of AgeOfMajority doesn't exist in configuration",
+        );
+      }
 
-    if (ageOfMajority === undefined) {
-      throw new Error("The value of AgeOfMajority doesn't exist in configuration");
-    }
-    
-    const employeeResult = Employee.create(
-      command.id,
-      command.firstName,
-      command.lastName,
-      command.documentNumber,
-      command.dateOfBirth,
-      this.clock.now(),
-      ageOfMajority,
-    );
+      const employeeResult = Employee.create(
+        command.id,
+        command.firstName,
+        command.lastName,
+        command.documentNumber,
+        command.dateOfBirth,
+        this.clock.now(),
+        ageOfMajority,
+      );
 
-    if (employeeResult.success === false) {
-      return employeeResult;
-    }
+      if (employeeResult.success === false) {
+        return employeeResult;
+      }
 
-    await this.transactionScope.execute(async () => {
       const domainEvents = employeeResult.value.pullDomainEvents();
-  
+
       for (const event of domainEvents) {
         await this.outboxRepository.save(event);
       }
 
       await this.employeeRepository.create(employeeResult.value);
+
+      return Ok();
     });
-    
-    return Ok();
   }
 
   private async employeeAlreadyExist(command: CreateEmployeeCommand) {
