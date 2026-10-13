@@ -45,11 +45,11 @@ describe('SqlServerOutboxRepository', () => {
 
       const result = await setup.executeQuery(
         'SELECT * FROM outboxMessages WHERE aggregateId = @id',
-        { id: event.id },
+        { id: event.aggregateId },
       );
 
       assertOutboxMessageInDatabase(result.recordset, {
-        aggregateId: event.id,
+        aggregateId: event.aggregateId,
         aggregateType: 'Employee',
         event,
       });
