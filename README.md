@@ -15,7 +15,7 @@ REST API for managing home care employees. Built with **NestJS** + **TypeScript*
 | Testcontainers | ^12.2 | Docker containers for integration tests |
 | Supertest | ^7.0 | HTTP assertions for E2E tests |
 | OpenTelemetry | ^1.22 | Observability (traces, metrics, logs) |
-| Docker Compose | - | MSSQL 2022 + app for local development |
+| Docker Compose | - | MSSQL 2022 + app + Grafana LGTM stack for local development |
 
 ## Folder Structure
 
