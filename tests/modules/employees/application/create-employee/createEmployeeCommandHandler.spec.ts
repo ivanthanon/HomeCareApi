@@ -119,6 +119,7 @@ describe('CreateEmployeeCommandHandler', () => {
         expect((result as Failure<Error>).error.message).toBe('Employee already exists');
         expect(inMemoryRepository.employeeList).toHaveLength(1);
         expect(outboxInMemoryRepository.events).toHaveLength(0);
+        expect(transactionScope.execute).toHaveBeenCalledOnce();
     });
 
     it('should return a duplicate employee failure when document number already exists', async () => {
@@ -146,5 +147,6 @@ describe('CreateEmployeeCommandHandler', () => {
         expect((result as Failure<Error>).error.message).toBe('Employee already exists');
         expect(inMemoryRepository.employeeList).toHaveLength(1);
         expect(outboxInMemoryRepository.events).toHaveLength(0);
+        expect(transactionScope.execute).toHaveBeenCalledOnce();
     });
 });
