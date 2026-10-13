@@ -9,7 +9,7 @@ import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs
 import { logs } from '@opentelemetry/api-logs';
 
 const resource = resourceFromAttributes({
-  'service.name': 'homecare-api',
+  'service.name': process.env.OTEL_SERVICE_NAME || 'homecare-api',
   'service.version': '1.0.0',
 });
 

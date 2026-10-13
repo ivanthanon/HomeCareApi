@@ -194,7 +194,7 @@ pnpm test:artifact   # Only artifact tests (artifact-spec)
 Interactive API documentation is available via **Swagger UI** at:
 
 ```
-http://localhost:3000/swagger
+http://localhost:3007/swagger
 ```
 
 Powered by `@nestjs/swagger`. The OpenAPI specification is auto-generated from decorators (`@ApiProperty`, `@ApiOperation`, `@ApiTags`, etc.) and reflects the current state of the API endpoints, request bodies, and response codes.
