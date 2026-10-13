@@ -10,7 +10,7 @@ import { Clock } from "src/modules/employees/domain/shared/clock";
 import { Employee } from "src/modules/employees/domain/employee";
 import { EmployeeCreatedV1 } from "src/modules/employees/domain/events/EmployeeCreatedV1";
 import { Failure } from "src/modules/employees/domain/shared/result";
-import { ConfigService } from "@nestjs/config";
+import { ForRetrievingMajorityAge } from 'src/modules/employees/application/ports/forRetrievingMajorityAge';
 
 describe('CreateEmployeeCommandHandler', () => {
     let handler: CreateEmployeeCommandHandler;
@@ -18,6 +18,7 @@ describe('CreateEmployeeCommandHandler', () => {
     let outboxInMemoryRepository: OutboxInMemoryRepository;
     let transactionScope: TransactionScope & { execute: ReturnType<typeof vi.fn> };
     let mockClock: Clock;
+    let configurationProvider: ForRetrievingMajorityAge;
 
     beforeEach(() => {
         inMemoryRepository = new EmployeeInMemoryRepository();
@@ -26,12 +27,13 @@ describe('CreateEmployeeCommandHandler', () => {
             execute: vi.fn(async (work) => work()),
         };
         mockClock = new DateClockStub();
+        configurationProvider = { getAgeOfMajority: () => 18 };
         handler = new CreateEmployeeCommandHandler(
             inMemoryRepository,
             outboxInMemoryRepository,
             transactionScope,
             mockClock,
-            new ConfigService({ app: { ageOfMajority: 18 } }),
+            configurationProvider,
         );
     });
 
@@ -84,7 +86,8 @@ describe('CreateEmployeeCommandHandler', () => {
 
     it('should throw an exception when configuration of age majority does not exist', async () => {
         const handlerWithoutConfig = new CreateEmployeeCommandHandler(
-            inMemoryRepository, outboxInMemoryRepository, transactionScope, mockClock, new ConfigService(),
+            inMemoryRepository, outboxInMemoryRepository, transactionScope, mockClock,
+            { getAgeOfMajority: () => undefined },
         );
 
         await expect(handlerWithoutConfig.execute(validCommand())).rejects.toThrow(
