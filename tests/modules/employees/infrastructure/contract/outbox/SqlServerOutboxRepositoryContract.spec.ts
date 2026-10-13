@@ -30,11 +30,11 @@ class SqlServerOutboxRepositoryContract extends OutboxRepositoryContractTest {
   protected async customAssert(expectedEvent: EmployeeCreatedV1): Promise<void> {
     const result = await this.containerSetup.executeQuery(
       'SELECT * FROM outboxMessages WHERE aggregateId = @id',
-      { id: expectedEvent.id },
+      { id: expectedEvent.aggregateId },
     );
 
     assertOutboxMessageInDatabase(result.recordset, {
-      aggregateId: expectedEvent.id,
+      aggregateId: expectedEvent.aggregateId,
       aggregateType: 'Employee',
       event: expectedEvent,
     });

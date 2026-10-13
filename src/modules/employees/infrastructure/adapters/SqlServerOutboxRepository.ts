@@ -7,12 +7,10 @@ export class SqlServerOutboxRepository implements OutboxRepository {
     constructor(private readonly transactionScope: SqlServerTransactionScope) {}
 
     async save(event: DomainEvent): Promise<void> {
-        const employeeEvent = event as any;
-
         await this.transactionScope.getRequest()
             .input('type', NVarChar, event.eventName)
-            .input('aggregateId', UniqueIdentifier, employeeEvent.id)
-            .input('aggregateType', NVarChar, 'Employee')
+            .input('aggregateId', UniqueIdentifier, event.aggregateId)
+            .input('aggregateType', NVarChar, event.aggregateType)
             .input('payload', NVarChar('max'), JSON.stringify(event))
             .query(`
                 INSERT INTO outboxMessages (type, aggregateId, aggregateType, payload)

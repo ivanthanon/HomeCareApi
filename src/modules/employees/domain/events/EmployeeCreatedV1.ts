@@ -3,6 +3,14 @@ import { DomainEvent } from "../shared/domainevent";
 export class EmployeeCreatedV1 implements DomainEvent {
   public readonly eventName = "EmployeeCreated.v1";
 
+  get aggregateId(): string {
+    return this.id;
+  }
+
+  get aggregateType(): string {
+    return "Employee";
+  }
+
   constructor(
     public readonly id: string,
     public readonly firstName: string,
