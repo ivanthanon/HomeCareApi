@@ -15,7 +15,7 @@ REST API for managing home care employees. Built with **NestJS** + **TypeScript*
 | Testcontainers | ^12.2 | Docker containers for integration tests |
 | Supertest | ^7.0 | HTTP assertions for E2E tests |
 | OpenTelemetry | ^1.22 | Observability (traces, metrics, logs) |
-| Docker Compose | - | MSSQL 2022 + app for local development |
+| Docker Compose | - | MSSQL 2022 + app + Grafana LGTM stack for local development |
 
 ## Folder Structure
 
@@ -194,7 +194,7 @@ pnpm test:artifact   # Only artifact tests (artifact-spec)
 Interactive API documentation is available via **Swagger UI** at:
 
 ```
-http://localhost:3000/swagger
+http://localhost:3007/swagger
 ```
 
 Powered by `@nestjs/swagger`. The OpenAPI specification is auto-generated from decorators (`@ApiProperty`, `@ApiOperation`, `@ApiTags`, etc.) and reflects the current state of the API endpoints, request bodies, and response codes.
