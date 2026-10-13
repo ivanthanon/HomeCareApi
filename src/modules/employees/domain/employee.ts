@@ -7,7 +7,7 @@ import { DomainEvent } from "./shared/domainevent";
 import { EmployeeCreatedV1 } from "./events/EmployeeCreatedV1";
 
 export class Employee {
-  public constructor(
+  private constructor(
     readonly id: EmployeeId,
     readonly firstName: Name,
     readonly lastName: Name,
@@ -15,7 +15,7 @@ export class Employee {
     readonly dateOfBirth: DateOfBirth,
   ) { }
 
-  public DomainEvents: DomainEvent[] = [];
+  private domainEvents: DomainEvent[] = [];
 
   public static create(
     id: string,
@@ -60,7 +60,7 @@ export class Employee {
       dateOfBirthValueObject.value
     );
 
-    employee.DomainEvents.push(
+    employee.domainEvents.push(
       new EmployeeCreatedV1(
         employee.id.value,
         employee.firstName.value,
@@ -75,8 +75,8 @@ export class Employee {
   }
 
   public pullDomainEvents(): DomainEvent[] {
-    const events = this.DomainEvents;
-    this.DomainEvents = [];
+    const events = this.domainEvents;
+    this.domainEvents = [];
     return events;
   }
 

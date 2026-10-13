@@ -14,8 +14,9 @@ describe("When creating an employee", () =>  {
         );
 
         const employeeSuccess = employee as Success<Employee>;
-        expect(employeeSuccess.value.DomainEvents.length).toBe(1);
-        expect(employeeSuccess.value.DomainEvents[0].eventName).toBe("EmployeeCreated.v1");
+        const domainEvents = employeeSuccess.value.pullDomainEvents();
+        expect(domainEvents.length).toBe(1);
+        expect(domainEvents[0].eventName).toBe("EmployeeCreated.v1");
     });
 });
 
@@ -35,6 +36,6 @@ describe("When pull events from employee", () =>  {
         const domainEvents = employeeSuccess.value.pullDomainEvents();
         expect(domainEvents.length).toBe(1);
         expect(domainEvents[0].eventName).toBe("EmployeeCreated.v1");
-        expect(employeeSuccess.value.DomainEvents.length).toBe(0);
+        expect(employeeSuccess.value.pullDomainEvents()).toEqual([]);
     });
 });
