@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
-import { ConfigurationProvider } from 'src/modules/employees/application/ports/configurationProvider';
+import { ForRetrievingMajorityAge } from 'src/modules/employees/application/ports/forRetrievingMajorityAge';
 
-export class NestConfigurationProvider implements ConfigurationProvider {
+export class NestConfigurationProvider implements ForRetrievingMajorityAge {
   constructor(private readonly configService: ConfigService) {}
 
   getAgeOfMajority(): number | undefined {

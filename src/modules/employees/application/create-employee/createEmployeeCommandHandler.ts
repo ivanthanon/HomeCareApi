@@ -5,7 +5,7 @@ import { Err, Ok, Result } from 'src/modules/employees/domain/shared/result';
 import { Clock } from 'src/modules/employees/domain/shared/clock';
 import { TransactionScope } from 'src/modules/employees/application/ports/transactionScope';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
-import { ConfigurationProvider } from 'src/modules/employees/application/ports/configurationProvider';
+import { ForRetrievingMajorityAge } from 'src/modules/employees/application/ports/forRetrievingMajorityAge';
 import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
 import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
 
@@ -25,7 +25,7 @@ export class CreateEmployeeCommandHandler {
     private readonly outboxRepository: OutboxRepository,
     private readonly transactionScope: TransactionScope,
     private readonly clock: Clock,
-    private readonly configurationProvider: ConfigurationProvider,
+    private readonly configurationProvider: ForRetrievingMajorityAge,
   ) {}
   
   async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {

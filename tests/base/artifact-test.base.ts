@@ -8,6 +8,7 @@ import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
+import { NestConfigurationProvider } from 'src/modules/employees/infrastructure/adapters/nestConfigurationProvider';
 import { DateClockStub } from 'tests/doubles/stub/dateClockStub';
 import testConfig from 'tests/base/test.config.json';
 
@@ -41,7 +42,7 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
           new SqlServerOutboxRepository(transactionScope),
           transactionScope,
           new DateClockStub(),
-          new ConfigService(testConfig),
+          new NestConfigurationProvider(new ConfigService(testConfig)),
         )
       })
       .compile();

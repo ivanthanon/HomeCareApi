@@ -10,7 +10,7 @@ import { Clock } from "src/modules/employees/domain/shared/clock";
 import { Employee } from "src/modules/employees/domain/employee";
 import { EmployeeCreatedV1 } from "src/modules/employees/domain/events/EmployeeCreatedV1";
 import { Failure } from "src/modules/employees/domain/shared/result";
-import { ConfigurationProvider } from 'src/modules/employees/application/ports/configurationProvider';
+import { ForRetrievingMajorityAge } from 'src/modules/employees/application/ports/forRetrievingMajorityAge';
 
 describe('CreateEmployeeCommandHandler', () => {
     let handler: CreateEmployeeCommandHandler;
@@ -18,7 +18,7 @@ describe('CreateEmployeeCommandHandler', () => {
     let outboxInMemoryRepository: OutboxInMemoryRepository;
     let transactionScope: TransactionScope & { execute: ReturnType<typeof vi.fn> };
     let mockClock: Clock;
-    let configurationProvider: ConfigurationProvider;
+    let configurationProvider: ForRetrievingMajorityAge;
 
     beforeEach(() => {
         inMemoryRepository = new EmployeeInMemoryRepository();
