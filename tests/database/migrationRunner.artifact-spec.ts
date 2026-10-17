@@ -70,7 +70,6 @@ describe('When applying a migration', () => {
     );
     expect(state.recordset[0].tableId).not.toBeNull();
     expect(state.recordset[0].records).toBe(1);
-
   });
 
   it('should roll back the schema change when recording fails', async () => {
@@ -86,9 +85,12 @@ describe('When applying a migration', () => {
     `);
 
     const runner = new MigrationRunner(database.dbConnection);
+
+
     const error = await runner
       .runMigrations()
       .catch((reason: unknown) => reason);
+
     expect(getErrorMessages(error)).toMatch(
       /Migration record failed|Transaction has been aborted/i,
     );
