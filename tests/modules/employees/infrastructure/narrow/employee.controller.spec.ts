@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
-import {
-  CreateEmployeeCommandHandler,
-
-} from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import request from 'supertest';
 import {
   describe,
