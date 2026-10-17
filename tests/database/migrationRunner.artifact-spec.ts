@@ -58,13 +58,6 @@ describe('When applying a migration', () => {
     );
   });
 
-  afterEach(async () => {
-    await database.executeQuery('DROP TRIGGER IF EXISTS fail_migration_record');
-    await database.executeQuery(
-      'DROP TRIGGER IF EXISTS fail_migration_unrecord',
-    );
-  });
-
   it('should apply the schema change and record the migration', async () => {
     await new MigrationRunner(database.dbConnection).runMigrations();
 
@@ -92,7 +85,12 @@ describe('When applying a migration', () => {
     `);
 
     const runner = new MigrationRunner(database.dbConnection);
-    const error = await runner.runMigrations().catch((reason: unknown) => reason);
+
+
+    const error = await runner
+      .runMigrations()
+      .catch((reason: unknown) => reason);
+
     expect(getErrorMessages(error)).toMatch(
       /Migration record failed|Transaction has been aborted/i,
     );
