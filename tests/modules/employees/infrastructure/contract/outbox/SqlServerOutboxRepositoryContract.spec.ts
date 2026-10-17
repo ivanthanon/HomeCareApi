@@ -19,7 +19,9 @@ class SqlServerOutboxRepositoryContract extends OutboxRepositoryContractTest {
   }
 
   protected createRepository(): SqlServerOutboxRepository {
-    const transactionScope = new SqlServerTransactionScope(this.containerSetup.dbConnection);
+    const transactionScope = new SqlServerTransactionScope(
+      this.containerSetup.dbConnection,
+    );
     return new SqlServerOutboxRepository(transactionScope);
   }
 
@@ -27,7 +29,9 @@ class SqlServerOutboxRepositoryContract extends OutboxRepositoryContractTest {
     await this.containerSetup.cleanTable('outboxMessages');
   }
 
-  protected async customAssert(expectedEvent: EmployeeCreatedV1): Promise<void> {
+  protected async customAssert(
+    expectedEvent: EmployeeCreatedV1,
+  ): Promise<void> {
     const result = await this.containerSetup.executeQuery(
       'SELECT * FROM outboxMessages WHERE aggregateId = @id',
       { id: expectedEvent.aggregateId },

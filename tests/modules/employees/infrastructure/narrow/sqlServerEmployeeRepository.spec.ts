@@ -28,7 +28,7 @@ describe('SqlServerEmployeeRepository', () => {
   });
 
   beforeEach(async () => {
-    await setup.cleanTable("Employees"); 
+    await setup.cleanTable('Employees');
   });
 
   describe('create', () => {
@@ -40,7 +40,7 @@ describe('SqlServerEmployeeRepository', () => {
         '12345678A',
         new Date('1985-03-15T00:00:00Z'),
       );
-    
+
       await repository.create(employeeToCreate);
 
       const result = await setup.executeQuery(
@@ -54,7 +54,7 @@ describe('SqlServerEmployeeRepository', () => {
         firstName: employeeToCreate.firstName.value,
         lastName: employeeToCreate.lastName.value,
         documentNumber: employeeToCreate.documentNumber.value,
-        dateOfBirth: employeeToCreate.dateOfBirth.value
+        dateOfBirth: employeeToCreate.dateOfBirth.value,
       });
     });
   });
@@ -76,10 +76,10 @@ describe('SqlServerEmployeeRepository', () => {
           firstName: alreadyExistEmployee.firstName,
           lastName: alreadyExistEmployee.lastName,
           documentNumber: alreadyExistEmployee.documentNumber,
-          dateOfBirth: alreadyExistEmployee.dateOfBirth
-        }
+          dateOfBirth: alreadyExistEmployee.dateOfBirth,
+        },
       );
-    
+
       const employee = await repository.getBy(
         new EmployeeId(alreadyExistEmployee.id),
       );
@@ -100,7 +100,7 @@ describe('SqlServerEmployeeRepository', () => {
       );
 
       expect(employee).toBe(null);
-    })
+    });
   });
 
   describe('getByDocumentNumber', () => {

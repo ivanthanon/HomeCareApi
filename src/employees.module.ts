@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConnectionPool } from 'mssql';
+import { ConnectionPool, config as MssqlConfig } from 'mssql';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
@@ -31,8 +31,8 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
     {
       provide: ConnectionPool,
       useFactory: async (configService: ConfigService) => {
-        const dbConfig = configService.get('database');
-        const pool = new ConnectionPool(dbConfig);
+        const dbConfig = configService.get<MssqlConfig>('database');
+        const pool = new ConnectionPool(dbConfig!);
         return pool.connect();
       },
       inject: [ConfigService],
@@ -44,28 +44,43 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
     },
     {
       provide: SqlServerEmployeeRepository,
-      useFactory: (transactionScope: SqlServerTransactionScope) => new SqlServerEmployeeRepository(transactionScope),
+      useFactory: (transactionScope: SqlServerTransactionScope) =>
+        new SqlServerEmployeeRepository(transactionScope),
       inject: [SqlServerTransactionScope],
     },
     {
       provide: SqlServerOutboxRepository,
-      useFactory: (transactionScope: SqlServerTransactionScope) => new SqlServerOutboxRepository(transactionScope),
+      useFactory: (transactionScope: SqlServerTransactionScope) =>
+        new SqlServerOutboxRepository(transactionScope),
       inject: [SqlServerTransactionScope],
     },
     {
       provide: NestConfigurationProvider,
-      useFactory: (configService: ConfigService) => new NestConfigurationProvider(configService),
+      useFactory: (configService: ConfigService) =>
+        new NestConfigurationProvider(configService),
       inject: [ConfigService],
     },
     {
-      provide: CreateEmployeeCommandHandler, 
+      provide: CreateEmployeeCommandHandler,
       useFactory: (
         employeeRepository: SqlServerEmployeeRepository,
         outboxRepository: SqlServerOutboxRepository,
         unitOfWork: SqlServerTransactionScope,
         configurationProvider: NestConfigurationProvider,
-      ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configurationProvider),
-      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, NestConfigurationProvider]
+      ) =>
+        new CreateEmployeeCommandHandler(
+          employeeRepository,
+          outboxRepository,
+          unitOfWork,
+          new DateClock(),
+          configurationProvider,
+        ),
+      inject: [
+        SqlServerEmployeeRepository,
+        SqlServerOutboxRepository,
+        SqlServerTransactionScope,
+        NestConfigurationProvider,
+      ],
     },
     {
       provide: GetEmployeeByIdQueryHandler,
@@ -75,5 +90,4 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
     },
   ],
 })
-
-export class EmployeesModule { }
+export class EmployeesModule {}

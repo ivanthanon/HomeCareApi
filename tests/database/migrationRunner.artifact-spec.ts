@@ -36,9 +36,7 @@ describe('When applying a migration', () => {
   const migrationName = '002_create_outbox_tables.ts';
 
   beforeAll(async () => {
-    database = new TestcontainerSetup(
-      testContainerSettings as ITestContainerConfig,
-    );
+    database = new TestcontainerSetup(testContainerSettings);
     await database.startDatabaseTestContainer();
   }, 60000);
 
@@ -85,7 +83,6 @@ describe('When applying a migration', () => {
     `);
 
     const runner = new MigrationRunner(database.dbConnection);
-
 
     const error = await runner
       .runMigrations()

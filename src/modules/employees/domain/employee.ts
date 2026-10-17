@@ -1,10 +1,10 @@
-import { Err, Ok, Result } from "./shared/result";
-import { DateOfBirth } from "./value-objects/DateOfBirth";
-import { DocumentNumber } from "./value-objects/DocumentNumber";
-import { EmployeeId } from "./value-objects/EmployeeId";
-import { Name } from "./value-objects/Name";
-import { DomainEvent } from "./shared/domainevent";
-import { EmployeeCreatedV1 } from "./events/EmployeeCreatedV1";
+import { Err, Ok, Result } from './shared/result';
+import { DateOfBirth } from './value-objects/DateOfBirth';
+import { DocumentNumber } from './value-objects/DocumentNumber';
+import { EmployeeId } from './value-objects/EmployeeId';
+import { Name } from './value-objects/Name';
+import { DomainEvent } from './shared/domainevent';
+import { EmployeeCreatedV1 } from './events/EmployeeCreatedV1';
 
 export class Employee {
   private constructor(
@@ -13,7 +13,7 @@ export class Employee {
     readonly lastName: Name,
     readonly documentNumber: DocumentNumber,
     readonly dateOfBirth: DateOfBirth,
-  ) { }
+  ) {}
 
   private domainEvents: DomainEvent[] = [];
 
@@ -24,9 +24,8 @@ export class Employee {
     documentNumber: string,
     dateOfBirth: Date,
     currentDate: Date,
-    ageOfMajority: number
+    ageOfMajority: number,
   ): Result<Employee, Error> {
-
     const employeeIdValueObject = EmployeeId.create(id);
     if (employeeIdValueObject.success === false) {
       return Err(new Error(employeeIdValueObject.error.message));
@@ -47,7 +46,11 @@ export class Employee {
       return Err(new Error(documentNumberValueObject.error.message));
     }
 
-    const dateOfBirthValueObject = DateOfBirth.create(dateOfBirth, currentDate, ageOfMajority);
+    const dateOfBirthValueObject = DateOfBirth.create(
+      dateOfBirth,
+      currentDate,
+      ageOfMajority,
+    );
     if (dateOfBirthValueObject.success === false) {
       return Err(new Error(dateOfBirthValueObject.error.message));
     }
@@ -57,7 +60,7 @@ export class Employee {
       firstNameValueObject.value,
       lastNameValueObject.value,
       documentNumberValueObject.value,
-      dateOfBirthValueObject.value
+      dateOfBirthValueObject.value,
     );
 
     employee.domainEvents.push(
@@ -67,8 +70,8 @@ export class Employee {
         employee.lastName.value,
         employee.documentNumber.value,
         employee.dateOfBirth.value,
-        currentDate
-      )
+        currentDate,
+      ),
     );
 
     return Ok(employee);
@@ -80,12 +83,19 @@ export class Employee {
     return events;
   }
 
-  public static reconstitute(id: string, firstName: string, lastName: string, documentNumber: string, dateOfBirth: Date): Employee {
-        return new Employee(
-            new EmployeeId(id),
-            new Name(firstName),
-            new Name(lastName),
-            new DocumentNumber(documentNumber),
-            new DateOfBirth(dateOfBirth));
-    }
+  public static reconstitute(
+    id: string,
+    firstName: string,
+    lastName: string,
+    documentNumber: string,
+    dateOfBirth: Date,
+  ): Employee {
+    return new Employee(
+      new EmployeeId(id),
+      new Name(firstName),
+      new Name(lastName),
+      new DocumentNumber(documentNumber),
+      new DateOfBirth(dateOfBirth),
+    );
+  }
 }

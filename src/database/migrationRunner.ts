@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ConnectionPool, Transaction } from 'mssql';
+import { IMigration } from './IMigration';
 export class MigrationRunner {
   private migrationsPath = path.join(__dirname, 'migrations');
   private migrationsTable = '__migrations__';
@@ -8,7 +9,9 @@ export class MigrationRunner {
 
   constructor(pool: ConnectionPool) {
     if (!pool) {
-      throw new Error('MigrationRunner requires a mssql ConnectionPool instance');
+      throw new Error(
+        'MigrationRunner requires a mssql ConnectionPool instance',
+      );
     }
 
     this.pool = pool;
@@ -31,8 +34,13 @@ export class MigrationRunner {
   async runMigrations(): Promise<void> {
     await this.initialize();
 
-    const files = fs.readdirSync(this.migrationsPath)
-      .filter(file => (file.endsWith('.ts') || file.endsWith('.js')) && !file.startsWith('IMigration'))
+    const files = fs
+      .readdirSync(this.migrationsPath)
+      .filter(
+        (file) =>
+          (file.endsWith('.ts') || file.endsWith('.js')) &&
+          !file.startsWith('IMigration'),
+      )
       .sort();
 
     for (const file of files) {
@@ -44,7 +52,9 @@ export class MigrationRunner {
 
         try {
           const filePath = path.join(this.migrationsPath, file);
-          const { migration } = await import(filePath);
+          const { migration } = (await import(filePath)) as {
+            migration: IMigration;
+          };
 
           transaction = new Transaction(this.pool);
           await transaction.begin();
@@ -83,7 +93,9 @@ export class MigrationRunner {
 
     try {
       const filePath = path.join(this.migrationsPath, lastMigration.name);
-      const { migration } = await import(filePath);
+      const { migration } = (await import(filePath)) as {
+        migration: IMigration;
+      };
 
       transaction = new Transaction(this.pool);
       await transaction.begin();
@@ -134,7 +146,7 @@ export class MigrationRunner {
 
   private async getLastExecutedMigration(): Promise<{ name: string } | null> {
     const request = this.pool.request();
-    const result = await request.query(`
+    const result = await request.query<{ name: string }>(`
       SELECT TOP 1 name FROM ${this.migrationsTable} ORDER BY executed_at DESC
     `);
 

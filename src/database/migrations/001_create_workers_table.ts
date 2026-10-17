@@ -22,5 +22,5 @@ export const migration: IMigration = {
     await request.batch(`
       DROP TABLE IF EXISTS employees;
     `);
-  }
+  },
 };

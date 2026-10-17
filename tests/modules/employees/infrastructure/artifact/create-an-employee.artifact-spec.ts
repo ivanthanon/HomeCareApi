@@ -5,7 +5,7 @@ import { assertOutboxMessageInDatabase } from 'tests/helpers/assert/OutboxTestHe
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
-  class EmployeesArtifactTest extends ArtifactTestBase { }
+  class EmployeesArtifactTest extends ArtifactTestBase {}
 
   let testCase: EmployeesArtifactTest;
   const path = '/employees';
@@ -51,7 +51,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: employee.firstName,
         lastName: employee.lastName,
         documentNumber: employee.documentNumber,
-        dateOfBirth: new Date(employee.dateOfBirth)
+        dateOfBirth: new Date(employee.dateOfBirth),
       });
 
       const outboxQuery = await testCase.executeQuery(
@@ -90,10 +90,10 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         .expect(400);
 
       const expectedResponse = {
-        "error": "Bad Request",
-        "message": "Employee must be an adult",
-        "statusCode": 400,
-      }
+        error: 'Bad Request',
+        message: 'Employee must be an adult',
+        statusCode: 400,
+      };
       expect(response.body).toStrictEqual(expectedResponse);
       const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
@@ -126,10 +126,9 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
           firstName: alreadyExistEmployee.firstName,
           lastName: alreadyExistEmployee.lastName,
           documentNumber: alreadyExistEmployee.documentNumber,
-          dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
-        }
+          dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth),
+        },
       );
-
 
       await request(testCase['app'].getHttpServer())
         .post(path)
@@ -152,7 +151,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         firstName: alreadyExistEmployee.firstName,
         lastName: alreadyExistEmployee.lastName,
         documentNumber: alreadyExistEmployee.documentNumber,
-        dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth)
+        dateOfBirth: new Date(alreadyExistEmployee.dateOfBirth),
       });
     });
 
@@ -175,7 +174,10 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
 
       await request(testCase['app'].getHttpServer())
         .post(path)
-        .send({ ...existingEmployee, id: '650E8400-E29B-41D4-A716-446655440000' })
+        .send({
+          ...existingEmployee,
+          id: '650E8400-E29B-41D4-A716-446655440000',
+        })
         .expect(409)
         .expect({
           error: 'Conflict',

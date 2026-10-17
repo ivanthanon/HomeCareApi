@@ -1,29 +1,30 @@
-import { EmployeeRepository } from "src/modules/employees/domain/repositories/employee.repository";
-import { EmployeeRepositoryContractTest } from "tests/modules/employees/infrastructure/contract/Employee/EmployeeRepositoryContractTest";
-import { EmployeeInMemoryRepository } from "../../../../../doubles/fake/EmployeeInMemoryRepository";
-import { Employee } from "src/modules/employees/domain/employee";
+import { EmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
+import { EmployeeRepositoryContractTest } from 'tests/modules/employees/infrastructure/contract/Employee/EmployeeRepositoryContractTest';
+import { EmployeeInMemoryRepository } from '../../../../../doubles/fake/EmployeeInMemoryRepository';
+import { Employee } from 'src/modules/employees/domain/employee';
 
 class InMemoryEmployeeRepositoryContract extends EmployeeRepositoryContractTest {
+  public employeeInMemoryRepository!: EmployeeInMemoryRepository;
 
-    public employeeInMemoryRepository!: EmployeeInMemoryRepository;
+  protected createRepository(): EmployeeRepository {
+    this.employeeInMemoryRepository = new EmployeeInMemoryRepository();
+    return this.employeeInMemoryRepository;
+  }
 
-    protected createRepository(): EmployeeRepository {
-        this.employeeInMemoryRepository = new EmployeeInMemoryRepository();
-        return this.employeeInMemoryRepository;
-    }
+  protected async customArrange(employee: Employee): Promise<void> {
+    this.employeeInMemoryRepository.employeeList.push(employee);
+  }
 
-    protected async customArrange(employee: Employee): Promise<void> {
-        this.employeeInMemoryRepository.employeeList.push(employee);
-    }
+  protected async cleanUp(): Promise<void> {
+    this.employeeInMemoryRepository.employeeList = [];
+  }
 
-    protected async cleanUp(): Promise<void> { 
-        this.employeeInMemoryRepository.employeeList = [];
-     }
-
-    protected async customAssert(expectedEmployee: Employee): Promise<void> {
-        expect(this.employeeInMemoryRepository.employeeList).toHaveLength(1);
-        expect(this.employeeInMemoryRepository.employeeList[0]).toEqual(expectedEmployee);
-    }
+  protected async customAssert(expectedEmployee: Employee): Promise<void> {
+    expect(this.employeeInMemoryRepository.employeeList).toHaveLength(1);
+    expect(this.employeeInMemoryRepository.employeeList[0]).toEqual(
+      expectedEmployee,
+    );
+  }
 }
 
 new InMemoryEmployeeRepositoryContract().runContractTest();

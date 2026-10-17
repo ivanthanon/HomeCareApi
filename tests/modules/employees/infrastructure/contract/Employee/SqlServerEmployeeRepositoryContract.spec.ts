@@ -18,7 +18,9 @@ class SqlServerEmployeeRepositoryContract extends EmployeeRepositoryContractTest
   }
 
   protected createRepository(): SqlServerEmployeeRepository {
-    const transactionScope = new SqlServerTransactionScope(this.containerSetup.dbConnection);
+    const transactionScope = new SqlServerTransactionScope(
+      this.containerSetup.dbConnection,
+    );
     return new SqlServerEmployeeRepository(transactionScope);
   }
 
@@ -27,17 +29,17 @@ class SqlServerEmployeeRepositoryContract extends EmployeeRepositoryContractTest
   }
 
   protected async customArrange(employee: Employee): Promise<void> {
-      await this.containerSetup.executeQuery(
-        `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth) 
+    await this.containerSetup.executeQuery(
+      `INSERT INTO employees (id, firstName, lastName, documentNumber, dateOfBirth) 
         VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)`,
-        {
-          id: employee.id.value,
-          firstName: employee.firstName.value,
-          lastName: employee.lastName.value,
-          documentNumber: employee.documentNumber.value,
-          dateOfBirth: new Date(employee.dateOfBirth.value)
-        }
-      );
+      {
+        id: employee.id.value,
+        firstName: employee.firstName.value,
+        lastName: employee.lastName.value,
+        documentNumber: employee.documentNumber.value,
+        dateOfBirth: new Date(employee.dateOfBirth.value),
+      },
+    );
   }
 
   protected async customAssert(expectedEmployee: Employee): Promise<void> {
