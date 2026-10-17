@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
 import {
   CreateEmployeeCommandHandler,
-  CreateEmployeeCommand,
+
 } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import request from 'supertest';
 import {
