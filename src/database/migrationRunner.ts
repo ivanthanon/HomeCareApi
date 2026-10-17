@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ConnectionPool } from 'mssql';
+import { ConnectionPool, Transaction } from 'mssql';
 export class MigrationRunner {
   private migrationsPath = path.join(__dirname, 'migrations');
   private migrationsTable = '__migrations__';
@@ -37,19 +37,29 @@ export class MigrationRunner {
 
     for (const file of files) {
       const executed = await this.isMigrationExecuted(file);
-      
+
       if (!executed) {
+        let transaction: Transaction | undefined;
+        let transactionStarted = false;
+
         try {
           const filePath = path.join(this.migrationsPath, file);
           const { migration } = await import(filePath);
-          
-          const request = this.pool.request();
+
+          transaction = new Transaction(this.pool);
+          await transaction.begin();
+          transactionStarted = true;
+
+          const request = transaction.request();
           await migration.up(request);
-          
-          await this.markMigrationAsExecuted(file);
+          await this.markMigrationAsExecuted(file, transaction);
+          await transaction.commit();
           console.log(`✓ Migration up: ${file}`);
         } catch (error) {
           console.error(`✗ Migration failed: ${file}`, error);
+          if (transactionStarted && transaction) {
+            await transaction.rollback();
+          }
           throw error;
         }
       }
@@ -62,23 +72,33 @@ export class MigrationRunner {
     await this.initialize();
 
     const lastMigration = await this.getLastExecutedMigration();
-    
+
     if (!lastMigration) {
       console.log('No migrations to revert');
       return;
     }
 
+    let transaction: Transaction | undefined;
+    let transactionStarted = false;
+
     try {
       const filePath = path.join(this.migrationsPath, lastMigration.name);
       const { migration } = await import(filePath);
-      
-      const request = this.pool.request();
+
+      transaction = new Transaction(this.pool);
+      await transaction.begin();
+      transactionStarted = true;
+
+      const request = transaction.request();
       await migration.down(request);
-      
-      await this.unmarkMigration(lastMigration.name);
+      await this.unmarkMigration(lastMigration.name, transaction);
+      await transaction.commit();
       console.log(`✓ Migration reverted: ${lastMigration.name}`);
     } catch (error) {
       console.error(`✗ Revert failed: ${lastMigration.name}`, error);
+      if (transactionStarted && transaction) {
+        await transaction.rollback();
+      }
       throw error;
     }
   }
@@ -88,19 +108,25 @@ export class MigrationRunner {
     const result = await request
       .input('name', name)
       .query(`SELECT * FROM ${this.migrationsTable} WHERE name = @name`);
-    
+
     return result.recordset.length > 0;
   }
 
-  private async markMigrationAsExecuted(name: string): Promise<void> {
-    const request = this.pool.request();
+  private async markMigrationAsExecuted(
+    name: string,
+    transaction: Transaction,
+  ): Promise<void> {
+    const request = transaction.request();
     await request
       .input('name', name)
       .query(`INSERT INTO ${this.migrationsTable} (name) VALUES (@name)`);
   }
 
-  private async unmarkMigration(name: string): Promise<void> {
-    const request = this.pool.request();
+  private async unmarkMigration(
+    name: string,
+    transaction: Transaction,
+  ): Promise<void> {
+    const request = transaction.request();
     await request
       .input('name', name)
       .query(`DELETE FROM ${this.migrationsTable} WHERE name = @name`);
@@ -111,7 +137,7 @@ export class MigrationRunner {
     const result = await request.query(`
       SELECT TOP 1 name FROM ${this.migrationsTable} ORDER BY executed_at DESC
     `);
-    
+
     return result.recordset[0] || null;
   }
 }
