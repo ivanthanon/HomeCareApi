@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ConnectionPool, Transaction } from 'mssql';
+import { IMigration } from './IMigration';
 export class MigrationRunner {
   private migrationsPath = path.join(__dirname, 'migrations');
   private migrationsTable = '__migrations__';
@@ -51,7 +52,9 @@ export class MigrationRunner {
 
         try {
           const filePath = path.join(this.migrationsPath, file);
-          const { migration } = await import(filePath);
+          const { migration } = (await import(filePath)) as {
+            migration: IMigration;
+          };
 
           transaction = new Transaction(this.pool);
           await transaction.begin();
@@ -90,7 +93,9 @@ export class MigrationRunner {
 
     try {
       const filePath = path.join(this.migrationsPath, lastMigration.name);
-      const { migration } = await import(filePath);
+      const { migration } = (await import(filePath)) as {
+        migration: IMigration;
+      };
 
       transaction = new Transaction(this.pool);
       await transaction.begin();
@@ -141,7 +146,7 @@ export class MigrationRunner {
 
   private async getLastExecutedMigration(): Promise<{ name: string } | null> {
     const request = this.pool.request();
-    const result = await request.query(`
+    const result = await request.query<{ name: string }>(`
       SELECT TOP 1 name FROM ${this.migrationsTable} ORDER BY executed_at DESC
     `);
 

@@ -5,6 +5,14 @@ import { SqlServerTransactionScope } from './sqlServerTransactionScope';
 import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
 import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
 
+interface EmployeeRow {
+  id: string;
+  firstName: string;
+  lastName: string;
+  documentNumber: string;
+  dateOfBirth: globalThis.Date;
+}
+
 export class SqlServerEmployeeRepository implements EmployeeRepository {
   constructor(private readonly transactionScope: SqlServerTransactionScope) {}
 
@@ -12,7 +20,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
     const result = await this.transactionScope
       .getRequest()
       .input('id', UniqueIdentifier, id.value)
-      .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
+      .query<EmployeeRow>(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
                 FROM Employees 
                 WHERE id = @id`);
 
@@ -37,7 +45,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
     const result = await this.transactionScope
       .getRequest()
       .input('documentNumber', NVarChar, documentNumber.value)
-      .query(`SELECT id, firstName, lastName, documentNumber, dateOfBirth
+      .query<EmployeeRow>(`SELECT id, firstName, lastName, documentNumber, dateOfBirth
                 FROM Employees
                 WHERE documentNumber = @documentNumber`);
 

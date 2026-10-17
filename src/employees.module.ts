@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConnectionPool } from 'mssql';
+import { ConnectionPool, config as MssqlConfig } from 'mssql';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
@@ -31,8 +31,8 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
     {
       provide: ConnectionPool,
       useFactory: async (configService: ConfigService) => {
-        const dbConfig = configService.get('database');
-        const pool = new ConnectionPool(dbConfig);
+        const dbConfig = configService.get<MssqlConfig>('database');
+        const pool = new ConnectionPool(dbConfig!);
         return pool.connect();
       },
       inject: [ConfigService],

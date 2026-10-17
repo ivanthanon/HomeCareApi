@@ -26,7 +26,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3006);
 }
-bootstrap();
+void bootstrap();
 
 async function applyMigrations() {
   const { database } = appConfig();
