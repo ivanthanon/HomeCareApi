@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConnectionPool } from 'mssql';
 import { EmployeesController } from 'src/modules/employees/infrastructure/restapi/create-employee/employee.controller';
@@ -10,6 +11,7 @@ import appConfig from './config/app.config';
 import { DateClock } from './modules/employees/infrastructure/adapters/dateClock';
 import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 import { NestConfigurationProvider } from 'src/modules/employees/infrastructure/adapters/nestConfigurationProvider';
+import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure/restapi/httpExceptionLogging.filter';
 
 @Module({
   controllers: [EmployeesController],
@@ -20,6 +22,12 @@ import { NestConfigurationProvider } from 'src/modules/employees/infrastructure/
     }),
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useFactory: (httpAdapterHost: HttpAdapterHost) =>
+        new HttpExceptionLoggingFilter(httpAdapterHost),
+      inject: [HttpAdapterHost],
+    },
     {
       provide: ConnectionPool,
       useFactory: async (configService: ConfigService) => {

@@ -5,6 +5,7 @@ import { EmployeesModule } from 'src/employees.module';
 import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
 import { SqlServerOutboxRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerOutboxRepository';
 import { SqlServerTransactionScope } from 'src/modules/employees/infrastructure/adapters/sqlServerTransactionScope';
@@ -20,6 +21,12 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
 
   constructor() {
     super(config);
+  }
+
+  protected getEmployeeByIdQueryHandlerOverride(
+    employeeRepository: SqlServerEmployeeRepository,
+  ): GetEmployeeByIdQueryHandler {
+    return new GetEmployeeByIdQueryHandler(employeeRepository);
   }
 
   async setupApplication(): Promise<void> {
@@ -44,6 +51,13 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
           new DateClockStub(),
           new NestConfigurationProvider(new ConfigService(testConfig)),
         )
+      })
+      .overrideProvider(GetEmployeeByIdQueryHandler)
+      .useFactory({
+        factory: () =>
+          this.getEmployeeByIdQueryHandlerOverride(
+            new SqlServerEmployeeRepository(transactionScope),
+          ),
       })
       .compile();
 
