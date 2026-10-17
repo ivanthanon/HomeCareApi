@@ -1,3 +1,3 @@
 export interface Clock {
-    now(): Date;
+  now(): Date;
 }

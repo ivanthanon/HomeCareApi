@@ -44,28 +44,43 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
     },
     {
       provide: SqlServerEmployeeRepository,
-      useFactory: (transactionScope: SqlServerTransactionScope) => new SqlServerEmployeeRepository(transactionScope),
+      useFactory: (transactionScope: SqlServerTransactionScope) =>
+        new SqlServerEmployeeRepository(transactionScope),
       inject: [SqlServerTransactionScope],
     },
     {
       provide: SqlServerOutboxRepository,
-      useFactory: (transactionScope: SqlServerTransactionScope) => new SqlServerOutboxRepository(transactionScope),
+      useFactory: (transactionScope: SqlServerTransactionScope) =>
+        new SqlServerOutboxRepository(transactionScope),
       inject: [SqlServerTransactionScope],
     },
     {
       provide: NestConfigurationProvider,
-      useFactory: (configService: ConfigService) => new NestConfigurationProvider(configService),
+      useFactory: (configService: ConfigService) =>
+        new NestConfigurationProvider(configService),
       inject: [ConfigService],
     },
     {
-      provide: CreateEmployeeCommandHandler, 
+      provide: CreateEmployeeCommandHandler,
       useFactory: (
         employeeRepository: SqlServerEmployeeRepository,
         outboxRepository: SqlServerOutboxRepository,
         unitOfWork: SqlServerTransactionScope,
         configurationProvider: NestConfigurationProvider,
-      ) => new CreateEmployeeCommandHandler(employeeRepository, outboxRepository, unitOfWork, new DateClock(), configurationProvider),
-      inject: [SqlServerEmployeeRepository, SqlServerOutboxRepository, SqlServerTransactionScope, NestConfigurationProvider]
+      ) =>
+        new CreateEmployeeCommandHandler(
+          employeeRepository,
+          outboxRepository,
+          unitOfWork,
+          new DateClock(),
+          configurationProvider,
+        ),
+      inject: [
+        SqlServerEmployeeRepository,
+        SqlServerOutboxRepository,
+        SqlServerTransactionScope,
+        NestConfigurationProvider,
+      ],
     },
     {
       provide: GetEmployeeByIdQueryHandler,
@@ -75,5 +90,4 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
     },
   ],
 })
-
-export class EmployeesModule { }
+export class EmployeesModule {}

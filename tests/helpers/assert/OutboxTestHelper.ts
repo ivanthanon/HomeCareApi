@@ -41,7 +41,7 @@ export function assertOutboxMessageInDatabase<T extends DomainEvent>(
   expect(outboxMessage.processed).toBe(false);
   expect(outboxMessage.processedAt).toBeNull();
 
-  const payload = JSON.parse(outboxMessage.payload as string);
+  const payload = JSON.parse(outboxMessage.payload);
   const expectedPayload = JSON.parse(JSON.stringify(expected.event));
   expect(payload).toEqual(expectedPayload);
 }

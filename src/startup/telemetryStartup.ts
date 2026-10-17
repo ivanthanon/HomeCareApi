@@ -5,7 +5,10 @@ import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import {
+  LoggerProvider,
+  BatchLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
 import { logs } from '@opentelemetry/api-logs';
 
 const resource = resourceFromAttributes({
@@ -13,7 +16,8 @@ const resource = resourceFromAttributes({
   'service.version': '1.0.0',
 });
 
-const otelEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4317';
+const otelEndpoint =
+  process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4317';
 
 const traceExporter = new OTLPTraceExporter({
   url: otelEndpoint,
@@ -45,14 +49,16 @@ const sdk = new NodeSDK({
 sdk.start();
 
 process.on('SIGTERM', () => {
-  sdk.shutdown()
+  sdk
+    .shutdown()
     .then(() => console.log('OTel SDK shut down'))
     .catch((err) => console.error('Error shutting down OTel SDK', err))
     .finally(() => process.exit(0));
 });
 
 process.on('SIGINT', () => {
-  sdk.shutdown()
+  sdk
+    .shutdown()
     .then(() => console.log('OTel SDK shut down'))
     .catch((err) => console.error('Error shutting down OTel SDK', err))
     .finally(() => process.exit(0));

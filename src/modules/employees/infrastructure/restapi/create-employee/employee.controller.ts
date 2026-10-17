@@ -1,13 +1,45 @@
-import { Controller, Post, Body, HttpCode, BadRequestException, ConflictException, Get, Param, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiProperty, ApiOkResponse, ApiNotFoundResponse, ApiParam } from '@nestjs/swagger';
-import { CreateEmployeeCommandHandler, CreateEmployeeCommand } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  BadRequestException,
+  ConflictException,
+  Get,
+  Param,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiProperty,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiParam,
+} from '@nestjs/swagger';
+import {
+  CreateEmployeeCommandHandler,
+  CreateEmployeeCommand,
+} from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
-import { isAValidDate, isAValidGuid } from 'src/modules/employees/domain/shared/utils';
-import { GetEmployeeByIdQueryHandler, GetEmployeeByIdQuery } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
+import {
+  isAValidDate,
+  isAValidGuid,
+} from 'src/modules/employees/domain/shared/utils';
+import {
+  GetEmployeeByIdQueryHandler,
+  GetEmployeeByIdQuery,
+} from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 import { EmployeeNotFoundError } from 'src/modules/employees/application/errors/employeeNotFoundError';
 
 export class CreateEmployeeRequest {
-  @ApiProperty({ description: 'Employee unique identifier (GUID)', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({
+    description: 'Employee unique identifier (GUID)',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   id!: string;
 
   @ApiProperty({ description: 'Employee first name', example: 'John' })
@@ -61,18 +93,12 @@ export class EmployeesController {
     };
   }
 
-  @Get()
-  async getEmployeeWithoutId() {
-    throw new BadRequestException('Employee id is required');
-  }
-
   @Post()
   @HttpCode(201)
   @ApiOperation({ summary: 'Create a new employee' })
   @ApiCreatedResponse()
   @ApiBadRequestResponse()
   async createEmployee(@Body() createEmployeeRequest: CreateEmployeeRequest) {
-
     this.validateCreateEmployeeRequest(createEmployeeRequest);
 
     const command = new CreateEmployeeCommand(
@@ -100,11 +126,12 @@ export class EmployeesController {
     }
   }
 
-  private validateCreateEmployeeRequest(createEmployeeRequest: CreateEmployeeRequest) {
+  private validateCreateEmployeeRequest(
+    createEmployeeRequest: CreateEmployeeRequest,
+  ) {
     if (!createEmployeeRequest.firstName) {
       throw new BadRequestException('Employee name must not be empty');
     }
-
 
     if (!createEmployeeRequest.lastName) {
       throw new BadRequestException('Employee lastname must not be empty');
@@ -115,11 +142,15 @@ export class EmployeesController {
     }
 
     if (!createEmployeeRequest.documentNumber) {
-      throw new BadRequestException('Employee document number must not be empty');
+      throw new BadRequestException(
+        'Employee document number must not be empty',
+      );
     }
 
     if (!isAValidDate(createEmployeeRequest.dateOfBirth)) {
-      throw new BadRequestException('Employee date of birth number must be a valid date');
+      throw new BadRequestException(
+        'Employee date of birth number must be a valid date',
+      );
     }
   }
 }

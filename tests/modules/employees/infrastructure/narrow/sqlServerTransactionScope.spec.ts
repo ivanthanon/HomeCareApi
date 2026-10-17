@@ -32,7 +32,8 @@ describe('SqlServerTransactionScope', () => {
       const employeeId = '550E8400-E29B-41D4-A716-446655440000';
 
       await transactionScope.execute(async () => {
-        await transactionScope.getRequest()
+        await transactionScope
+          .getRequest()
           .input('id', UniqueIdentifier, employeeId)
           .input('firstName', NVarChar, 'María')
           .input('lastName', NVarChar, 'García López')
@@ -46,7 +47,7 @@ describe('SqlServerTransactionScope', () => {
 
       const result = await setup.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
-        { id: employeeId }
+        { id: employeeId },
       );
 
       expect(result.recordset).toHaveLength(1);
@@ -65,11 +66,12 @@ describe('SqlServerTransactionScope', () => {
           lastName: 'García López',
           documentNumber: '12345678A',
           dateOfBirth: new Date('1985-03-15T00:00:00Z'),
-        }
+        },
       );
 
       const result = await transactionScope.execute(async () => {
-        const fetched = await transactionScope.getRequest()
+        const fetched = await transactionScope
+          .getRequest()
           .input('id', UniqueIdentifier, employeeId)
           .query('SELECT firstName, lastName FROM employees WHERE id = @id');
 
@@ -86,7 +88,8 @@ describe('SqlServerTransactionScope', () => {
 
       await expect(
         transactionScope.execute(async () => {
-          await transactionScope.getRequest()
+          await transactionScope
+            .getRequest()
             .input('id', UniqueIdentifier, employeeId)
             .input('firstName', NVarChar, 'María')
             .input('lastName', NVarChar, 'García López')
@@ -98,12 +101,12 @@ describe('SqlServerTransactionScope', () => {
             `);
 
           throw new Error('Simulated failure');
-        })
+        }),
       ).rejects.toThrow('Simulated failure');
 
       const result = await setup.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
-        { id: employeeId }
+        { id: employeeId },
       );
 
       expect(result.recordset).toHaveLength(0);
@@ -113,7 +116,7 @@ describe('SqlServerTransactionScope', () => {
       await expect(
         transactionScope.execute(async () => {
           throw new Error('Domain validation failed');
-        })
+        }),
       ).rejects.toThrow('Domain validation failed');
     });
   });
@@ -124,7 +127,8 @@ describe('SqlServerTransactionScope', () => {
       const id2 = '660E8400-E29B-41D4-A716-446655440001';
 
       await transactionScope.execute(async () => {
-        await transactionScope.getRequest()
+        await transactionScope
+          .getRequest()
           .input('id', UniqueIdentifier, id1)
           .input('firstName', NVarChar, 'María')
           .input('lastName', NVarChar, 'García López')
@@ -135,7 +139,8 @@ describe('SqlServerTransactionScope', () => {
             VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)
           `);
 
-        await transactionScope.getRequest()
+        await transactionScope
+          .getRequest()
           .input('id', UniqueIdentifier, id2)
           .input('firstName', NVarChar, 'Juan')
           .input('lastName', NVarChar, 'Pérez')
@@ -157,7 +162,8 @@ describe('SqlServerTransactionScope', () => {
 
       await expect(
         transactionScope.execute(async () => {
-          await transactionScope.getRequest()
+          await transactionScope
+            .getRequest()
             .input('id', UniqueIdentifier, id1)
             .input('firstName', NVarChar, 'María')
             .input('lastName', NVarChar, 'García López')
@@ -168,7 +174,8 @@ describe('SqlServerTransactionScope', () => {
               VALUES (@id, @firstName, @lastName, @documentNumber, @dateOfBirth)
             `);
 
-          await transactionScope.getRequest()
+          await transactionScope
+            .getRequest()
             .input('id', UniqueIdentifier, id2)
             .input('firstName', NVarChar, 'Juan')
             .input('lastName', NVarChar, 'Pérez')
@@ -180,7 +187,7 @@ describe('SqlServerTransactionScope', () => {
             `);
 
           throw new Error('Second operation failed');
-        })
+        }),
       ).rejects.toThrow('Second operation failed');
 
       const result = await setup.executeQuery('SELECT * FROM employees');

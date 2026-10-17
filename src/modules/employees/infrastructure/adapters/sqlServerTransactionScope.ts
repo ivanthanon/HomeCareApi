@@ -1,11 +1,14 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { ConnectionPool, Request, Transaction as MssqlTransaction } from 'mssql';
+import {
+  ConnectionPool,
+  Request,
+  Transaction as MssqlTransaction,
+} from 'mssql';
 import { TransactionScope } from 'src/modules/employees/application/ports/transactionScope';
 
 const transactionStorage = new AsyncLocalStorage<MssqlTransaction>();
 
 export class SqlServerTransactionScope implements TransactionScope {
-
   constructor(private readonly pool: ConnectionPool) {}
 
   async execute<T>(work: () => Promise<T>): Promise<T> {

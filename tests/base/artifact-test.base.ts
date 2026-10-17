@@ -2,7 +2,10 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionPool } from 'mssql';
 import { EmployeesModule } from 'src/employees.module';
-import { TestcontainerSetup, ITestContainerConfig } from './testcontainer-setup';
+import {
+  TestcontainerSetup,
+  ITestContainerConfig,
+} from './testcontainer-setup';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CreateEmployeeCommandHandler } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { SqlServerEmployeeRepository } from 'src/modules/employees/infrastructure/adapters/SqlServerEmployeeRepository';
@@ -28,22 +31,26 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
     const transactionScope = new SqlServerTransactionScope(this.dbConnection);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [EmployeesModule, ConfigModule.forRoot({
-        envFilePath: '.test.settings.env',
-        load: [() => testConfig],
-      })],      
+      imports: [
+        EmployeesModule,
+        ConfigModule.forRoot({
+          envFilePath: '.test.settings.env',
+          load: [() => testConfig],
+        }),
+      ],
     })
       .overrideProvider(ConnectionPool)
       .useValue(this.dbConnection)
       .overrideProvider(CreateEmployeeCommandHandler)
       .useFactory({
-        factory: () => new CreateEmployeeCommandHandler(
-          new SqlServerEmployeeRepository(transactionScope),
-          new SqlServerOutboxRepository(transactionScope),
-          transactionScope,
-          new DateClockStub(),
-          new NestConfigurationProvider(new ConfigService(testConfig)),
-        )
+        factory: () =>
+          new CreateEmployeeCommandHandler(
+            new SqlServerEmployeeRepository(transactionScope),
+            new SqlServerOutboxRepository(transactionScope),
+            transactionScope,
+            new DateClockStub(),
+            new NestConfigurationProvider(new ConfigService(testConfig)),
+          ),
       })
       .compile();
 

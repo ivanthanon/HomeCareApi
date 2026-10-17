@@ -36,15 +36,18 @@ export class TestcontainerSetup {
     const container = await new GenericContainer(this.config.sqlServer.image)
       .withEnvironment({
         ...this.config.sqlServer.environment,
-        SA_PASSWORD: this.password
+        SA_PASSWORD: this.password,
       })
       .withExposedPorts(this.config.sqlServer.exposedPort)
       .withHealthCheck({
-        test: ["CMD-SHELL", `/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${this.password}" -C -Q "SELECT 1" || exit 1`],
+        test: [
+          'CMD-SHELL',
+          `/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${this.password}" -C -Q "SELECT 1" || exit 1`,
+        ],
         interval: 2000,
         timeout: 5000,
         retries: 10,
-        startPeriod: 5000
+        startPeriod: 5000,
       })
       .withWaitStrategy(Wait.forHealthCheck())
       .start();
@@ -53,7 +56,9 @@ export class TestcontainerSetup {
     this.host = container.getHost();
     this.port = container.getMappedPort(this.config.sqlServer.exposedPort);
 
-    console.log(`[TEST] Container live. Host: ${this.host}, Port: ${this.port}, Pass: ${this.password.substring(0, 5)}...`);
+    console.log(
+      `[TEST] Container live. Host: ${this.host}, Port: ${this.port}, Pass: ${this.password.substring(0, 5)}...`,
+    );
 
     await this.createTestDatabase();
     const dbConfig = this.getConnectionConfig(this.testDbName);
@@ -88,10 +93,15 @@ export class TestcontainerSetup {
     }
   }
 
-  async executeQuery(query: string, params?: Record<string, any>): Promise<any> {
+  async executeQuery(
+    query: string,
+    params?: Record<string, any>,
+  ): Promise<any> {
     const request = this.dbConnection.request();
     if (params) {
-      Object.entries(params).forEach(([key, value]) => request.input(key, value));
+      Object.entries(params).forEach(([key, value]) =>
+        request.input(key, value),
+      );
     }
     return request.query(query);
   }

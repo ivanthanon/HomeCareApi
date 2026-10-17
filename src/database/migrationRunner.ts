@@ -8,7 +8,9 @@ export class MigrationRunner {
 
   constructor(pool: ConnectionPool) {
     if (!pool) {
-      throw new Error('MigrationRunner requires a mssql ConnectionPool instance');
+      throw new Error(
+        'MigrationRunner requires a mssql ConnectionPool instance',
+      );
     }
 
     this.pool = pool;
@@ -31,8 +33,13 @@ export class MigrationRunner {
   async runMigrations(): Promise<void> {
     await this.initialize();
 
-    const files = fs.readdirSync(this.migrationsPath)
-      .filter(file => (file.endsWith('.ts') || file.endsWith('.js')) && !file.startsWith('IMigration'))
+    const files = fs
+      .readdirSync(this.migrationsPath)
+      .filter(
+        (file) =>
+          (file.endsWith('.ts') || file.endsWith('.js')) &&
+          !file.startsWith('IMigration'),
+      )
       .sort();
 
     for (const file of files) {
