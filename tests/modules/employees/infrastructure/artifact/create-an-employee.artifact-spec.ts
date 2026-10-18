@@ -3,6 +3,7 @@ import request from 'supertest';
 import { ArtifactTestBase } from 'tests/base/artifact-test.base';
 import { assertOutboxMessageInDatabase } from 'tests/helpers/assert/OutboxTestHelper';
 import { EmployeeCreatedV1 } from 'src/modules/employees/domain/events/EmployeeCreatedV1';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 
 describe('Employees E2E - Create Employee Acceptance Test', () => {
   class EmployeesArtifactTest extends ArtifactTestBase {}
@@ -23,6 +24,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
   afterEach(async () => {
     await testCase.cleanTable('outboxMessages');
     await testCase.cleanTable('employees');
+    testCase.commandLogger.reset();
   });
 
   describe('when creating a valid employee', () => {
@@ -39,6 +41,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         .post(path)
         .send(employee)
         .expect(201);
+
+      expect(testCase.commandLogger.records).toHaveLength(0);
 
       const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
@@ -95,6 +99,19 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         statusCode: 400,
       };
       expect(response.body).toStrictEqual(expectedResponse);
+      expect(testCase.commandLogger.records).toMatchObject([
+        {
+          eventName: 'command.result.error',
+          severityNumber: SeverityNumber.ERROR,
+          severityText: 'ERROR',
+          body: 'Employee must be an adult',
+          attributes: {
+            'command.name': 'CreateEmployeeCommand',
+            'exception.type': 'Error',
+            'exception.message': 'Employee must be an adult',
+          },
+        },
+      ]);
       const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
         { id: employee.id },
@@ -139,6 +156,18 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
           message: 'Employee already exists',
           statusCode: 409,
         });
+
+      expect(testCase.commandLogger.records).toMatchObject([
+        {
+          eventName: 'command.result.error',
+          severityNumber: SeverityNumber.ERROR,
+          attributes: {
+            'command.name': 'CreateEmployeeCommand',
+            'exception.type': 'EmployeeAlreadyExistsError',
+            'exception.message': 'Employee already exists',
+          },
+        },
+      ]);
 
       const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
