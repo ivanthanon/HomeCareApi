@@ -25,6 +25,13 @@ pnpm migration:down     # revert last migration
 
 CI (`.github/workflows/pr.yml`) runs `pnpm build` then `pnpm test` on PRs to `main`. Both must pass.
 
+## Finding your way around
+
+- Start with CodeGraph for indexed code: query the symbol or file with `codegraph_explore`, naming both endpoints when tracing a flow (for example, `CreateEmployeeCommandHandler SqlServerEmployeeRepository`). Check callers/impact before editing; use the read-only CLI intelligence commands (`codegraph explore`, `codegraph query`, `codegraph callers`, `codegraph impact`) if the tool is unavailable.
+- If CodeGraph is unavailable, unindexed, or stale after an edit, inspect the affected files directly and use scoped searches; do not treat stale graph results as current source. Follow the local CodeGraph setup instructions if an index is needed rather than committing generated state.
+- Follow a request from the REST controller in `src/modules/employees/infrastructure/restapi/` through the application handler and domain; `src/employees.module.ts` wires adapters at the composition root. Find acceptance tests under `tests/modules/employees/infrastructure/artifact/`, HTTP contract tests under `tests/modules/employees/infrastructure/narrow/`, their app/database fixture in `tests/base/artifact-test.base.ts`, and SQL changes under `src/database/migrations/`.
+- `AGENTS.md` is portable, tracked guidance. `.codegraph/.gitignore` is tracked, but the CodeGraph index and other generated files in `.codegraph/` are local and must not be committed. The `.atl/` registry and `odd/` task progress are also local/ignored.
+
 ## Architecture rules
 
 Bounded context lives under `src/modules/<context>/`. Keep the dependency direction **inward only**:
@@ -71,7 +78,7 @@ The **domain must never import** from `application` or `infrastructure`, and mus
 
 ## Testing rules
 
-Runner: **Vitest v4** (`vitest.config.ts`, globals enabled, node environment). Test files are `*.spec.ts` (unit/narrow/contract) or `*.artifact-spec.ts` (E2E). Tests mirror the source path under `tests/`.
+Runner: **Vitest v5** (`vitest.config.ts`, globals enabled, node environment). Test files are `*.spec.ts` (unit/narrow/contract) or `*.artifact-spec.ts` (E2E). Tests mirror the source path under `tests/`.
 
 ### Test strategy
 

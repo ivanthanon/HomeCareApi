@@ -17,6 +17,10 @@ REST API for managing home care employees. Built with **NestJS** + **TypeScript*
 | OpenTelemetry | ^1.22 | Observability (traces, metrics, logs) |
 | Docker Compose | - | MSSQL 2022 + app + Grafana LGTM stack for local development |
 
+## Agent onboarding
+
+Read [AGENTS.md](AGENTS.md) for the architecture, CodeGraph-first navigation, and artifact-first testing workflow. `AGENTS.md` and `.codegraph/.gitignore` are tracked; the CodeGraph index in `.codegraph/`, the `.atl/` registry, and `odd/` task progress are local/ignored. Do not commit generated or machine-specific agent state.
+
 ## Folder Structure
 
 ```
@@ -158,36 +162,19 @@ This ensures **at-least-once delivery** and avoids the dual-write problem withou
 
 ## Testing
 
-### Framework: **Vitest** v4.0
+**Vitest v5.** For new features, start with a failing HTTP artifact acceptance test (`*.artifact-spec.ts`) using the booted Nest app and real SQL Server through `tests/base/artifact-test.base.ts`. Arrange persisted preconditions with direct SQL, then implement inward through controller, application, and domain until positive HTTP behavior, use-case outcomes, and persistence are covered. Run artifact tests at checkpoints and after implementation.
 
-Testing strategy: 
-```
-https://miro.com/app/board/uXjVHCdydrQ=/
-```
-
-| Type | Description |
-|------|-------------|
-| **Unit** | Validates Value Objects and Command Handlers in isolation using mocked dependencies. — fast, no dependencies |
-| **Social Unit** | Application layer tested with `InMemoryRepository` fake |
-| **Narrow Integration** | Repository, TransactionScope and Controller tested against real dependencies (TestContainer / NestJS) |
-| **Contract** | Abstract base classes ensuring both fake and real implementations satisfy the same behavioral contract |
-| **Artifact** | Full HTTP (Supertest) + NestJS + real MSSQL in Docker container |
-
-### Test Doubles
-
-| Type | Location | Description |
-|------|----------|-------------|
-| **Fakes** | `tests/doubles/fake/` | Working in-memory implementations (`EmployeeInMemoryRepository`, `OutboxInMemoryRepository`) |
-| **Stubs** | `tests/doubles/stub/` | Fixed-value replacements (`DateClockStub`) |
-| **Mocks** | Inline `vi.fn()` | Vitest mocks for verifying interactions |
+Add controller contract tests (`tests/modules/.../infrastructure/narrow/*controller.spec.ts`) only for missing, malformed, or wrongly typed HTTP inputs. Keep business validation and success/not-found outcomes in artifact tests. Existing unit, social-unit, narrow adapter, and repository contract tests remain in the tree, but do not add new lower-level feature tests unless explicitly requested. See [AGENTS.md](AGENTS.md#testing-rules) for detailed test conventions.
 
 ### Commands
 
 ```bash
-pnpm test            # Run all tests (unit + integration + artifact)
-pnpm test:unit       # Unit + integration tests (excludes artifact)
-pnpm test:artifact   # Only artifact tests (artifact-spec)
+pnpm test            # All tests, including artifact tests (Docker required)
+pnpm test:unit       # Existing non-artifact tests (no Docker needed)
+pnpm test:artifact   # Artifact tests only (Docker required)
 ```
+
+Artifact tests use Testcontainers and need a working Docker daemon; `test:unit` excludes `*.artifact-spec.ts` and cannot substitute for artifact acceptance.
 
 ### Swagger / OpenAPI
 
