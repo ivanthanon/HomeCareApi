@@ -8,6 +8,7 @@ import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/er
 import { ForRetrievingMajorityAge } from 'src/modules/employees/application/ports/forRetrievingMajorityAge';
 import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
 import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
+import { CommandHandler } from 'src/modules/employees/application/ports/commandHandler';
 
 export class CreateEmployeeCommand {
   constructor(
@@ -19,7 +20,10 @@ export class CreateEmployeeCommand {
   ) {}
 }
 
-export class CreateEmployeeCommandHandler {
+export class CreateEmployeeCommandHandler implements CommandHandler<
+  CreateEmployeeCommand,
+  void
+> {
   constructor(
     private readonly employeeRepository: EmployeeRepository,
     private readonly outboxRepository: OutboxRepository,
@@ -52,7 +56,7 @@ export class CreateEmployeeCommandHandler {
         ageOfMajority,
       );
 
-      if (employeeResult.success === false) {
+      if (!employeeResult.success) {
         return employeeResult;
       }
 

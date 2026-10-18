@@ -12,6 +12,8 @@ import { DateClock } from './modules/employees/infrastructure/adapters/dateClock
 import { GetEmployeeByIdQueryHandler } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 import { NestConfigurationProvider } from 'src/modules/employees/infrastructure/adapters/nestConfigurationProvider';
 import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure/restapi/httpExceptionLogging.filter';
+import { logs } from '@opentelemetry/api-logs';
+import { LoggingCommandHandler } from 'src/modules/employees/application/decorators/loggingCommandHandler';
 
 @Module({
   controllers: [EmployeesController],
@@ -68,12 +70,15 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
         unitOfWork: SqlServerTransactionScope,
         configurationProvider: NestConfigurationProvider,
       ) =>
-        new CreateEmployeeCommandHandler(
-          employeeRepository,
-          outboxRepository,
-          unitOfWork,
-          new DateClock(),
-          configurationProvider,
+        new LoggingCommandHandler(
+          new CreateEmployeeCommandHandler(
+            employeeRepository,
+            outboxRepository,
+            unitOfWork,
+            new DateClock(),
+            configurationProvider,
+          ),
+          logs.getLogger('homecare-api.commands'),
         ),
       inject: [
         SqlServerEmployeeRepository,
