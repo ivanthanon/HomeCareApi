@@ -18,8 +18,8 @@ export class LoggingCommandHandler<Command, Value> implements CommandHandler<
       try {
         this.logger.emit({
           eventName: 'command.result.error',
-          severityNumber: SeverityNumber.ERROR,
-          severityText: 'ERROR',
+          severityNumber: SeverityNumber.WARNING,
+          severityText: 'WARNING',
           body: result.error.message,
           attributes: {
             'command.name':
@@ -31,7 +31,7 @@ export class LoggingCommandHandler<Command, Value> implements CommandHandler<
           },
         });
       } catch {
-
+        // If logging fails, we don't want to throw an error and break the application flow.
       }
     }
 

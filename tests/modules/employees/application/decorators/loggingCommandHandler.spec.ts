@@ -25,8 +25,8 @@ describe('When a command returns an error Result', () => {
     expect(logger.records).toEqual([
       {
         eventName: 'command.result.error',
-        severityNumber: SeverityNumber.ERROR,
-        severityText: 'ERROR',
+        severityNumber: SeverityNumber.WARNING,
+        severityText: 'WARNING',
         body: 'Invalid registration',
         attributes: {
           'command.name': 'RegisterCommand',
