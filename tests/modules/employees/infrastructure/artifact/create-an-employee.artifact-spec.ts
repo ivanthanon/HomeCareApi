@@ -102,8 +102,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       expect(testCase.commandLogger.records).toMatchObject([
         {
           eventName: 'command.result.error',
-          severityNumber: SeverityNumber.WARNING,
-          severityText: 'WARNING',
+          severityNumber: SeverityNumber.WARN,
+          severityText: 'WARN',
           body: 'Employee must be an adult',
           attributes: {
             'command.name': 'CreateEmployeeCommand',
@@ -160,8 +160,8 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
       expect(testCase.commandLogger.records).toMatchObject([
         {
           eventName: 'command.result.error',
-          severityNumber: SeverityNumber.WARNING,
-          severityText: 'WARNING',
+          severityNumber: SeverityNumber.WARN,
+          severityText: 'WARN',
           body: 'Employee already exists',
           attributes: {
             'command.name': 'CreateEmployeeCommand',

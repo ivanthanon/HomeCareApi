@@ -15,14 +15,15 @@ import { NestConfigurationProvider } from 'src/modules/employees/infrastructure/
 import { DateClockStub } from 'tests/doubles/stub/dateClockStub';
 import testConfig from 'tests/base/test.config.json';
 import { LoggerFake } from 'tests/doubles/fake/LoggerFake';
-import { LoggingCommandHandler } from 'src/modules/employees/application/decorators/loggingCommandHandler';
+import { CommandTelemetryDecorator } from 'src/modules/employees/application/decorators/commandTelemetryDecorator';
+import { OpenTelemetryLogger } from 'src/modules/employees/infrastructure/adapters/openTelemetryLogger';
 
 const testContainerSettings = require('./testContainerSettings.json');
 const config = testContainerSettings as ITestContainerConfig;
 
 export abstract class ArtifactTestBase extends TestcontainerSetup {
   protected app!: INestApplication;
-  readonly commandLogger = new LoggerFake();
+  readonly fakeLogger = new LoggerFake();
 
   constructor() {
     super(config);
@@ -47,7 +48,7 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
       .overrideProvider(CreateEmployeeCommandHandler)
       .useFactory({
         factory: () =>
-          new LoggingCommandHandler(
+          new CommandTelemetryDecorator(
             new CreateEmployeeCommandHandler(
               new SqlServerEmployeeRepository(transactionScope),
               new SqlServerOutboxRepository(transactionScope),
@@ -55,7 +56,7 @@ export abstract class ArtifactTestBase extends TestcontainerSetup {
               new DateClockStub(),
               new NestConfigurationProvider(new ConfigService(testConfig)),
             ),
-            this.commandLogger,
+            new OpenTelemetryLogger(this.fakeLogger),
           ),
       })
       .compile();
