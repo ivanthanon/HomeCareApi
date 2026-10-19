@@ -24,7 +24,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
   afterEach(async () => {
     await testCase.cleanTable('outboxMessages');
     await testCase.cleanTable('employees');
-    testCase.commandLogger.reset();
+    testCase.fakeLogger.reset();
   });
 
   describe('when creating a valid employee', () => {
@@ -42,7 +42,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         .send(employee)
         .expect(201);
 
-      expect(testCase.commandLogger.records).toHaveLength(0);
+      expect(testCase.fakeLogger.records).toHaveLength(0);
 
       const query = await testCase.executeQuery(
         'SELECT * FROM employees WHERE id = @id',
@@ -99,7 +99,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
         statusCode: 400,
       };
       expect(response.body).toStrictEqual(expectedResponse);
-      expect(testCase.commandLogger.records).toMatchObject([
+      expect(testCase.fakeLogger.records).toMatchObject([
         {
           eventName: 'command.result.error',
           severityNumber: SeverityNumber.WARN,
@@ -157,7 +157,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
           statusCode: 409,
         });
 
-      expect(testCase.commandLogger.records).toMatchObject([
+      expect(testCase.fakeLogger.records).toMatchObject([
         {
           eventName: 'command.result.error',
           severityNumber: SeverityNumber.WARN,
