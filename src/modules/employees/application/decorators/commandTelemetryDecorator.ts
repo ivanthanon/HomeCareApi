@@ -1,5 +1,5 @@
 import { CommandHandler } from 'src/modules/employees/application/ports/commandHandler';
-import { ForLogging } from 'src/modules/employees/application/ports/forLogging';
+import { ForLoggingCommandFailures } from 'src/modules/employees/application/ports/forLoggingCommandFailures';
 import { Result } from 'src/modules/employees/domain/shared/result';
 
 export class CommandTelemetryDecorator<
@@ -8,7 +8,7 @@ export class CommandTelemetryDecorator<
 > implements CommandHandler<Command, Value> {
   constructor(
     private readonly handler: CommandHandler<Command, Value>,
-    private readonly logger: ForLogging,
+    private readonly logger: ForLoggingCommandFailures,
   ) {}
 
   async execute(command: Command): Promise<Result<Value, Error>> {

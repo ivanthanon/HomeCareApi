@@ -1,7 +1,7 @@
 import { Logger, SeverityNumber } from '@opentelemetry/api-logs';
-import { ForLogging } from 'src/modules/employees/application/ports/forLogging';
+import { ForLoggingCommandFailures } from 'src/modules/employees/application/ports/forLoggingCommandFailures';
 
-export class OpenTelemetryLogger implements ForLogging {
+export class OpenTelemetryLogger implements ForLoggingCommandFailures {
   constructor(private readonly logger: Logger) {}
 
   log(commandName: string, error: Error): void {
