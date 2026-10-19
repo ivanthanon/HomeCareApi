@@ -1,59 +1,35 @@
 import {
-  Controller,
-  Post,
   Body,
-  HttpCode,
-  BadRequestException,
-  ConflictException,
+  Controller,
   Get,
-  Param,
-  NotFoundException,
+  HttpCode,
+  HttpStatus,
   InternalServerErrorException,
+  Param,
+  Post,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiCreatedResponse,
   ApiBadRequestResponse,
-  ApiProperty,
-  ApiOkResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
   ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import {
-  CreateEmployeeCommandHandler,
   CreateEmployeeCommand,
+  CreateEmployeeCommandHandler,
 } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
 import {
-  isAValidDate,
-  isAValidGuid,
-} from 'src/modules/employees/domain/shared/utils';
-import {
-  GetEmployeeByIdQueryHandler,
   GetEmployeeByIdQuery,
+  GetEmployeeByIdQueryHandler,
 } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
 import { EmployeeNotFoundError } from 'src/modules/employees/application/errors/employeeNotFoundError';
-
-export class CreateEmployeeRequest {
-  @ApiProperty({
-    description: 'Employee unique identifier (GUID)',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  id!: string;
-
-  @ApiProperty({ description: 'Employee first name', example: 'John' })
-  firstName!: string;
-
-  @ApiProperty({ description: 'Employee last name', example: 'Doe' })
-  lastName!: string;
-
-  @ApiProperty({ description: 'Employee document number', example: '12345678' })
-  documentNumber!: string;
-
-  @ApiProperty({ description: 'Employee date of birth', example: '1990-01-01' })
-  dateOfBirth!: string;
-}
+import { CreateEmployeeRequest } from './createEmployeeRequest';
 
 @ApiTags('Employees')
 @Controller({ path: 'employees' })
@@ -69,19 +45,32 @@ export class EmployeesController {
   @ApiOkResponse({ description: 'Employee found' })
   @ApiBadRequestResponse({ description: 'Employee ID is not a valid GUID' })
   @ApiNotFoundResponse({ description: 'Employee not found' })
-  async getEmployeeById(@Param('id') id: string) {
-    this.ValidateRequests(id);
+  async getEmployeeById(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const query = new GetEmployeeByIdQuery(id);
+    const validationError = query.validate();
+    if (validationError) {
+      return this.sendErrorResponse(
+        response,
+        HttpStatus.BAD_REQUEST,
+        'Bad Request',
+        validationError,
+      );
+    }
 
-    const result = await this.getEmployeeByIdQueryHandler.execute(
-      new GetEmployeeByIdQuery(id),
-    );
+    const result = await this.getEmployeeByIdQueryHandler.execute(query);
 
-    if (result.success === false) {
+    if (!result.success) {
       if (result.error instanceof EmployeeNotFoundError) {
-        throw new NotFoundException(result.error.message);
+        return this.sendErrorResponse(
+          response,
+          HttpStatus.NOT_FOUND,
+          'Not Found',
+          result.error.message,
+        );
       }
-
-      throw new InternalServerErrorException(result.error.message);
     }
 
     return {
@@ -98,8 +87,19 @@ export class EmployeesController {
   @ApiOperation({ summary: 'Create a new employee' })
   @ApiCreatedResponse()
   @ApiBadRequestResponse()
-  async createEmployee(@Body() createEmployeeRequest: CreateEmployeeRequest) {
-    this.validateCreateEmployeeRequest(createEmployeeRequest);
+  async createEmployee(
+    @Body() createEmployeeRequest: CreateEmployeeRequest,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const validationError = CreateEmployeeRequest.validate(createEmployeeRequest);
+    if (validationError) {
+      return this.sendErrorResponse(
+        response,
+        HttpStatus.BAD_REQUEST,
+        'Bad Request',
+        validationError,
+      );
+    }
 
     const command = new CreateEmployeeCommand(
       createEmployeeRequest.id,
@@ -110,47 +110,35 @@ export class EmployeesController {
     );
     const result = await this.createEmployeeCommandHandler.execute(command);
 
-    if (result.success === false) {
+    if (!result.success) {
       if (result.error instanceof EmployeeAlreadyExistsError) {
-        throw new ConflictException(result.error.message);
+        return this.sendErrorResponse(
+          response,
+          HttpStatus.CONFLICT,
+          'Conflict',
+          result.error.message,
+        );
       }
-      throw new BadRequestException(result.error.message);
+
+      return this.sendErrorResponse(
+        response,
+        HttpStatus.BAD_REQUEST,
+        'Bad Request',
+        result.error.message,
+      );
     }
 
     return;
   }
 
-  private ValidateRequests(id: string) {
-    if (typeof id !== 'string' || !isAValidGuid(id)) {
-      throw new BadRequestException('Employee id must be a valid guid');
-    }
-  }
 
-  private validateCreateEmployeeRequest(
-    createEmployeeRequest: CreateEmployeeRequest,
+  private sendErrorResponse(
+    response: Response,
+    statusCode: HttpStatus,
+    error: string,
+    message: string,
   ) {
-    if (!createEmployeeRequest.firstName) {
-      throw new BadRequestException('Employee name must not be empty');
-    }
-
-    if (!createEmployeeRequest.lastName) {
-      throw new BadRequestException('Employee lastname must not be empty');
-    }
-
-    if (!isAValidGuid(createEmployeeRequest.id)) {
-      throw new BadRequestException('Employee id must be a valid guid');
-    }
-
-    if (!createEmployeeRequest.documentNumber) {
-      throw new BadRequestException(
-        'Employee document number must not be empty',
-      );
-    }
-
-    if (!isAValidDate(createEmployeeRequest.dateOfBirth)) {
-      throw new BadRequestException(
-        'Employee date of birth number must be a valid date',
-      );
-    }
+    response.status(statusCode);
+    return { error, message, statusCode };
   }
 }
