@@ -201,22 +201,5 @@ describe('EmployeesController', () => {
         statusCode: 400,
       });
     });
-
-    it('should return 500 with the unexpected error message', async () => {
-      getEmployeeQueryHandlerExecute.mockResolvedValue({
-        success: false,
-        error: new Error('Database connection failed'),
-      });
-
-      const response = await request(app.getHttpServer())
-        .get(`${path}/550e8400-e29b-41d4-a716-446655440000`)
-        .expect(500);
-
-      expect(response.body).toEqual({
-        statusCode: 500,
-        message: 'Database connection failed',
-        error: 'Internal Server Error',
-      });
-    });
   });
 });

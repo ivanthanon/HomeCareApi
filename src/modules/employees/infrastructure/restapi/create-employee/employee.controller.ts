@@ -24,7 +24,6 @@ import {
   CreateEmployeeCommandHandler,
 } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
-import { isAValidGuid } from 'src/modules/employees/domain/shared/utils';
 import {
   GetEmployeeByIdQuery,
   GetEmployeeByIdQueryHandler,
@@ -50,9 +49,18 @@ export class EmployeesController {
     @Param('id') id: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.getEmployeeByIdQueryHandler.execute(
-      new GetEmployeeByIdQuery(id),
-    );
+    const query = new GetEmployeeByIdQuery(id);
+    const validationError = query.validate();
+    if (validationError) {
+      return this.sendErrorResponse(
+        response,
+        HttpStatus.BAD_REQUEST,
+        'Bad Request',
+        validationError,
+      );
+    }
+
+    const result = await this.getEmployeeByIdQueryHandler.execute(query);
 
     if (!result.success) {
       if (result.error instanceof EmployeeNotFoundError) {
@@ -63,13 +71,6 @@ export class EmployeesController {
           result.error.message,
         );
       }
-
-      return this.sendErrorResponse(
-        response,
-        HttpStatus.BAD_REQUEST,
-        'Bad Request',
-        result.error.message,
-      );
     }
 
     return {
