@@ -52,10 +52,15 @@ describe('When pull events from employee', () => {
     });
 
     expect(result.success).toBe(false);
-    if (result.success === false) {
-      expect(result.error).toBeInstanceOf(EmployeeValidationError);
-      expect(result.error.code).toBe('employee.id.invalid');
-      expect(result.error.message).toBe('Invalid UUID format');
-    }
+    expect(result).toMatchObject({
+      success: false,
+      error: expect.any(EmployeeValidationError),
+    });
+    expect(result).toMatchObject({
+      error: {
+        code: 'employee.id.invalid',
+        message: 'Invalid UUID format',
+      },
+    });
   });
 });

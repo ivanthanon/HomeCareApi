@@ -40,13 +40,16 @@ describe('When a command returns an error Result', () => {
     ).execute(createCommand(new Date('2026-02-10T00:00:00.000Z')));
 
     expect(result.success).toBe(false);
-    if (result.success === false) {
-      expect(result.error).toBeInstanceOf(EmployeeValidationError);
-      if (result.error instanceof EmployeeValidationError) {
-        expect(result.error.code).toBe('employee.date_of_birth.underage');
-        expect(result.error.message).toBe('Employee must be an adult');
-      }
-    }
+    expect(result).toMatchObject({
+      success: false,
+      error: expect.any(EmployeeValidationError),
+    });
+    expect(result).toMatchObject({
+      error: {
+        code: 'employee.date_of_birth.underage',
+        message: 'Employee must be an adult',
+      },
+    });
     expect(logger.records).toEqual([
       {
         eventName: 'command.result.error',
@@ -76,13 +79,16 @@ describe('When a command returns an error Result', () => {
     ).execute(createCommand(new Date('2026-02-10T00:00:00.000Z')));
 
     expect(result.success).toBe(false);
-    if (result.success === false) {
-      expect(result.error).toBeInstanceOf(EmployeeValidationError);
-      if (result.error instanceof EmployeeValidationError) {
-        expect(result.error.code).toBe('employee.date_of_birth.underage');
-        expect(result.error.message).toBe('Employee must be an adult');
-      }
-    }
+    expect(result).toMatchObject({
+      success: false,
+      error: expect.any(EmployeeValidationError),
+    });
+    expect(result).toMatchObject({
+      error: {
+        code: 'employee.date_of_birth.underage',
+        message: 'Employee must be an adult',
+      },
+    });
     expect(fakeFailingLogger.records).toHaveLength(0);
   });
 });
