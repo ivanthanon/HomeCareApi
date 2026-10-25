@@ -9,6 +9,7 @@ import { ForRetrievingMajorityAge } from 'src/modules/employees/application/port
 import { EmployeeId } from 'src/modules/employees/domain/value-objects/EmployeeId';
 import { DocumentNumber } from 'src/modules/employees/domain/value-objects/DocumentNumber';
 import { CommandHandler } from 'src/modules/employees/application/ports/commandHandler';
+import { EmployeeValidationError } from 'src/modules/employees/domain/errors/employeeValidationError';
 
 export class CreateEmployeeCommand {
   constructor(
@@ -32,7 +33,11 @@ export class CreateEmployeeCommandHandler implements CommandHandler<
     private readonly configurationProvider: ForRetrievingMajorityAge,
   ) {}
 
-  async execute(command: CreateEmployeeCommand): Promise<Result<void, Error>> {
+  async execute(
+    command: CreateEmployeeCommand,
+  ): Promise<
+    Result<void, EmployeeAlreadyExistsError | EmployeeValidationError>
+  > {
     return this.transactionScope.execute(async () => {
       if (await this.employeeAlreadyExist(command)) {
         return Err(new EmployeeAlreadyExistsError());
@@ -46,15 +51,15 @@ export class CreateEmployeeCommandHandler implements CommandHandler<
         );
       }
 
-      const employeeResult = Employee.create(
-        command.id,
-        command.firstName,
-        command.lastName,
-        command.documentNumber,
-        command.dateOfBirth,
-        this.clock.now(),
+      const employeeResult = Employee.create({
+        id: command.id,
+        firstName: command.firstName,
+        lastName: command.lastName,
+        documentNumber: command.documentNumber,
+        dateOfBirth: command.dateOfBirth,
+        currentDate: this.clock.now(),
         ageOfMajority,
-      );
+      });
 
       if (!employeeResult.success) {
         return employeeResult;

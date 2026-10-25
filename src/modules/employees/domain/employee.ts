@@ -5,8 +5,21 @@ import { EmployeeId } from './value-objects/EmployeeId';
 import { Name } from './value-objects/Name';
 import { DomainEvent } from './shared/domainevent';
 import { EmployeeCreatedV1 } from './events/EmployeeCreatedV1';
+import { EmployeeValidationError } from './errors/employeeValidationError';
+
+export interface CreateEmployeeProps {
+  id: string;
+  firstName: string;
+  lastName: string;
+  documentNumber: string;
+  dateOfBirth: Date;
+  currentDate: Date;
+  ageOfMajority: number;
+}
 
 export class Employee {
+  private domainEvents: DomainEvent[] = [];
+
   private constructor(
     readonly id: EmployeeId,
     readonly firstName: Name,
@@ -15,35 +28,33 @@ export class Employee {
     readonly dateOfBirth: DateOfBirth,
   ) {}
 
-  private domainEvents: DomainEvent[] = [];
-
-  public static create(
-    id: string,
-    firstName: string,
-    lastName: string,
-    documentNumber: string,
-    dateOfBirth: Date,
-    currentDate: Date,
-    ageOfMajority: number,
-  ): Result<Employee, Error> {
+  public static create({
+    id,
+    firstName,
+    lastName,
+    documentNumber,
+    dateOfBirth,
+    currentDate,
+    ageOfMajority,
+  }: CreateEmployeeProps): Result<Employee, EmployeeValidationError> {
     const employeeIdValueObject = EmployeeId.create(id);
     if (employeeIdValueObject.success === false) {
-      return Err(new Error(employeeIdValueObject.error.message));
+      return Err(employeeIdValueObject.error);
     }
 
     const firstNameValueObject = Name.create(firstName);
     if (firstNameValueObject.success === false) {
-      return Err(new Error(firstNameValueObject.error.message));
+      return Err(firstNameValueObject.error);
     }
 
     const lastNameValueObject = Name.create(lastName);
     if (lastNameValueObject.success === false) {
-      return Err(new Error(lastNameValueObject.error.message));
+      return Err(lastNameValueObject.error);
     }
 
     const documentNumberValueObject = DocumentNumber.create(documentNumber);
     if (documentNumberValueObject.success === false) {
-      return Err(new Error(documentNumberValueObject.error.message));
+      return Err(documentNumberValueObject.error);
     }
 
     const dateOfBirthValueObject = DateOfBirth.create(
@@ -52,7 +63,7 @@ export class Employee {
       ageOfMajority,
     );
     if (dateOfBirthValueObject.success === false) {
-      return Err(new Error(dateOfBirthValueObject.error.message));
+      return Err(dateOfBirthValueObject.error);
     }
 
     const employee = new Employee(

@@ -107,7 +107,7 @@ describe('Employees E2E - Create Employee Acceptance Test', () => {
           body: 'Employee must be an adult',
           attributes: {
             'command.name': 'CreateEmployeeCommand',
-            'exception.type': 'Error',
+            'exception.type': 'EmployeeValidationError',
             'exception.message': 'Employee must be an adult',
           },
         },

@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
   Param,
   Post,
   Res,
@@ -24,11 +23,11 @@ import {
   CreateEmployeeCommandHandler,
 } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
+import { EmployeeValidationError } from 'src/modules/employees/domain/errors/employeeValidationError';
 import {
   GetEmployeeByIdQuery,
   GetEmployeeByIdQueryHandler,
 } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
-import { EmployeeNotFoundError } from 'src/modules/employees/application/errors/employeeNotFoundError';
 import { CreateEmployeeRequest } from './createEmployeeRequest';
 
 @ApiTags('Employees')
@@ -63,14 +62,12 @@ export class EmployeesController {
     const result = await this.getEmployeeByIdQueryHandler.execute(query);
 
     if (!result.success) {
-      if (result.error instanceof EmployeeNotFoundError) {
-        return this.sendErrorResponse(
-          response,
-          HttpStatus.NOT_FOUND,
-          'Not Found',
-          result.error.message,
-        );
-      }
+      return this.sendErrorResponse(
+        response,
+        HttpStatus.NOT_FOUND,
+        'Not Found',
+        result.error.message,
+      );
     }
 
     return {
@@ -91,7 +88,9 @@ export class EmployeesController {
     @Body() createEmployeeRequest: CreateEmployeeRequest,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const validationError = CreateEmployeeRequest.validate(createEmployeeRequest);
+    const validationError = CreateEmployeeRequest.validate(
+      createEmployeeRequest,
+    );
     if (validationError) {
       return this.sendErrorResponse(
         response,
@@ -120,17 +119,20 @@ export class EmployeesController {
         );
       }
 
-      return this.sendErrorResponse(
-        response,
-        HttpStatus.BAD_REQUEST,
-        'Bad Request',
-        result.error.message,
-      );
+      if (result.error instanceof EmployeeValidationError) {
+        return this.sendErrorResponse(
+          response,
+          HttpStatus.BAD_REQUEST,
+          'Bad Request',
+          result.error.message,
+        );
+      }
+
+      throw result.error;
     }
 
     return;
   }
-
 
   private sendErrorResponse(
     response: Response,

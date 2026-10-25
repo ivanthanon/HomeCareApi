@@ -5,6 +5,7 @@ import {
   CreateEmployeeCommand,
   CreateEmployeeCommandHandler,
 } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
+import { EmployeeValidationError } from 'src/modules/employees/domain/errors/employeeValidationError';
 import { OpenTelemetryLogger } from 'src/modules/employees/infrastructure/adapters/openTelemetryLogger';
 import { EmployeeInMemoryRepository } from 'tests/doubles/fake/EmployeeInMemoryRepository';
 import { LoggerFake } from 'tests/doubles/fake/LoggerFake';
@@ -38,9 +39,16 @@ describe('When a command returns an error Result', () => {
       new OpenTelemetryLogger(logger),
     ).execute(createCommand(new Date('2026-02-10T00:00:00.000Z')));
 
-    expect(result).toEqual({
+    expect(result.success).toBe(false);
+    expect(result).toMatchObject({
       success: false,
-      error: new Error('Employee must be an adult'),
+      error: expect.any(EmployeeValidationError),
+    });
+    expect(result).toMatchObject({
+      error: {
+        code: 'employee.date_of_birth.underage',
+        message: 'Employee must be an adult',
+      },
     });
     expect(logger.records).toEqual([
       {
@@ -50,7 +58,7 @@ describe('When a command returns an error Result', () => {
         body: 'Employee must be an adult',
         attributes: {
           'command.name': 'CreateEmployeeCommand',
-          'exception.type': 'Error',
+          'exception.type': 'EmployeeValidationError',
           'exception.message': 'Employee must be an adult',
         },
       },
@@ -70,9 +78,16 @@ describe('When a command returns an error Result', () => {
       new OpenTelemetryLogger(fakeFailingLogger),
     ).execute(createCommand(new Date('2026-02-10T00:00:00.000Z')));
 
-    expect(result).toEqual({
+    expect(result.success).toBe(false);
+    expect(result).toMatchObject({
       success: false,
-      error: new Error('Employee must be an adult'),
+      error: expect.any(EmployeeValidationError),
+    });
+    expect(result).toMatchObject({
+      error: {
+        code: 'employee.date_of_birth.underage',
+        message: 'Employee must be an adult',
+      },
     });
     expect(fakeFailingLogger.records).toHaveLength(0);
   });
