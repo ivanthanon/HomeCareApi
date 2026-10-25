@@ -42,8 +42,10 @@ describe('When a command returns an error Result', () => {
     expect(result.success).toBe(false);
     if (result.success === false) {
       expect(result.error).toBeInstanceOf(EmployeeValidationError);
-      expect(result.error.code).toBe('employee.date_of_birth.underage');
-      expect(result.error.message).toBe('Employee must be an adult');
+      if (result.error instanceof EmployeeValidationError) {
+        expect(result.error.code).toBe('employee.date_of_birth.underage');
+        expect(result.error.message).toBe('Employee must be an adult');
+      }
     }
     expect(logger.records).toEqual([
       {
@@ -76,8 +78,10 @@ describe('When a command returns an error Result', () => {
     expect(result.success).toBe(false);
     if (result.success === false) {
       expect(result.error).toBeInstanceOf(EmployeeValidationError);
-      expect(result.error.code).toBe('employee.date_of_birth.underage');
-      expect(result.error.message).toBe('Employee must be an adult');
+      if (result.error instanceof EmployeeValidationError) {
+        expect(result.error.code).toBe('employee.date_of_birth.underage');
+        expect(result.error.message).toBe('Employee must be an adult');
+      }
     }
     expect(fakeFailingLogger.records).toHaveLength(0);
   });

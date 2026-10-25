@@ -2,7 +2,15 @@ import { Ok, Err, Result } from 'src/modules/employees/domain/shared/result';
 import { EmployeeValidationError } from '../errors/employeeValidationError';
 
 export class DateOfBirth {
-  public constructor(readonly value: Date) {}
+  private readonly timestamp: number;
+
+  public constructor(value: Date) {
+    this.timestamp = value.getTime();
+  }
+
+  public get value(): Date {
+    return new Date(this.timestamp);
+  }
 
   public static create(
     value: Date,
