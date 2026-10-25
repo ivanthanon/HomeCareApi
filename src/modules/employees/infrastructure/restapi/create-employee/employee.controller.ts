@@ -28,7 +28,6 @@ import {
   GetEmployeeByIdQuery,
   GetEmployeeByIdQueryHandler,
 } from 'src/modules/employees/application/get-employee-by-id/getEmployeeByIdQueryHandler';
-import { EmployeeNotFoundError } from 'src/modules/employees/application/errors/employeeNotFoundError';
 import { CreateEmployeeRequest } from './createEmployeeRequest';
 
 @ApiTags('Employees')
@@ -63,14 +62,12 @@ export class EmployeesController {
     const result = await this.getEmployeeByIdQueryHandler.execute(query);
 
     if (!result.success) {
-      if (result.error instanceof EmployeeNotFoundError) {
-        return this.sendErrorResponse(
-          response,
-          HttpStatus.NOT_FOUND,
-          'Not Found',
-          result.error.message,
-        );
-      }
+      return this.sendErrorResponse(
+        response,
+        HttpStatus.NOT_FOUND,
+        'Not Found',
+        result.error.message,
+      );
     }
 
     return {

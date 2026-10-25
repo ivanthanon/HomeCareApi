@@ -18,7 +18,9 @@ export class GetEmployeeByIdQuery {
 export class GetEmployeeByIdQueryHandler {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
 
-  async execute(query: GetEmployeeByIdQuery): Promise<Result<Employee, Error>> {
+  async execute(
+    query: GetEmployeeByIdQuery,
+  ): Promise<Result<Employee, EmployeeNotFoundError>> {
     const employee = await this.employeeRepository.getBy(
       new EmployeeId(query.id),
     );
