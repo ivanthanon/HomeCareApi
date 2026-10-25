@@ -10,7 +10,7 @@ export const migration: IMigration = {
             firstName NVARCHAR(255) NOT NULL,
             lastName NVARCHAR(255) NOT NULL,
             documentNumber NVARCHAR(50) UNIQUE NOT NULL,
-            dateOfBirth DATE NOT NULL,
+            dateOfBirth DATE NOT NULL
         );
 
         CREATE INDEX idx_employees_document ON employees(documentNumber);

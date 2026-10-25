@@ -21,7 +21,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
       .getRequest()
       .input('id', UniqueIdentifier, id.value)
       .query<EmployeeRow>(`SELECT id, firstName, lastName, documentNumber, dateOfBirth 
-                FROM Employees 
+                FROM employees 
                 WHERE id = @id`);
 
     if (!result.recordset || result.recordset.length === 0) {
@@ -46,7 +46,7 @@ export class SqlServerEmployeeRepository implements EmployeeRepository {
       .getRequest()
       .input('documentNumber', NVarChar, documentNumber.value)
       .query<EmployeeRow>(`SELECT id, firstName, lastName, documentNumber, dateOfBirth
-                FROM Employees
+                FROM employees
                 WHERE documentNumber = @documentNumber`);
 
     if (!result.recordset || result.recordset.length === 0) {
