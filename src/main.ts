@@ -1,4 +1,4 @@
-import './startup/telemetryStartup';
+import './startup/telemetry/telemetryStartup';
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -15,6 +15,7 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(EmployeesModule);
+  app.enableShutdownHooks();
 
   const config = new DocumentBuilder()
     .setTitle('HomeCare API')

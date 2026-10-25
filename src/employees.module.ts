@@ -15,6 +15,7 @@ import { HttpExceptionLoggingFilter } from 'src/modules/employees/infrastructure
 import { logs } from '@opentelemetry/api-logs';
 import { CommandTelemetryDecorator } from 'src/modules/employees/application/decorators/commandTelemetryDecorator';
 import { OpenTelemetryLogger } from 'src/modules/employees/infrastructure/adapters/openTelemetryLogger';
+import { TelemetryLifecycle } from './startup/telemetry/telemetryLifecycle';
 
 @Module({
   controllers: [EmployeesController],
@@ -25,6 +26,7 @@ import { OpenTelemetryLogger } from 'src/modules/employees/infrastructure/adapte
     }),
   ],
   providers: [
+    TelemetryLifecycle,
     {
       provide: APP_FILTER,
       useFactory: (httpAdapterHost: HttpAdapterHost) =>

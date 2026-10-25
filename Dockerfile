@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 3006
-CMD ["node", "--require", "./dist/startup/telemetryStartup.js", "dist/main"]
+CMD ["node", "dist/main"]
