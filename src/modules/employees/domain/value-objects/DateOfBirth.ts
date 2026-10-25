@@ -1,4 +1,5 @@
 import { Ok, Err, Result } from 'src/modules/employees/domain/shared/result';
+import { EmployeeValidationError } from '../errors/employeeValidationError';
 
 export class DateOfBirth {
   public constructor(readonly value: Date) {}
@@ -7,13 +8,23 @@ export class DateOfBirth {
     value: Date,
     currentDate: Date,
     ageOfMajority: number,
-  ): Result<DateOfBirth, Error> {
+  ): Result<DateOfBirth, EmployeeValidationError> {
     if (isNaN(value.getTime())) {
-      return Err(new Error('The date of birth is not a valid Date'));
+      return Err(
+        new EmployeeValidationError(
+          'employee.date_of_birth.invalid',
+          'The date of birth is not a valid Date',
+        ),
+      );
     }
 
     if (!this.IsAdult(currentDate, value, ageOfMajority)) {
-      return Err(new Error('Employee must be an adult'));
+      return Err(
+        new EmployeeValidationError(
+          'employee.date_of_birth.underage',
+          'Employee must be an adult',
+        ),
+      );
     }
 
     return Ok(new DateOfBirth(value));

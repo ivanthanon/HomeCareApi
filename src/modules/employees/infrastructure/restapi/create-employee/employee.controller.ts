@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
   Param,
   Post,
   Res,
@@ -24,6 +23,7 @@ import {
   CreateEmployeeCommandHandler,
 } from 'src/modules/employees/application/create-employee/createEmployeeCommandHandler';
 import { EmployeeAlreadyExistsError } from 'src/modules/employees/application/errors/employeeAlreadyExistsError';
+import { EmployeeValidationError } from 'src/modules/employees/domain/errors/employeeValidationError';
 import {
   GetEmployeeByIdQuery,
   GetEmployeeByIdQueryHandler,
@@ -88,7 +88,9 @@ export class EmployeesController {
     @Body() createEmployeeRequest: CreateEmployeeRequest,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const validationError = CreateEmployeeRequest.validate(createEmployeeRequest);
+    const validationError = CreateEmployeeRequest.validate(
+      createEmployeeRequest,
+    );
     if (validationError) {
       return this.sendErrorResponse(
         response,
@@ -117,17 +119,20 @@ export class EmployeesController {
         );
       }
 
-      return this.sendErrorResponse(
-        response,
-        HttpStatus.BAD_REQUEST,
-        'Bad Request',
-        result.error.message,
-      );
+      if (result.error instanceof EmployeeValidationError) {
+        return this.sendErrorResponse(
+          response,
+          HttpStatus.BAD_REQUEST,
+          'Bad Request',
+          result.error.message,
+        );
+      }
+
+      throw result.error;
     }
 
     return;
   }
-
 
   private sendErrorResponse(
     response: Response,

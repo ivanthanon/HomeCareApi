@@ -1,11 +1,17 @@
 import { Ok, Err, Result } from 'src/modules/employees/domain/shared/result';
+import { EmployeeValidationError } from '../errors/employeeValidationError';
 
 export class Name {
   public constructor(readonly value: string) {}
 
-  public static create(value: string): Result<Name, Error> {
+  public static create(value: string): Result<Name, EmployeeValidationError> {
     if (value.length < 2) {
-      return Err(new Error('Name must be at least 2 characters long'));
+      return Err(
+        new EmployeeValidationError(
+          'employee.name.too_short',
+          'Name must be at least 2 characters long',
+        ),
+      );
     }
 
     return Ok(new Name(value));
